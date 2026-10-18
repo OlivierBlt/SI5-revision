@@ -1,0 +1,1575 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Examen blanc App. Image</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : copie d'examen — en-tête sujet, onglets par type d'épreuve, cartes-questions avec barème, corrigé "stylo rouge" à déplier */
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --sunk:#EBEEF3; --ink:#161A21; --muted:#596273; --line:#D9DEE6;
+  --accent:#1D5BA8; --accent-soft:#E3ECF8; --pen:#B8352A; --pen-soft:#FBEDEB;
+  --ok:#1D7A4C; --ok-soft:#E3F3EA; --bad:#B2281F; --bad-soft:#FBE8E6; --code:#0F1720; --code-ink:#DCE3EC;
+  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#10141A; --surface:#181D25; --sunk:#1F2530; --ink:#E6EAF0; --muted:#9AA4B4; --line:#2B323E;
+  --accent:#86AEEA; --accent-soft:#1C2A40; --pen:#F08A7E; --pen-soft:#2E1C1B;
+  --ok:#62C792; --ok-soft:#16291F; --bad:#F2887F; --bad-soft:#301A19; --code:#0A0E13; --code-ink:#DCE3EC; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#10141A; --surface:#181D25; --sunk:#1F2530; --ink:#E6EAF0; --muted:#9AA4B4; --line:#2B323E;
+  --accent:#86AEEA; --accent-soft:#1C2A40; --pen:#F08A7E; --pen-soft:#2E1C1B;
+  --ok:#62C792; --ok-soft:#16291F; --bad:#F2887F; --bad-soft:#301A19; --code:#0A0E13; --code-ink:#DCE3EC; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 64px}
+.wrap{max-width:920px;margin:0 auto}
+header.sujet{padding-block:36px 20px;border-bottom:2px solid var(--ink);display:grid;gap:10px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,5vw,46px);line-height:1.05;margin:0;text-wrap:balance}
+.lede{margin:0;color:var(--muted);max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;color:var(--muted)}
+.meta b{color:var(--ink);font-variant-numeric:tabular-nums}
+.shape{font-family:var(--f-mono);font-size:12.5px;color:var(--muted);overflow-x:auto;white-space:nowrap;padding-block:4px}
+nav.tabs{position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;padding-block:12px;border-bottom:1px solid var(--line);margin-bottom:22px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--bg)}
+nav.tabs button{flex:0 0 auto;font:600 14px/1 var(--f-body);color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;padding:9px 14px;cursor:pointer}
+nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+nav.tabs button .n{font-family:var(--f-mono);font-size:11px;opacity:.75;margin-left:6px}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:18px}
+.toolbar .left{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{font:600 13px/1 var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:6px;padding:7px 10px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.btn{font:600 14px/1 var(--f-body);border:1px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:6px;padding:9px 14px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.score{font-family:var(--f-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.score b{color:var(--ink)}
+.intro{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin-bottom:18px;color:var(--muted);font-size:15px}
+.intro b{color:var(--ink)}
+.list{display:grid;gap:14px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px 18px 14px;min-width:0}
+.qhead{display:flex;gap:10px;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.qnum{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+.tag{font-family:var(--f-mono);font-size:11px;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:2px 6px;white-space:nowrap}
+.pts{font-family:var(--f-mono);font-size:12px;color:var(--pen);white-space:nowrap}
+.qtext{font-size:16px;min-width:0}
+.qtext p{margin:.4em 0}
+.qtext ul,.qtext ol,.corr ul,.corr ol{margin:.4em 0;padding-left:1.3em}
+.opts{display:grid;gap:6px;margin:12px 0 8px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:9px 11px;cursor:pointer;background:var(--surface)}
+.opt input{margin-top:5px;accent-color:var(--accent)}
+.opt.good{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.missed{border-color:var(--ok);border-style:dashed}
+.multi{font-size:12.5px;color:var(--muted);font-style:italic}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.verdict{font-weight:700;font-size:14px}
+.verdict.okv{color:var(--ok)} .verdict.badv{color:var(--bad)}
+details.corr{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+details.corr summary{cursor:pointer;font:600 14px var(--f-body);color:var(--pen);list-style:none;display:inline-flex;gap:6px;align-items:center}
+details.corr summary::-webkit-details-marker{display:none}
+details.corr summary::before{content:"+";font-family:var(--f-mono);display:inline-block;width:1em}
+details.corr[open] summary::before{content:"–"}
+.corrbody{margin-top:8px;padding:12px 14px;border-left:3px solid var(--pen);background:var(--pen-soft);border-radius:0 6px 6px 0;font-size:15px;min-width:0}
+.corrbody p{margin:.45em 0}
+.expl{margin-top:8px;padding:10px 12px;border-left:3px solid var(--pen);background:var(--pen-soft);border-radius:0 6px 6px 0;font-size:14.5px}
+pre{background:var(--code);color:var(--code-ink);font-family:var(--f-mono);font-size:13px;line-height:1.55;padding:12px 14px;border-radius:6px;overflow-x:auto;margin:.6em 0;max-width:100%}
+code{font-family:var(--f-mono);font-size:.88em}
+:not(pre)>code{background:var(--sunk);padding:1px 5px;border-radius:4px}
+table{border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.tw{overflow-x:auto;max-width:100%;margin:.6em 0}
+th,td{border:1px solid var(--line);padding:5px 9px;text-align:left;vertical-align:top}
+th{background:var(--sunk);font-weight:600}
+.exo{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.exo>.ehead{padding:18px 18px 8px}
+.exo h2{font-family:var(--f-display);font-weight:700;font-size:22px;margin:4px 0 6px;text-wrap:balance}
+.exo .ctx{color:var(--muted);font-size:15px}
+.exo .sub{border-top:1px solid var(--line);padding:14px 18px}
+.subq{display:flex;gap:10px;justify-content:space-between;align-items:baseline}
+.subq .qtext{flex:1}
+.hint{font-size:13px;color:var(--muted)}
+.empty{color:var(--muted);padding:20px;text-align:center}
+.foot{margin-top:28px;font-size:13px;color:var(--muted)}
+.k{font-weight:700}
+@media (max-width:560px){ .qhead{flex-wrap:wrap} .subq{flex-direction:column;gap:2px} }
+@media (prefers-reduced-motion: no-preference){ details.corr[open] .corrbody{animation:fade .18s ease-out} @keyframes fade{from{opacity:.4}to{opacity:1}} }
+</style>
+
+<div class="wrap">
+<header class="sujet">
+  <div class="eyebrow">Polytech SI5 · Apprentissage pour l'image · Examen final blanc</div>
+  <h1>Examen blanc App. Image</h1>
+  <p class="lede">Entraînement complet sur les CM1 à CM6 et les TD1 à TD6, construit dans le style du partiel : questions de cours, choix et adaptation de modèle avec code, distillation, hiérarchie, explicabilité, transformers et détection.</p>
+  <div class="meta" id="meta"></div>
+  <div class="shape">x : (N, 3, 224, 224) → features → (N, 512, 7, 7) → avgpool → (N, 512) → classifier → (N, C)</div>
+</header>
+<nav class="tabs" role="tablist" id="tabs"></nav>
+<main id="main"></main>
+<p class="foot">Les barèmes sont indicatifs. Les QCM peuvent avoir plusieurs bonnes réponses quand c'est indiqué. Ta progression reste dans ce navigateur.</p>
+</div>
+<script>
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const C = s => `<pre><code>${esc(s.replace(/^\n/,"").replace(/\s+$/,""))}</code></pre>`;
+const T = (head, rows) => `<div class="tw"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+const DATA = { cours: [], qcm: [], exos: [], code: [], calc: [] };
+DATA.cours = [
+{cm:"CM1", pts:2, q:`Qu'est-ce qu'ImageNet ? Pourquoi ce dataset est-il si important pour les CNN que l'on utilise en TP ?`,
+a:`<p><span class="k">Points attendus :</span></p><ul>
+<li>Grande base d'images annotées organisée selon la hiérarchie <b>WordNet</b>. Version la plus utilisée : <b>ImageNet-1k</b> = <b>1 000 classes, ~1,3 M images</b> d'entraînement. Version étendue : <b>ImageNet-21k</b> = 21 000 classes, 14 M images.</li>
+<li>Support de la compétition <b>ILSVRC</b> (ImageNet Large Scale Visual Recognition Challenge). En <b>2012, AlexNet</b> est le premier CNN à la gagner, avec un grand écart : c'est le début de l'ère deep learning en vision. VGG, GoogLeNet/Inception, ResNet ont ensuite été présentés à ILSVRC.</li>
+<li>Importance pratique : presque tous les modèles de <code>torchvision</code> (VGG16, ResNet, EfficientNet…) sont fournis avec des <b>poids pré-entraînés sur ImageNet</b>. On les réutilise en <b>transfer learning</b> : leurs features génériques (bords, textures, formes, parties d'objets) servent sur nos petits datasets (CatDogBird, poissons).</li>
+<li>Conséquence : il faut reprendre le <b>même pré-traitement</b> (taille d'entrée, normalisation avec <code>mean=[0.485, 0.456, 0.406]</code>, <code>std=[0.229, 0.224, 0.225]</code>).</li>
+<li>Bonus : la hiérarchie WordNet d'ImageNet sert aussi en classification hiérarchique (tieredImageNet-H, CM4).</li></ul>`},
+
+{cm:"CM1", pts:2, q:`Quelles sont les trois grandes parties d'un CNN de classification ? Donnez leur rôle et leur nom dans un modèle <code>torchvision</code> comme EfficientNet ou VGG16.`,
+a:`<ol>
+<li><b><code>features</code></b> : la partie <b>description / extraction de caractéristiques</b>. Blocs de convolutions + activations (ReLU…) + pooling. Elle transforme l'image en cartes de features de plus en plus abstraites et de moins en moins résolues. C'est la partie que l'on <b>gèle</b> en transfer learning.</li>
+<li><b><code>avgpool</code></b> : le <b>pooling global</b> qui ramène les cartes à une taille fixe. GAP (<code>AdaptiveAvgPool2d((1,1))</code>) dans EfficientNet, <code>AdaptiveAvgPool2d((7,7))</code> dans VGG16. Il fait le lien entre la partie spatiale et la partie dense, puis un <code>flatten</code> donne un vecteur.</li>
+<li><b><code>classifier</code></b> : la partie <b>classification</b>. Couches denses (Linear), dropout, et une dernière couche avec autant de neurones que de classes. C'est la partie que l'on <b>remplace</b> pour l'adapter à son problème (ex : <code>model.classifier[1] = nn.Linear(1792, 3)</code> pour EfficientNet-B4).</li></ol>
+<p>Version « cours » : partie <b>description</b> (conv + pooling) → <b>flatten / pooling global</b> → partie <b>classification</b> (FC + softmax).</p>`},
+
+{cm:"CM1", pts:3, q:`Quelles évolutions d'architecture depuis AlexNet (2012) ont rendu les CNN plus performants ? Citez au moins 5 idées avec le réseau associé.`,
+a:`${T(["Réseau","Année","Idée clé"],[
+["AlexNet","2012","1er CNN gagnant ILSVRC, ReLU, dropout, entraînement GPU"],
+["VGG16/19","2014","<b>Filtres 3×3 empilés</b> : 3 conv 3×3 = même champ réceptif qu'une 7×7, mais <b>moins de paramètres</b> (3·9·C² contre 49·C²) et <b>plus de non-linéarités</b>. Réseau plus profond (16/19 couches à poids)"],
+["Network in Network","2013","<b>Convolution 1×1</b> : réduire la profondeur (nb de canaux) et ajouter de la non-linéarité à moindre coût"],
+["GoogLeNet / Inception v1","2014","<b>Module Inception</b> : conv 1×1, 3×3, 5×5 et max pool <b>en parallèle</b> (on ne choisit pas la taille, on essaie tout), avec des 1×1 de réduction avant les grosses conv. 22 couches mais 12× moins de paramètres qu'AlexNet. <b>Sorties auxiliaires</b> pour injecter du gradient dans les couches basses"],
+["ResNet","2015","<b>Connexions résiduelles</b> (shortcut) : le bloc apprend F(x) et sort F(x)+x. Au pire il apprend l'identité, donc un réseau profond ne fait pas moins bien qu'un réseau moins profond. Jusqu'à <b>152 couches</b>. Plus de FC sauf la dernière (GAP). Effet régularisant sur le paysage de la loss"],
+["Xception","2016","<b>Convolutions séparables</b> : depthwise (spatiale, par canal) puis pointwise (1×1)"],
+["EfficientNet","2019","<b>Compound scaling</b> : agrandir ensemble profondeur (d = α^φ), largeur (w = β^φ) et résolution (r = γ^φ) avec un seul coefficient φ. État de l'art avec moins de paramètres et une inférence rapide"],
+["NasNet, EfficientNetV2","2018-21","<b>Architecture apprise</b> (Neural Architecture Search : grid search, reinforcement learning, progressive learning)"],
+["ConvNeXt","2022","CNN « modernisé » avec des choix inspirés des transformers"]])}
+<p>À citer aussi : <b>Batch Normalization</b> (stabilise et accélère), remplacement des FC par un <b>GAP</b> (beaucoup moins de paramètres).</p>`},
+
+{cm:"CM1", pts:3, q:`Comment améliorer l'apprentissage d'un CNN <b>uniquement en modifiant la boucle d'apprentissage</b>, sans toucher à l'architecture du modèle ? Justifiez chaque proposition.`,
+a:`<ul>
+<li><b>Early stopping</b> : surveiller une métrique de <b>validation</b> à chaque époque et s'arrêter quand elle ne progresse plus de plus de <code>delta</code> pendant <code>max_patience</code> époques. Évite le surapprentissage et le temps perdu.</li>
+<li><b>Sauvegarder le meilleur modèle</b> (<code>copy.deepcopy(model.state_dict())</code>) au lieu du dernier, puis le recharger à la fin.</li>
+<li><b>Choix de l'optimiseur</b> : SGD + momentum, RMSprop, Adam, AdamW, Muon. Les optimiseurs adaptatifs convergent plus vite.</li>
+<li><b>Learning rate et scheduler</b> : un lr adapté, puis un scheduler qui le diminue (step, cosine, ReduceLROnPlateau) pour affiner en fin d'apprentissage. Le scheduler « connaît » l'optimiseur.</li>
+<li><b>Taille de batch</b> et <b>mélange</b> des données à chaque époque (<code>shuffle=True</code> pour le train seulement).</li>
+<li><b>Data augmentation</b> dans le Dataset / DataLoader (translations comme le jitter de Hinton, flips, crops, rotations…) : plus de données vues, meilleure généralisation, sans changer le modèle.</li>
+<li><b>Weight decay</b> (régularisation L2 via l'optimiseur), <b>gradient clipping</b>.</li>
+<li>Respecter <code>model.train()</code> / <code>model.eval()</code>, faire <code>optimizer.zero_grad()</code> à chaque batch, évaluer sous <code>torch.inference_mode()</code>.</li>
+<li>Bien découper train / validation / test (le test n'est utilisé qu'une fois à la fin).</li></ul>
+<p class="hint">Piège : dropout et batch normalization sont des modifications du <b>modèle</b>, ils ne répondent pas à la question.</p>`},
+
+{cm:"CM1", pts:2, q:`Expliquez la différentiation automatique de PyTorch (autograd) sur l'exemple <code>y = 3a + ab</code> avec <code>a = 10</code>, <code>b = 20</code>. Pourquoi faut-il appeler <code>zero_grad()</code> ?`,
+a:`<ul>
+<li>Pendant le <b>forward</b>, PyTorch construit un <b>graphe (arbre) dynamique</b> des opérations pour toutes les variables qui ont <code>requires_grad=True</code> : v₁ = 3a = 30, v₂ = ab = 200, y = v₁ + v₂ = <b>230</b>.</li>
+<li>Pendant le <b>backward</b> (mode <b>reverse</b>, adapté à beaucoup d'entrées et peu de sorties, comme en ML), on propage les valeurs adjointes depuis la sortie : ȳ = 1, puis ∂y/∂a = 3 + b = <b>23</b> et ∂y/∂b = a = <b>10</b>.</li>
+<li>Le graphe est <b>libéré</b> après <code>backward()</code>.</li>
+<li>Les gradients sont <b>accumulés</b> (additionnés) dans <code>.grad</code>. Sans <code>zero_grad()</code>, le gradient d'un batch s'ajouterait à celui du batch précédent.</li></ul>
+<p class="hint">Remarque : la slide écrit y = 220, c'est une coquille (30 + 200 = 230).</p>`},
+
+{cm:"CM1", pts:2, q:`Pourquoi utilise-t-on des convolutions plutôt que des couches denses pour les images ? Combien de paramètres a une couche <code>Conv2d(3, 4, kernel_size=3)</code> ?`,
+a:`<ul><li><b>Partage des poids</b> : le même filtre est appliqué à tous les pixels, donc beaucoup moins de poids à apprendre qu'une couche dense sur tous les pixels.</li>
+<li><b>Localité</b> : un neurone ne regarde qu'un voisinage, ce qui est adapté aux motifs locaux (bords, textures).</li>
+<li>Équivariance à la translation : le même motif est détecté partout.</li>
+<li>Héritage du traitement d'image classique (Sobel, filtres de lissage, SIFT…), tous à base de convolution. Le CNN <b>apprend</b> les filtres.</li></ul>
+<p>Paramètres : chaque filtre a 3 × 3 × 3 (canaux d'entrée) + 1 (biais) = 28 coefficients. Pour 4 filtres : <b>4 × 28 = 112</b>. Le nombre de canaux d'entrée « disparaît » car chaque filtre somme sur tous les canaux.</p>`},
+
+{cm:"CM1", pts:2, q:`Que changent <code>model.train()</code>, <code>model.eval()</code> et <code>torch.inference_mode()</code> ? Pour quelles couches est-ce important ?`,
+a:`<ul><li><code>model.train()</code> : mode entraînement. Le <b>dropout</b> éteint aléatoirement des neurones, la <b>batch norm</b> normalise avec les statistiques du batch et met à jour sa moyenne mobile (EMA).</li>
+<li><code>model.eval()</code> : mode évaluation. Dropout <b>désactivé</b>, batch norm utilise la <b>moyenne mobile</b> apprise.</li>
+<li><code>torch.inference_mode()</code> (ou <code>torch.no_grad()</code>) : <b>ne construit pas le graphe</b> et ne calcule pas de gradients. Plus rapide et moins de mémoire. Ça n'a <b>rien à voir</b> avec le mode train/eval : il faut les deux pour évaluer.</li></ul>`},
+
+{cm:"CM1", pts:2, q:`Quelles métriques utiliser en classification multi-classe ? Différence entre F1 <code>micro</code>, <code>macro</code> et <code>weighted</code> ? Quelle est l'accuracy d'un classifieur aléatoire sur n classes équilibrées ?`,
+a:`<ul><li>Accuracy, rappel (TP/(TP+FN)), précision (TP/(TP+FP)), F1 = 2·P·R/(P+R) = 2TP/(2TP+FP+FN), matrice de confusion.</li>
+<li><b>micro</b> : on cumule TP, FP, FN sur toutes les classes puis on calcule. En multi-classe mono-label, micro = accuracy.</li>
+<li><b>macro</b> : on calcule le score par classe (une classe positive contre les autres) puis on fait la <b>moyenne simple</b>. Chaque classe compte pareil.</li>
+<li><b>weighted</b> : moyenne pondérée par la taille des classes.</li>
+<li><code>None</code> : un score par classe.</li>
+<li>Classifieur aléatoire sur n classes équilibrées : accuracy = rappel(micro) = F1(micro) = <b>1/n</b> (33 % pour 3 classes, 10 % pour MNIST). C'est la référence pour juger un modèle.</li></ul>`},
+
+{cm:"CM1", pts:2, q:`Expliquez le rôle du dropout et de la batch normalization.`,
+a:`<p><b>Dropout</b> : à chaque itération, une proportion p de neurones choisis aléatoirement est éteinte. Ils ne contribuent pas à la sortie et leurs poids ne sont pas mis à jour. Effet : <b>régularisation</b>, moins de surapprentissage. Actif en train, désactivé en eval. Exemple : <code>nn.Dropout(p=0.2)</code>.</p>
+<p><b>Batch normalization</b> : normaliser l'entrée des couches cachées avec la moyenne et l'écart-type du batch (64, 128, 256…). Avantages : régularisation, évite le vanishing gradient avec la sigmoïde, accélère l'apprentissage. En train : stats du batch + calcul d'une moyenne mobile (EMA). En eval : utilise la moyenne mobile.</p>`},
+
+{cm:"CM1", pts:2, q:`Qu'est-ce que le transfer learning et le fine-tuning ? Dans quel ordre fait-on les choses et pourquoi ?`,
+a:`<ol><li>Charger un modèle <b>pré-entraîné</b> (ImageNet) et son <b>pré-traitement</b>.</li>
+<li><b>Remplacer la dernière couche</b> du classifier par une couche à C sorties (nos classes).</li>
+<li><b>Geler</b> la partie <code>features</code> (<code>requires_grad = False</code>) : les features génériques sont déjà bonnes, et on a peu de données, donc pas de risque de les détruire.</li>
+<li>Entraîner <b>seulement le classifier</b> (transfer learning), en passant à l'optimiseur uniquement les paramètres entraînables.</li>
+<li><b>Fine-tuning</b> : <b>dégeler les derniers blocs</b> de <code>features</code> (les plus spécifiques à ImageNet) et entraîner <b>quelques époques</b> avec un <b>lr plus petit</b> (ex : 1e-4 au lieu de 1e-3), pour adapter légèrement les features sans les détruire.</li></ol>
+<p>Pourquoi cet ordre : au début, la nouvelle tête est aléatoire et produit de gros gradients. Si tout était dégelé, ces gradients abîmeraient les features pré-entraînées.</p>`},
+
+{cm:"CM2-3", pts:3, q:`Décrivez les étapes d'un Vision Transformer (ViT), de l'image jusqu'à la classe.`,
+a:`<ol><li><b>Découpage en patchs</b> (ex : 224×224, patchs 16×16 → 14×14 = <b>196 patchs</b>).</li>
+<li><b>Projection linéaire</b> de chaque patch aplati vers un embedding de dimension D (<code>nn.Linear(16*16*3, D)</code>), ou de façon équivalente <code>nn.Conv2d(3, D, kernel_size=16, stride=16)</code>.</li>
+<li>Ajout d'un <b>token [CLS]</b> appris en position 0 (197 tokens).</li>
+<li>Ajout d'un <b>position embedding</b> 1D <b>appris</b> (<code>nn.Parameter</code> de forme (1, N+1, D)). L'étude du papier montre que la méthode d'encodage importe peu, mais qu'il en faut un.</li>
+<li><b>L blocs encodeur</b> : LayerNorm → <b>multi-head self-attention</b> → résiduel, puis LayerNorm → MLP → résiduel.</li>
+<li><b>Tête MLP</b> appliquée à la sortie du token [CLS] → classes. Alternative « CNN » : GAP sur les tokens. Avec un bon lr, les deux donnent des résultats proches.</li></ol>`},
+
+{cm:"CM2-3", pts:2, q:`Écrivez la formule de l'attention et expliquez le rôle de Q, K, V, de √d<sub>k</sub> et du multi-head.`,
+a:`<p><b>Attention(Q, K, V) = softmax(Q·Kᵀ / √d<sub>k</sub>) · V</b>, avec Q, K ∈ ℝ^(T×d<sub>k</sub>), V ∈ ℝ^(T×d<sub>v</sub>), T = longueur de la séquence (nb de tokens).</p>
+<ul><li><b>Q</b> (queries) : ce que chaque token cherche. <b>K</b> (keys) : ce que chaque token propose. Q·Kᵀ donne une matrice <b>T×T</b> de similarités.</li>
+<li>softmax par ligne → poids d'attention. Chaque sortie est une moyenne pondérée des <b>V</b> (values).</li>
+<li><b>√d<sub>k</sub></b> : les produits scalaires grandissent avec la dimension, ce qui saturerait le softmax (gradients quasi nuls). On divise pour stabiliser.</li>
+<li>En PyTorch : <code>torch.matmul(Q, K.transpose(-2, -1))</code>, en transposant les deux <b>dernières</b> dimensions.</li>
+<li><b>Multi-head</b> : h attentions en parallèle avec leurs propres projections W<sub>i</sub><sup>Q</sup>, W<sub>i</sub><sup>K</sup>, W<sub>i</sub><sup>V</sup>, puis concaténation et projection W<sup>O</sup>. Chaque tête peut capter un type de relation différent.</li></ul>`},
+
+{cm:"CM2-3", pts:2, q:`Pourquoi un ViT a-t-il besoin de beaucoup plus de données qu'un CNN ? Sur quels datasets a-t-il été entraîné ?`,
+a:`<ul><li>Le CNN a des <b>biais inductifs</b> forts : localité et partage des poids (convolution), invariance à la translation (pooling). Le ViT n'en a presque pas : l'attention relie tous les patchs dès la première couche, et il doit tout apprendre des données.</li>
+<li>Entraîné sur <b>ImageNet-1k</b> (1 000 classes, 1,3 M images), <b>ImageNet-21k</b> (21 000 classes, 14 M images) et <b>JFT-300M</b> (18 000 classes, des centaines de millions d'images haute résolution, <b>non public</b>).</li>
+<li>Variantes : ViT-Base (12 couches, D = 768, 12 têtes, 86 M), ViT-Large (24 couches, D = 1024, 16 têtes, 307 M ; la slide écrit 1064, c'est une coquille), ViT-Huge (32 couches, D = 1280, 16 têtes, 632 M).</li>
+<li>C'est ce qui motive <b>DeiT</b> : entraîner un ViT avec moins de données et moins de GPU, grâce à la distillation.</li></ul>`},
+
+{cm:"CM2-3", pts:3, q:`Qu'est-ce que la distillation de connaissances (Hinton 2015) ? Écrivez la loss et expliquez le rôle de la température T et du facteur T².`,
+a:`<p>Transférer la connaissance d'un grand modèle déjà entraîné (<b>teacher</b>) vers un modèle plus petit (<b>student</b>). Le student obtient de meilleurs résultats que s'il était entraîné seul.</p>
+<p><b>L = (1 − λ) · CE(ψ(z<sub>s</sub>), y) + λ · T² · KL(ψ(z<sub>t</sub>/T) ‖ ψ(z<sub>s</sub>/T))</b>, avec ψ = softmax, z = logits, KL(t, s) = Σ t·log(t/s).</p>
+<ul><li>Terme <b>hard</b> : cross-entropy classique avec les vraies classes.</li>
+<li>Terme <b>soft</b> : le student imite la distribution de probabilités du teacher. Ces « soft targets » contiennent la connaissance cachée : pour un 2, le teacher dit aussi « ça ressemble un peu à un 7 ».</li>
+<li><b>Température T</b> : softmax(z/T). T = 1 : softmax normal. <b>T grand</b> : distribution <b>plus douce, plus uniforme</b>, donc les petites probabilités deviennent visibles et informatives. Hinton utilise <b>T = 20</b> sur MNIST.</li>
+<li><b>T²</b> : les gradients du terme soft sont divisés par T². On multiplie par T² pour garder un équilibre entre les deux termes quand on change T.</li>
+<li>Le teacher est <b>figé</b> (<code>teacher.eval()</code>, pas de gradient). À l'inférence, le student utilise T = 1.</li></ul>`},
+
+{cm:"CM2-3", pts:2, q:`Quels sont les résultats de Hinton 2015 sur MNIST (architectures et nombre d'erreurs) ?`,
+a:`${T(["Modèle","Architecture","Régularisation","Erreurs test"],[
+["Teacher","MLP 2 couches cachées de <b>1200</b> ReLU","dropout + contraintes de poids + images décalées (jitter) jusqu'à 2 pixels","<b>67</b>"],
+["Student seul","MLP 2 couches cachées de <b>800</b> ReLU","aucune","<b>146</b>"],
+["Student distillé","même que le student","seulement la tâche de matcher les soft targets du teacher à <b>T = 20</b>","<b>74</b>"]])}
+<p>Le student distillé se rapproche fortement du teacher, avec beaucoup moins de paramètres et sans régularisation.</p>`},
+
+{cm:"CM2-3", pts:2, q:`Qu'apporte DeiT par rapport à ViT ? Qu'est-ce que le distillation token ?`,
+a:`<ul><li>DeiT (Touvron et al. 2021) : entraîner un transformer avec <b>moins de GPU</b> et <b>moins de données</b> (ImageNet-1k seulement).</li>
+<li><b>Distillation token</b> : un token appris en plus du [CLS], qui traverse l'encodeur et interagit avec les patchs par l'attention. Sa sortie est entraînée à prédire les <b>labels durs prédits par le teacher</b> (hard distillation), tandis que le [CLS] apprend avec les vraies classes.</li>
+<li>Le <b>teacher est un CNN</b> : il apporte au ViT son biais inductif.</li>
+<li>Students : architecture ViT + distillation token, tête linéaire. DeiT-Ti (D = 192, 3 têtes, 5 M), DeiT-S (384, 6 têtes, 22 M), DeiT-B (768, 12 têtes, 86 M = ViT-B).</li>
+<li>Variante de loss hard : L = ½·CE(ψ(z<sub>s</sub>), y) + ½·CE(ψ(z<sub>s</sub>), y<sub>t</sub>), y<sub>t</sub> = argmax du teacher.</li></ul>`},
+
+{cm:"CM2-3", pts:3, q:`Expliquez DINO : comment apprendre des représentations sans labels ? Comment éviter le collapse ? Qu'apportent DINOv2 et DINOv3 ?`,
+a:`<ul><li><b>DINO</b> = self-<b>DI</b>stillation with <b>NO</b> labels (2021). <b>Même architecture</b> pour teacher et student.</li>
+<li>Le student doit reproduire la <b>distribution de sortie</b> du teacher sur <b>des vues augmentées différentes</b> de la même image, ce qui rend la représentation invariante aux augmentations.</li>
+<li>Vues : <b>2 crops globaux</b> (> 50 % de l'image) passés au teacher <b>et</b> au student, plusieurs <b>crops locaux</b> (< 50 %) passés <b>seulement au student</b>. Le student apprend le lien local → global.</li>
+<li>Le teacher <b>n'est pas entraîné par gradient</b> : ses poids sont une <b>moyenne mobile (EMA)</b> de ceux du student (momentum encoder) : θ<sub>t</sub> ← λ·θ<sub>t</sub> + (1 − λ)·θ<sub>s</sub>, avec λ ≥ 0,99.</li>
+<li><b>Collapse</b> (sortie constante) évité par <b>centering</b> (on retire une moyenne aux sorties du teacher) et <b>sharpening</b> (température basse dans le softmax du teacher).</li>
+<li><b>DINOv2</b> (2024) : foundation model (classification, segmentation, profondeur…), plus gros, données curées <b>LVD-142M</b> (clustering puis même nombre d'images par cluster). Deux losses : <b>DINO</b> (niveau image, vue d'ensemble) + <b>iBOT</b> (niveau patch, détails locaux).</li>
+<li><b>DINOv3</b> (2025) : 1 B → <b>7 B</b> paramètres, plus de données. Problème : dégradation sur les tâches locales. Solution : <b>Gram anchoring</b> (après 1 M itérations), une loss qui garde les similarités entre patchs (matrice de Gram) proches de celles d'un « Gram teacher ». Haute résolution.</li></ul>`},
+
+{cm:"CM4", pts:2, q:`Quelle est la différence entre classification multi-classe, multi-label et multi-label hiérarchique ? Que change-t-on à la sortie du réseau ?`,
+a:`<ul><li><b>Multi-classe</b> : classes mutuellement exclusives, une seule par image. Sortie <b>softmax</b> + cross-entropy.</li>
+<li><b>Multi-label</b> : plusieurs labels par image (chat + chien + appartement). Sortie : <b>une sigmoïde par label</b> (vecteur binaire), loss <b>binary cross-entropy</b> (<code>nn.BCEWithLogitsLoss</code>), et un seuil (ex : 0,5) par label.</li>
+<li><b>Hiérarchique</b> : les labels forment un arbre ou un DAG (chat → félin → mammifère → animal). Si un label est vrai, ses ancêtres le sont aussi.</li></ul>`},
+
+{cm:"CM4", pts:3, q:`Présentez Binary Relevance, Classifier Chains et Label Powerset, avec leurs avantages et inconvénients.`,
+a:`${T(["Méthode","Principe","+","−"],[
+["Binary Relevance","1 classifieur binaire indépendant par label, on garde ceux qui disent oui","simple, parallélisable","<b>ignore les corrélations</b> entre labels"],
+["Classifier Chains","chaîne de classifieurs : c<sub>i</sub> reçoit en entrée les labels des précédents (vrais en train, prédits en test)","prend en compte les <b>corrélations</b>","<b>l'ordre compte</b>, les erreurs se propagent (solution : ensemble de chaînes aléatoires)"],
+["Label Powerset","chaque <b>combinaison</b> de labels devient une classe d'un problème multi-classe","1 seul classifieur","jusqu'à <b>2ⁿ</b> classes, combinaisons rares, impossible de prédire une combinaison jamais vue"]])}
+<p>Autre famille : <b>adaptation d'algorithmes</b> (ML-kNN, Clare, AdaBoost.MH/MR, BP-MLL).</p>`},
+
+{cm:"CM4", pts:3, q:`Expliquez les approches flat, locale (top-down) et globale de la classification hiérarchique.`,
+a:`<ul><li><b>Flat (bottom-up)</b> : on ignore la hiérarchie, on classe les <b>feuilles</b>, puis on <b>remonte</b> aux ancêtres. Cohérent mais n'exploite pas la structure (modèle n°2 du TD4).</li>
+<li><b>Locale (top-down)</b> : on descend l'arbre. Un classifieur <b>par nœud</b> (binaire : incohérences possibles), <b>par nœud parent</b> (multi-classe parmi les enfants : cohérent) ou <b>par niveau</b> (incohérences à corriger). Défaut : <b>propagation des erreurs</b> (une erreur en haut est définitive).</li>
+<li><b>Globale (big-bang)</b> : un seul modèle apprend toute la hiérarchie (ex : Hierarchy-Aware CNN avec des branches à plusieurs profondeurs, modèle n°3 du TD4).</li></ul>`},
+
+{cm:"CM4", pts:2, q:`Qu'est-ce qu'une « better mistake » ? Pourquoi le top-k ne suffit-il pas ? Quelle mesure le cours propose-t-il ?`,
+a:`<ul><li>Toutes les erreurs ne se valent pas : confondre un husky et un malamute est moins grave que confondre un husky et une voiture.</li>
+<li>Le <b>top-k</b> traite toutes les erreurs de la même façon.</li>
+<li><b>Distance hiérarchique</b> : LCA = hauteur du plus proche ancêtre commun entre la vraie classe et la prédiction (Husky/Bulldog = 1, Husky/Puppy = 2, Husky/Wolf = 3). Normalisée par la hauteur max de l'arbre.</li>
+<li><b>Average hierarchical distance @k</b> : moyenne des LCA des k meilleures prédictions. Exemple du cours : « malinois + border collie » (faux en top-2) a un meilleur score (0,25) que « groenendael + méduse » (juste en top-2 mais 0,5).</li>
+<li>Aussi <b>P<sub>LCA</sub>, R<sub>LCA</sub>, F<sub>LCA</sub></b> sur les ensembles augmentés des ancêtres jusqu'au LCA.</li></ul>`},
+
+{cm:"CM4", pts:2, q:`Citez les 4 endroits où l'on peut injecter la hiérarchie dans un réseau (cadre « Making Better Mistakes ») avec un exemple pour chacun.`,
+a:`${T(["Levier","Exemple"],[
+["Régularisation R<sup>H</sup>","overlapping group lasso : les classes sœurs partagent les mêmes features"],
+["Labels y<sup>H</sup>","soft labels exp(−β·d) ; embeddings sur l'hypersphère (Barz & Denzler)"],
+["Loss L<sup>H</sup>","CORR + CLS ; HXE (cross-entropy hiérarchique) ; MCLoss de C-HMCNN"],
+["Architecture φ<sup>H</sup>","YOLO9000 / WordTree (softmax par groupe de frères) ; Hierarchy-Aware CNN ; B-CNN"]])}`},
+
+{cm:"CM5", pts:2, q:`Pourquoi a-t-on besoin d'expliquer les décisions d'un modèle ? Donnez les deux exemples du cours.`,
+a:`<ul><li><b>Aide à la décision</b> : le médecin reçoit « grippe » avec l'explication (éternuements et mal de tête pour, pas de fatigue contre) et juge si le raisonnement tient.</li>
+<li><b>Confiance</b> : sur 20 Newsgroups (Christianity vs Atheism), une Random Forest de 500 arbres a <b>92,4 %</b> d'accuracy, mais LIME montre qu'elle s'appuie sur des mots d'en-tête (<code>Posting</code>, <code>Host</code>, <code>NNTP</code>, <code>edu</code>) : c'est un <b>biais du dataset</b>, pas le contenu. Une bonne accuracy ne prouve pas que le modèle a compris.</li>
+<li>Autres raisons : débogage, réglementation, sécurité.</li></ul>`},
+
+{cm:"CM5", pts:3, q:`Comparez occlusion, saliency, CAM, Grad-CAM et Guided Grad-CAM (principe, besoin, avantages, limites).`,
+a:`${T(["Méthode","Principe","Besoin","+ / −"],[
+["Occlusion","cacher un carré gris (0 après normalisation) et mesurer la baisse de P(classe)","forwards seulement (agnostique)","+ intuitif ; − coûteux, dépend de la taille du carré"],
+["Saliency","|∂score/∂pixel|, max sur RGB","gradient / pixels","+ 1 forward + 1 backward ; − bruité, peu discriminant"],
+["CAM","Σ<sub>k</sub> w<sub>k</sub><sup>c</sup>·M<sub>k</sub>","archi avec <b>GAP + dense</b>","+ discriminant ; − il faut modifier et ré-entraîner le réseau, basse résolution"],
+["Grad-CAM","ReLU(Σ α<sub>k</sub><sup>c</sup>·A<sup>k</sup>), α = GAP des gradients","gradient / cartes","+ n'importe quel CNN, sans ré-entraînement ; − basse résolution"],
+["Guided Backprop","saliency en ne gardant que les gradients positifs aux ReLU","hook sur les ReLU","+ net ; − non discriminant"],
+["Guided Grad-CAM","Guided Backprop ⊙ Grad-CAM upsamplé","les deux","+ net <b>et</b> discriminant"]])}`},
+
+{cm:"CM5", pts:2, q:`Expliquez LIME et ses limites.`,
+a:`<ul><li><b>L</b>ocal <b>I</b>nterpretable <b>M</b>odel-agnostic <b>E</b>xplanations : le modèle est une boîte noire.</li>
+<li>On découpe l'image en <b>superpixels</b> (composants compréhensibles), on crée beaucoup d'images où des superpixels sont <b>éteints</b> (gris), on note la probabilité de la classe pour chacune, puis on ajuste une <b>régression linéaire locale</b> pondérée par la proximité à l'image d'origine. Les plus grands coefficients donnent l'explication (exemple de la grenouille : P(tree frog) = 0,54, la tête est décisive).</li>
+<li>Limites : le modèle linéaire est restrictif ; les superpixels n'expliquent pas tout (un modèle qui classe les photos <b>sépia</b> comme « rétro » ne s'explique pas par des zones) ; résultat instable.</li></ul>`},
+
+{cm:"CM5", pts:2, q:`Qu'est-ce que la valeur de Shapley ? Quels sont ses 4 axiomes ? Pourquoi faut-il l'approximer ?`,
+a:`<ul><li>Théorie des jeux coopératifs : les <b>features</b> sont des joueurs, la <b>prédiction</b> est le gain. La valeur de Shapley d'une feature = sa <b>contribution marginale moyenne</b> v(S ∪ {i}) − v(S) sur tous les ordres d'arrivée possibles.</li>
+<li>Axiomes : <b>efficacité</b> (la somme des valeurs = valeur de la coalition totale), <b>symétrie</b>, <b>joueur nul</b> (n'apporte rien → 0), <b>additivité</b>.</li>
+<li>Coût : <b>2ⁿ</b> coalitions. On approxime par <b>Monte-Carlo</b> : on tire une instance z et une permutation, on construit x<sub>+j</sub> et x<sub>−j</sub> qui ne diffèrent que par la feature j, on fait la différence des prédictions, puis la moyenne sur M tirages.</li>
+<li>SHAP (NIPS 2017) applique ces valeurs pour expliquer les prédictions.</li></ul>`},
+
+{cm:"CM6", pts:2, q:`Définissez : classification, segmentation sémantique, classification + localisation, détection d'objets, segmentation d'instances, segmentation panoptique.`,
+a:`<ul><li><b>Classification</b> : une classe pour toute l'image.</li>
+<li><b>Segmentation sémantique</b> : une classe <b>par pixel</b> (MARMOT, GRASS, ROCKS).</li>
+<li><b>Classification + localisation</b> : <b>un</b> objet, son label et sa boîte (x, y, w, h).</li>
+<li><b>Détection</b> : <b>tous</b> les objets (nombre inconnu), pour chacun un identifiant, une classe, une position, une taille. Les boîtes peuvent se chevaucher.</li>
+<li><b>Segmentation d'instances</b> = détection + segmentation sémantique : un masque par objet (flamant 1, flamant 2…).</li>
+<li><b>Panoptique</b> = instances + tout le fond (« stuff » : ciel, herbe, eau).</li></ul>`},
+
+{cm:"CM6", pts:3, q:`Retracez l'évolution R-CNN → Fast R-CNN → Faster R-CNN.`,
+a:`${T(["","Propositions","CNN","Tête","Temps test"],[
+["R-CNN (2014)","~2000 régions par <b>Selective Search</b>","1 forward <b>par région</b> (régions déformées)","SVM + régression de boîte post hoc","~49 s"],
+["Fast R-CNN (2015)","Selective Search","<b>1 forward pour l'image</b>, puis <b>RoI Pooling</b> (SPP 1 niveau) dans la carte conv5","FC → softmax + régression ; loss multitâche log loss + smooth L1","~2,3 s"],
+["Faster R-CNN (2016)","<b>RPN</b> appris : fenêtre glissante n×n, k <b>ancres</b>, sorties 2k scores + 4k coordonnées","1 forward","4 losses entraînées conjointement","~0,2 s"]])}`},
+
+{cm:"CM6", pts:2, q:`Expliquez le principe de YOLO et la forme de son tenseur de sortie.`,
+a:`<ul><li>Détecteur <b>one-stage</b> : un seul passage prédit toutes les boîtes et classes (« You Only Look Once ») → temps réel.</li>
+<li>Image redimensionnée en 448×448, découpée en grille <b>S×S</b> (7×7). Chaque case prédit <b>B</b> boîtes (x, y, w, h, confiance = 5 nombres) et <b>C</b> probabilités de classe.</li>
+<li>Sortie : <b>S × S × (B·5 + C)</b>. Pascal VOC (S = 7, B = 2, C = 20) : 7 × 7 × 30. 24 conv + 2 FC.</li>
+<li>Entraînement : pour chaque objet, un seul prédicteur est <b>responsable</b>, celui qui a la plus grande <b>IoU</b> avec la vérité.</li></ul>`},
+
+{cm:"CM6", pts:3, q:`Définissez l'IoU, puis expliquez comment on calcule TP, FP, FN, l'AP et la mAP en détection.`,
+a:`<ul><li><b>IoU</b> = aire(intersection) / aire(union), entre 0 (disjointes) et 1 (identiques).</li>
+<li>Avec un seuil d'IoU : IoU > seuil et bonne classe (et pas de meilleure boîte déjà associée) → <b>TP</b> ; détection sans vérité suffisamment recouverte → <b>FP</b> ; vérité non détectée → <b>FN</b> ; bonne boîte mais mauvaise classe → <b>FP</b> pour la classe prédite et <b>FN</b> pour la vraie.</li>
+<li>Précision = TP/(TP+FP), rappel = TP/(TP+FN).</li>
+<li><b>AP</b> = aire sous la courbe précision-rappel d'une classe ; <b>mAP</b> = moyenne des AP sur les classes. Notations AP₅₀, AP₇₅, AP<sub>S/M/L</sub>.</li>
+<li>Les résultats dépendent du seuil : à 0,35 au lieu de 0,75, un chat prédit avec IoU 0,38 devient un TP.</li></ul>`},
+
+{cm:"CM6", pts:2, q:`Quel problème résout la Focal Loss (RetinaNet) ? Écrivez-la.`,
+a:`<p>Le <b>déséquilibre</b> entre le fond (des milliers de boîtes faciles) et les objets : les exemples faciles noient la loss.</p>
+<p><b>FL(p) = −(1 − p)^γ · log(p)</b>, γ ≥ 0. Si γ = 0, c'est la cross-entropy. Quand γ augmente, la loss des exemples <b>bien classés</b> (p > 0,5) diminue fortement, et l'effort porte sur les exemples difficiles. Par défaut <b>γ = 2</b> (entre 0,5 et 5). Exemple : p = 0,9 → facteur (0,1)² = 0,01, la loss est divisée par 100.</p>`},
+
+{cm:"CM6", pts:3, q:`Expliquez DETR. Pourquoi n'a-t-il besoin ni d'ancres ni de NMS ?`,
+a:`<ul><li>CNN (backbone) → conv 1×1 (c → d) → aplatissement : wh tokens de dimension d, + <b>encodage de position</b>.</li>
+<li><b>Encodeur transformer</b> (self-attention sur l'image), puis <b>décodeur</b> qui reçoit <b>N object queries</b> apprises.</li>
+<li>N têtes FFN : chaque query prédit une boîte (3 couches) et une classe parmi C + « <b>no object</b> ∅ » (1 couche).</li>
+<li>Entraînement : la vérité est complétée par des ∅ jusqu'à N, puis on cherche la <b>permutation</b> qui minimise la somme des coûts (classe + boîte) avec l'<b>algorithme hongrois</b>. Chaque objet est associé à exactement une prédiction.</li>
+<li>Pas d'ancres : les queries apprennent leurs positions. Pas de <b>NMS</b> : le matching un-pour-un empêche les doublons.</li>
+<li>Résultat : meilleur sur les grands objets (AP<sub>L</sub> 61,1 contre 52,0 pour Faster R-CNN-FPN), moins bon sur les petits.</li></ul>`},
+
+{cm:"CM6", pts:2, q:`Qu'est-ce qu'une convolution transposée ? Et une architecture U-Net ?`,
+a:`<ul><li><b>Convolution transposée</b> : on écrit la convolution comme un produit matriciel I₂ = C·I₁ (C de taille 4×16 pour une image 4×4 → 2×2). En multipliant par Cᵀ (16×4), on revient à la taille 4×4. Ce n'est <b>pas</b> une inversion : on retrouve la taille, pas l'image. Dans un réseau, les coefficients sont <b>appris</b>, d'où un <b>upsampling apprenable</b>. Défaut : <b>artefacts en damier</b>.</li>
+<li><b>U-Net</b> : encodeur-décodeur en U, avec des <b>skip connections</b> qui <b>concatènent</b> les features de l'encodeur avec celles du décodeur à chaque niveau. Elles réinjectent les détails de localisation perdus pendant la descente. Conçu pour le biomédical.</li></ul>`},
+
+{cm:"CM6", pts:2, q:`Que désignent backbone, neck et head dans un détecteur moderne ? Donnez des exemples.`,
+a:`${T(["Partie","Rôle","Exemples"],[
+["Backbone","extraire les features","VGG16, ResNet-50, ResNeXt-101, DarkNet53"],
+["Neck","mélanger les échelles","FPN, PANet, BiFPN"],
+["Head dense (1 étape)","prédire boîtes + classes","RPN, YOLO, SSD, RetinaNet"],
+["Head éparse (2 étapes)","","Faster R-CNN, R-FCN"]])}
+<p>FPN : voie descendante qui sur-échantillonne ×2 les cartes profondes et les additionne aux cartes moins profondes (via une conv 1×1), pour bien détecter les <b>petits objets</b>.</p>`}
+];
+DATA.qcm.push(
+// ===================== CM1 + TD1 =====================
+{cm:"CM1", q:`Quel mode de différentiation automatique PyTorch utilise-t-il pour l'apprentissage d'un réseau ?`,
+ o:[`Le mode forward, adapté à peu d'entrées et beaucoup de sorties`,`Le mode reverse, adapté à beaucoup d'entrées et peu de sorties`,`La différentiation numérique par différences finies`,`La différentiation symbolique des formules`], a:[1],
+ e:`Une loss = 1 sortie, des millions de paramètres = entrées. Le mode reverse (forward pour les valeurs, backward pour les adjoints) est fait pour ça. C'est ce que fait <code>torch.autograd</code>.`},
+{cm:"CM1", q:`On appelle deux fois <code>loss.backward()</code> (avec <code>retain_graph=True</code>) sans <code>zero_grad()</code>. Que contient <code>.grad</code> ?`,
+ o:[`Le gradient du dernier appel seulement`,`La somme des gradients des deux appels`,`Zéro, le graphe a été libéré`,`Une erreur est levée systématiquement`], a:[1],
+ e:`Les gradients sont <b>accumulés</b> dans <code>.grad</code>. C'est pour ça qu'on fait <code>optimizer.zero_grad()</code> à chaque batch.`},
+{cm:"CM1", q:`Avec <code>y = 3a + ab</code>, <code>a = 10</code>, <code>b = 20</code>, que valent <code>a.grad</code> et <code>b.grad</code> après <code>y.backward()</code> ?`,
+ o:[`a.grad = 23, b.grad = 10`,`a.grad = 10, b.grad = 23`,`a.grad = 3, b.grad = 10`,`a.grad = 23, b.grad = 20`], a:[0],
+ e:`∂y/∂a = 3 + b = 23 et ∂y/∂b = a = 10.`},
+{cm:"CM1", q:`Que fait <code>ToTensor()</code> sur une image MNIST ? <span class="multi">(plusieurs réponses)</span>`,
+ o:[`Convertit les uint8 0–255 en float32 0–1`,`Normalise avec la moyenne et l'écart-type d'ImageNet`,`Passe de (H, W, C) à (C, H, W)`,`Applique une augmentation aléatoire`], a:[0,2],
+ e:`<code>ToTensor</code> divise par 255 et met les canaux en premier. La normalisation se fait avec <code>Normalize</code>.`},
+{cm:"CM1", q:`Combien de paramètres possède <code>nn.Linear(784, 10)</code> ?`,
+ o:[`7 840`,`7 850`,`794`,`78 400`], a:[1], e:`784 × 10 poids + 10 biais = 7 850.`},
+{cm:"CM1", q:`Combien de paramètres possède <code>nn.Conv2d(3, 64, kernel_size=3)</code> ?`,
+ o:[`576`,`1 728`,`1 792`,`640`], a:[2], e:`64 × (3 × 3 × 3 + 1) = 64 × 28 = 1 792.`},
+{cm:"CM1", q:`Une image 32×32 passe dans une convolution 5×5, stride 1, sans padding. Quelle est la taille de sortie ?`,
+ o:[`32×32`,`30×30`,`28×28`,`27×27`], a:[2], e:`(W − K + 2P)/S + 1 = (32 − 5 + 0)/1 + 1 = 28.`},
+{cm:"CM1", q:`Avec <code>padding='same'</code> et stride 1, la taille de sortie d'une convolution est :`,
+ o:[`Divisée par 2`,`Égale à la taille d'entrée`,`Réduite de k − 1 pixels`,`Doublée`], a:[1], e:`« same » ajoute assez de bord pour garder la même taille. « valid » = pas de padding.`},
+{cm:"CM1", q:`Empiler deux couches <code>nn.Linear</code> sans activation entre elles revient à :`,
+ o:[`Un réseau plus expressif`,`Une seule couche linéaire`,`Un réseau non linéaire`,`Un MLP universel`], a:[1], e:`Une composition de fonctions linéaires est linéaire. Il faut une activation (ReLU…) pour casser la linéarité (TD1).`},
+{cm:"CM1", q:`Pour une classification binaire, la sortie conseillée dans le cours est :`,
+ o:[`2 neurones avec ReLU`,`1 neurone avec sigmoïde`,`1 neurone sans activation et MSE`,`10 neurones avec softmax`], a:[1], e:`Classification : autant de neurones que de classes + softmax ; binaire : un seul neurone + sigmoïde ; régression : autant de neurones que de valeurs.`},
+{cm:"CM1", q:`Que devient le dropout en <code>model.eval()</code> ?`,
+ o:[`Il éteint toujours p % des neurones`,`Il est désactivé`,`Il double la proportion de neurones éteints`,`Il gèle les poids`], a:[1], e:`Actif en entraînement, désactivé en évaluation.`},
+{cm:"CM1", q:`En mode évaluation, la batch normalization utilise :`,
+ o:[`La moyenne et l'écart-type du batch courant`,`La moyenne mobile (EMA) calculée pendant l'entraînement`,`Aucune normalisation`,`Les statistiques d'ImageNet`], a:[1], e:`En train : stats du batch + mise à jour de l'EMA. En eval : l'EMA.`},
+{cm:"CM1", q:`Quelles affirmations sur <code>torch.inference_mode()</code> sont vraies ? <span class="multi">(plusieurs réponses)</span>`,
+ o:[`Il désactive la construction du graphe et le calcul de gradients`,`Il met le dropout en mode évaluation`,`Il accélère l'évaluation et économise la mémoire`,`Il remplace <code>model.eval()</code>`], a:[0,2], e:`Il ne touche pas au dropout ni à la batch norm : il faut aussi <code>model.eval()</code>.`},
+{cm:"CM1", q:`Dans la boucle d'apprentissage, quel ordre est correct pour un batch ?`,
+ o:[`forward → loss → zero_grad → backward → step`,`forward → backward → loss → step → zero_grad`,`zero_grad → step → forward → loss → backward`,`loss → forward → backward → zero_grad → step`], a:[0],
+ e:`« do the forward pass, calculate the loss, optimizer zero grad, loss backward, optimizer step ». zero_grad peut aussi être placé avant le forward, l'important est qu'il soit avant backward.`},
+{cm:"CM1", q:`La slide « Learning loop (essential) » écrit <code>loss = myLoss(logits, y).item()</code> puis <code>loss.backward()</code>. Que se passe-t-il ?`,
+ o:[`Ça marche, .item() garde le graphe`,`Erreur : .item() renvoie un float Python sans graphe, on ne peut pas faire backward`,`Les gradients sont nuls mais pas d'erreur`,`Ça marche mais c'est plus lent`], a:[1],
+ e:`<code>.item()</code> sert seulement à accumuler la loss pour l'affichage (<code>train_loss += loss.item()</code>). Le backward se fait sur le tenseur.`},
+{cm:"CM1", q:`Quel optimiseur n'utilise que le <b>signe</b> du gradient, avec un pas adapté par paramètre ?`,
+ o:[`SGD`,`Rprop`,`Adam`,`RMSprop`], a:[1], e:`Rprop : θ ← θ − η·sign(g), η augmente si le gradient garde son signe, diminue sinon.`},
+{cm:"CM1", q:`RMSprop divise le gradient par :`,
+ o:[`La norme des poids`,`La racine d'une moyenne mobile des carrés du gradient`,`Le learning rate`,`Le nombre d'époques`], a:[1], e:`v ← α·v + (1 − α)·g², θ ← θ − γ·g/(√v + ε). Dans les TD : <code>RMSprop(lr=0.001, alpha=0.9)</code>.`},
+{cm:"CM1", q:`Un scheduler :`,
+ o:[`Modifie le learning rate au cours de l'apprentissage`,`Mélange les données`,`Choisit l'architecture`,`Calcule les gradients`], a:[0], e:`Optionnel, il connaît l'optimiseur et ajuste le lr.`},
+{cm:"CM1", q:`Accuracy d'un classifieur aléatoire sur MNIST (10 classes équilibrées) :`,
+ o:[`50 %`,`10 %`,`1 %`,`92 %`], a:[1], e:`1/n. C'est ce que donne le modèle avant entraînement dans le TD1.`},
+{cm:"CM1", q:`Le F1 <code>micro</code> en classification multi-classe mono-label est égal à :`,
+ o:[`La moyenne des F1 par classe`,`L'accuracy`,`Le rappel macro`,`La précision de la classe majoritaire`], a:[1], e:`En cumulant TP/FP/FN sur toutes les classes, chaque erreur est un FP pour une classe et un FN pour une autre : micro-P = micro-R = accuracy.`},
+{cm:"CM1", q:`Pourquoi VGG empile-t-il des convolutions 3×3 plutôt qu'utiliser une 7×7 ? <span class="multi">(plusieurs réponses)</span>`,
+ o:[`Même champ réceptif avec 3 couches 3×3`,`Moins de paramètres (27·C² contre 49·C²)`,`Plus de non-linéarités`,`Moins de couches donc plus rapide`], a:[0,1,2], e:`3 conv 3×3 empilées voient une zone 7×7, avec 3 ReLU au lieu d'une et moins de poids.`},
+{cm:"CM1", q:`À quoi sert une convolution 1×1 ? <span class="multi">(plusieurs réponses)</span>`,
+ o:[`Réduire le nombre de canaux (profondeur)`,`Réduire la largeur et la hauteur`,`Ajouter de la non-linéarité à moindre coût`,`Remplacer le pooling`], a:[0,2], e:`Network in Network. Elle combine les canaux pixel par pixel, sans toucher à w × h.`},
+{cm:"CM1", q:`Le module Inception :`,
+ o:[`Applique en parallèle des conv 1×1, 3×3, 5×5 et un max pooling, avec des 1×1 de réduction`,`Ajoute une connexion résiduelle`,`Utilise uniquement des conv 3×3`,`Remplace toutes les conv par de l'attention`], a:[0], e:`« Ne pas choisir la taille de conv, les essayer toutes ». GoogLeNet a aussi des sorties auxiliaires.`},
+{cm:"CM1", q:`Quelle est l'idée principale de ResNet ?`,
+ o:[`Des filtres 3×3 empilés`,`Des connexions résiduelles : le bloc sort F(x) + x`,`Le compound scaling`,`Des convolutions séparables`], a:[1], e:`Le bloc peut au pire apprendre l'identité : un réseau plus profond ne fait pas moins bien. 152 couches.`},
+{cm:"CM1", q:`L'EfficientNet « compound scaling » agrandit ensemble :`,
+ o:[`Le nombre de classes, le batch et le lr`,`La profondeur, la largeur et la résolution`,`Le nombre de têtes d'attention`,`La taille des filtres uniquement`], a:[1], e:`d = α^φ, w = β^φ, r = γ^φ, avec φ réglé selon les ressources.`},
+{cm:"CM1", q:`Xception est basé sur :`,
+ o:[`Les convolutions séparables en profondeur (depthwise puis pointwise)`,`Les connexions denses`,`Le pooling pyramidal`,`L'attention`], a:[0], e:`eXtreme Inception : séparation spatiale par canal puis 1×1.`},
+{cm:"CM1", q:`Quel réseau a gagné ILSVRC 2012 et lancé l'ère des CNN ?`,
+ o:[`LeNet-5`,`AlexNet`,`VGG16`,`ResNet`], a:[1], e:`LeNet-5 date de 1998, VGG et GoogLeNet de 2014, ResNet de 2015.`},
+{cm:"CM1", q:`Dans le TD1, <code>MyFirstCNN</code> fait 3 conv 3×3 sans padding sur une image 28×28 puis <code>max_pool2d(x, 4)</code> avec 32 canaux. Pourquoi <code>view(-1, 800)</code> ?`,
+ o:[`28 → 22 → pooling 4 → 5, et 32 × 5 × 5 = 800`,`28 × 28 = 784 ≈ 800`,`32 × 25 = 800 car le pooling donne 25×25`,`C'est arbitraire`], a:[0], e:`Chaque conv 3×3 sans padding enlève 2 pixels : 28 → 26 → 24 → 22. 22 // 4 = 5.`},
+{cm:"TD1", q:`EfficientNet-B4 pré-entraîné : quelle taille d'image et quelle couche remplace-t-on pour 3 classes ?`,
+ o:[`224×224, <code>model.fc = Linear(2048, 3)</code>`,`380×380, <code>model.classifier[1] = Linear(1792, 3)</code>`,`299×299, <code>model.classifier = Linear(1000, 3)</code>`,`380×380, <code>model.features[-1] = Linear(1792, 3)</code>`], a:[1], e:`Le classifier d'EfficientNet est [Dropout, Linear(1792, 1000)]. On remplace l'indice 1.`},
+{cm:"TD1", q:`Pour n'entraîner que le classifier, quel code est correct ?`,
+ o:[`<code>for p in model.features.parameters(): p.requires_grad = False</code>`,`<code>model.features.eval()</code>`,`<code>with torch.no_grad(): model.features</code>`,`<code>model.classifier.requires_grad = False</code>`], a:[0], e:`On gèle les paramètres de <code>features</code>. <code>eval()</code> ne gèle rien.`},
+{cm:"TD1", q:`Pourquoi passer <code>filter(lambda p: p.requires_grad, model.parameters())</code> à l'optimiseur ?`,
+ o:[`Pour ne lui donner que les paramètres à mettre à jour`,`Pour accélérer le forward`,`C'est obligatoire sinon erreur`,`Pour dégeler les couches`], a:[0], e:`Plus propre et plus léger. Après un dégel, il faut <b>recréer</b> l'optimiseur pour qu'il voie les nouveaux paramètres.`},
+{cm:"TD1", q:`Lors du fine-tuning (dégel des 2 derniers blocs de <code>features</code>), on choisit un learning rate :`,
+ o:[`Plus grand, pour aller vite`,`Plus petit (ex : 1e-4 au lieu de 1e-3)`,`Identique`,`Nul pour les blocs dégelés`], a:[1], e:`On ajuste légèrement les features pré-entraînées sans les détruire.`},
+{cm:"TD1", q:`Pourquoi faut-il utiliser <code>weights.transforms()</code> du modèle pré-entraîné ?`,
+ o:[`Pour appliquer exactement le pré-traitement utilisé à l'entraînement (taille, normalisation)`,`Pour faire de l'augmentation`,`Pour réduire le nombre de classes`,`Ce n'est pas nécessaire`], a:[0], e:`Le réseau ne reconnaît bien que des images préparées comme celles qu'il a vues.`},
+// ===================== CM2-3 + TD2/TD3 =====================
+{cm:"CM2-3", q:`Image 224×224, patchs 16×16, avec un token [CLS]. Combien de tokens entrent dans l'encodeur du ViT ?`,
+ o:[`196`,`197`,`256`,`224`], a:[1], e:`(224/16)² = 196 patchs + 1 [CLS] = 197.`},
+{cm:"CM2-3", q:`Quelle couche est équivalente au découpage en patchs 16×16 + projection linéaire vers D ?`,
+ o:[`<code>nn.Conv2d(3, D, kernel_size=16, stride=16)</code>`,`<code>nn.Conv2d(3, D, kernel_size=16, stride=1)</code>`,`<code>nn.Linear(224*224*3, D)</code>`,`<code>nn.MaxPool2d(16)</code>`], a:[0], e:`Un filtre 16×16 avec un pas de 16 voit chaque patch une seule fois, sans recouvrement.`},
+{cm:"CM2-3", q:`Le position embedding du ViT est :`,
+ o:[`Sinusoïdal 2D fixe`,`1D appris, de forme (1, N+1, D), ajouté aux embeddings`,`Concaténé aux embeddings`,`Inutile pour la classification`], a:[1], e:`Le papier montre qu'il est utile mais que la méthode importe peu, donc ils prennent la plus simple : 1D apprise (<code>nn.Parameter</code>).`},
+{cm:"CM2-3", q:`Pourquoi divise-t-on par √d<sub>k</sub> dans l'attention ?`,
+ o:[`Pour normaliser les valeurs V`,`Pour éviter que le softmax sature quand les produits scalaires deviennent grands`,`Pour réduire le nombre de paramètres`,`Pour rendre la matrice symétrique`], a:[1], e:`Un softmax saturé donne des gradients quasi nuls.`},
+{cm:"CM2-3", q:`Avec T tokens, quelle est la taille de la matrice softmax(QKᵀ/√d<sub>k</sub>) pour une tête ?`,
+ o:[`T × d<sub>k</sub>`,`T × T`,`d<sub>k</sub> × d<sub>k</sub>`,`T × d<sub>v</sub>`], a:[1], e:`Chaque token donne un poids à chaque token. C'est pourquoi le coût est quadratique en T.`},
+{cm:"CM2-3", q:`En PyTorch, pour calculer Q·Kᵀ sur des tenseurs (batch, têtes, T, d), on écrit :`,
+ o:[`<code>torch.matmul(Q, K.T)</code>`,`<code>torch.matmul(Q, K.transpose(-2, -1))</code>`,`<code>Q * K</code>`,`<code>torch.matmul(K, Q)</code>`], a:[1], e:`On transpose les deux dernières dimensions uniquement (conseil explicite de la slide).`},
+{cm:"CM2-3", q:`Le token [CLS] :`,
+ o:[`Est un vecteur appris placé en position 0 ; sa sortie sert à la classification`,`Est la moyenne des patchs`,`Contient la position des patchs`,`N'existe que dans DeiT`], a:[0], e:`Alternative « CNN » : GAP sur les sorties. Résultats proches avec un bon lr.`},
+{cm:"CM2-3", q:`L'attention rollout (Abnar & Zuidema) :`,
+ o:[`Multiplie les matrices d'attention des blocs (moyennées sur les têtes, + identité pour le résiduel, normalisées)`,`Ne regarde que le dernier bloc`,`Calcule le gradient par rapport aux pixels`,`Somme les embeddings`], a:[0], e:`On lit ensuite la ligne du [CLS] vers les patchs : <code>rollout[index, 1:, 0]</code>, remise en grille 7×7 pour MNIST.`},
+{cm:"CM2-3", q:`En distillation, quand la température T augmente, la distribution softmax(z/T) devient :`,
+ o:[`Plus piquée (one-hot)`,`Plus douce, plus proche de l'uniforme`,`Inchangée`,`Négative`], a:[1], e:`Avec z = [4, 2, 0] : T = 1 → [0,87 ; 0,12 ; 0,02], T = 4 → [0,51 ; 0,31 ; 0,19], T = 20 → [0,37 ; 0,33 ; 0,30].`},
+{cm:"CM2-3", q:`Pourquoi multiplie-t-on le terme KL par T² ?`,
+ o:[`Pour que le terme soft garde le même ordre de grandeur de gradient quand T change`,`Pour accélérer le teacher`,`Pour normaliser les probabilités`,`Pour annuler la cross-entropy`], a:[0], e:`Les gradients des soft targets sont en 1/T².`},
+{cm:"CM2-3", q:`<code>F.kl_div(input, target)</code> attend :`,
+ o:[`input = probabilités du student, target = log-probabilités du teacher`,`input = log-probabilités du student (<code>log_softmax(z_s/T)</code>), target = probabilités du teacher (<code>softmax(z_t/T)</code>)`,`les logits bruts des deux modèles`,`les labels entiers`], a:[1], e:`Code du TD2 : <code>F.kl_div(F.log_softmax(zs/T,1), F.softmax(zt/T,1), reduction='batchmean') * T*T</code>.`},
+{cm:"CM2-3", q:`Pendant la distillation, le teacher :`,
+ o:[`Est entraîné en même temps que le student`,`Est figé : <code>teacher.eval()</code> et prédictions sans gradient`,`Reçoit les gradients du student`,`Est remplacé par le student à chaque époque`], a:[1], e:`Il est entraîné indépendamment avant, puis ne fait que guider.`},
+{cm:"CM2-3", q:`Quelle température Hinton utilise-t-il sur MNIST ?`,
+ o:[`T = 1`,`T = 2`,`T = 20`,`T = 100`], a:[2], e:`Student distillé : 74 erreurs, contre 146 seul et 67 pour le teacher.`},
+{cm:"CM2-3", q:`Dans le TD2, le teacher a 2 couches cachées de 1200 avec dropout et des images décalées ; le student :`,
+ o:[`2 couches cachées de 800, sans régularisation`,`1 couche de 1200 avec dropout`,`Un CNN`,`2 couches de 1200 sans dropout`], a:[0], e:`Le student est plus petit et non régularisé : c'est la distillation qui le régularise.`},
+{cm:"CM2-3", q:`On peut aussi distiller sur les cartes de features. Que faut-il ? <span class="multi">(plusieurs réponses)</span>`,
+ o:[`Des formes compatibles, ou un pooling, ou une projection apprise`,`Une loss MSE ou cosinus entre features`,`Le même nombre de couches exactement`,`Des labels du teacher uniquement`], a:[0,1], e:`Avant ou après flatten. Si les dimensions diffèrent : pooling ou couche linéaire apprise.`},
+{cm:"CM2-3", q:`Le distillation token de DeiT apprend à prédire :`,
+ o:[`Les vraies classes`,`Les labels durs prédits par le teacher`,`La position des patchs`,`La température`], a:[1], e:`Le [CLS] apprend avec les vraies classes, le distillation token avec les sorties du teacher (CNN).`},
+{cm:"CM2-3", q:`Dans DeiT, le teacher est :`,
+ o:[`Un ViT plus gros`,`Un CNN`,`Le student lui-même (EMA)`,`Un MLP`], a:[1], e:`Le CNN transmet son biais inductif au transformer.`},
+{cm:"CM2-3", q:`Combien de paramètres pour DeiT-S ?`,
+ o:[`5 M`,`22 M`,`86 M`,`307 M`], a:[1], e:`DeiT-Ti 5 M (D = 192), DeiT-S 22 M (D = 384), DeiT-B 86 M (D = 768).`},
+{cm:"CM2-3", q:`Dans DINO, comment le teacher est-il mis à jour ?`,
+ o:[`Par descente de gradient sur la même loss`,`Par moyenne mobile exponentielle des poids du student (λ ≥ 0,99)`,`Il est figé dès le départ`,`Par copie exacte du student à chaque itération`], a:[1], e:`θ<sub>t</sub> ← λ·θ<sub>t</sub> + (1 − λ)·θ<sub>s</sub> (momentum encoder).`},
+{cm:"CM2-3", q:`Dans DINO, quelles vues reçoit le teacher ?`,
+ o:[`Les crops locaux uniquement`,`Les 2 crops globaux (> 50 % de l'image) uniquement`,`Toutes les vues`,`L'image non augmentée`], a:[1], e:`Le student reçoit les crops globaux et locaux : il apprend à relier local et global.`},
+{cm:"CM2-3", q:`Comment DINO évite-t-il le collapse ? <span class="multi">(plusieurs réponses)</span>`,
+ o:[`Centering des sorties du teacher`,`Sharpening : température basse pour le teacher`,`Labels supervisés`,`Dropout très élevé`], a:[0,1], e:`Le centering empêche une dimension de dominer, le sharpening empêche la sortie uniforme.`},
+{cm:"CM2-3", q:`DINOv2 combine les losses :`,
+ o:[`DINO (niveau image) + iBOT (niveau patch)`,`Cross-entropy + MSE`,`Focal + IoU`,`Gram + KL`], a:[0], e:`Données curées LVD-142M. Le Gram anchoring arrive avec DINOv3.`},
+{cm:"CM2-3", q:`Le « Gram anchoring » de DINOv3 sert à :`,
+ o:[`Garder la qualité des features locales (patchs) en entraînement long`,`Accélérer l'inférence`,`Remplacer le teacher`,`Supprimer le [CLS]`], a:[0], e:`Les similarités entre patchs (matrice de Gram) du student doivent rester proches de celles d'un Gram teacher.`},
+{cm:"TD3", q:`Avec DINOv2 ViT-S/14 (<code>dinov2_vits14</code>) en linear probing, quelle tête ajoute-t-on pour 5 classes ?`,
+ o:[`<code>nn.Linear(768, 5)</code>`,`<code>nn.Linear(384, 5)</code>`,`<code>nn.Linear(1792, 5)</code>`,`<code>nn.Linear(14, 5)</code>`], a:[1], e:`ViT-S a une dimension d'embedding de 384. On gèle tout le backbone et on n'entraîne que <code>model.head</code>.`},
+{cm:"TD3", q:`ViT-S/14 sur une image 224×224 : combien de patchs ?`,
+ o:[`196`,`256`,`224`,`49`], a:[1], e:`224/14 = 16, et 16 × 16 = 256.`}
+);
+DATA.qcm.push(
+// ===================== CM4 + TD4 =====================
+{cm:"CM4", q:`En classification multi-label, la couche de sortie et la loss adaptées sont :`,
+ o:[`Softmax + cross-entropy`,`Une sigmoïde par label + binary cross-entropy`,`ReLU + MSE`,`Softmax + KL`], a:[1], e:`Les labels ne sont pas exclusifs : chaque sortie est une probabilité indépendante. En PyTorch : <code>nn.BCEWithLogitsLoss</code>.`},
+{cm:"CM4", q:`Quelle méthode multi-label ignore complètement les corrélations entre labels ?`,
+ o:[`Binary Relevance`,`Classifier Chains`,`Label Powerset`,`BP-MLL`], a:[0], e:`Un classifieur binaire indépendant par label.`},
+{cm:"CM4", q:`Dans Classifier Chains, le classifieur c<sub>2</sub> reçoit en entrée :`,
+ o:[`Seulement x`,`x + les labels de c<sub>0</sub> et c<sub>1</sub> (vrais en train, prédits en test)`,`Les probabilités de tous les classifieurs`,`Les labels de c<sub>3</sub>`], a:[1], e:`D'où le problème de l'ordre et de la propagation d'erreurs.`},
+{cm:"CM4", q:`Avec 10 labels, Label Powerset peut créer au maximum :`,
+ o:[`10 classes`,`20 classes`,`100 classes`,`1 024 classes`], a:[3], e:`2¹⁰ = 1 024 combinaisons possibles, dont beaucoup de rares.`},
+{cm:"CM4", q:`ML-kNN est :`,
+ o:[`Une transformation en problème binaire`,`Une adaptation de kNN au multi-label (comptage des voisins par label + décision bayésienne)`,`Une méthode hiérarchique`,`Une variante de Label Powerset`], a:[1], e:`Famille « adaptation d'algorithmes », avec Clare, AdaBoost.MH/MR, BP-MLL.`},
+{cm:"CM4", q:`Dans un DAG (et pas dans un arbre) :`,
+ o:[`Un nœud peut avoir plusieurs parents`,`Il peut y avoir des cycles`,`Il n'y a qu'un seul niveau`,`Chaque nœud a un seul enfant`], a:[0], e:`Exemple : Gene Ontology.`},
+{cm:"CM4", q:`L'approche « flat » de la classification hiérarchique consiste à :`,
+ o:[`Classer les feuilles puis remonter aux ancêtres`,`Descendre l'arbre niveau par niveau`,`Un classifieur par nœud`,`Une loss hiérarchique`], a:[0], e:`C'est le modèle n°2 du TD4 (15 classes ramenées aux 3 superclasses).`},
+{cm:"CM4", q:`Quelle variante locale évite les incohérences ?`,
+ o:[`Un classifieur binaire par nœud`,`Un classifieur multi-classe par nœud parent`,`Un classifieur par niveau`,`Aucune`], a:[1], e:`On descend un chemin en choisissant parmi les enfants : impossible d'être incohérent.`},
+{cm:"CM4", q:`Le principal défaut des approches top-down est :`,
+ o:[`La propagation des erreurs (une erreur en haut est définitive)`,`Le nombre de paramètres`,`L'impossibilité de traiter des arbres`,`Elles ignorent les feuilles`], a:[0], e:`Si le premier niveau dit « objet », le husky est perdu.`},
+{cm:"CM4", q:`Dans l'arbre du cours, LCA(Husky, Puppy) vaut :`,
+ o:[`1`,`2`,`3`,`0`], a:[1], e:`Ancêtre commun = Dog, de hauteur 2. Husky/Bulldog = 1 (Working Dog), Husky/Wolf = 3 (Canine).`},
+{cm:"CM4", q:`Soft labels y<sub>A</sub> ∝ exp(−β·d(A, C)) : quand β est très grand, on obtient :`,
+ o:[`Une distribution uniforme`,`Le one-hot classique`,`Des probabilités négatives`,`La matrice LCA`], a:[1], e:`β petit → uniforme ; β grand → one-hot.`},
+{cm:"CM4", q:`La cross-entropy hiérarchique (HXE) avec tous les poids λ = 1 est égale à :`,
+ o:[`La MSE`,`La cross-entropy classique`,`La focal loss`,`Zéro`], a:[1], e:`La somme des log des probas conditionnelles = log du produit = log p(feuille).`},
+{cm:"CM4", q:`Dans C-HMCNN, le MCM (Max Constraint Module) définit le score d'une classe A comme :`,
+ o:[`La moyenne des scores de ses enfants`,`Le max des scores de A et de ses sous-classes`,`Le min de ses sous-classes`,`Le score de son parent`], a:[1], e:`Si « husky » vaut 0,9, « chien » vaut au moins 0,9 : la cohérence est garantie par construction.`},
+{cm:"CM4", q:`YOLO9000 / WordTree remplace le grand softmax sur 1 000 classes par :`,
+ o:[`Une sigmoïde par classe`,`Un softmax par groupe de frères, avec des probabilités conditionnelles multipliées le long du chemin`,`Un arbre de décision`,`Un SVM`], a:[1], e:`p(husky) = p(husky | dog) · p(dog | mammal) · …`},
+{cm:"CM4", q:`Dans le Hierarchy-Aware CNN (Bilal et al.), les branches de prédiction des niveaux grossiers sont placées :`,
+ o:[`Après la dernière couche FC`,`Sur les couches convolutives intermédiaires, les plus grossières le plus tôt`,`Avant la première convolution`,`Dans un autre réseau`], a:[1], e:`Les premières couches séparent déjà les grandes catégories. Chaque branche = FC (200…) → FC (n classes) → loss.`},
+{cm:"CM4", q:`Pourquoi le top-k ne mesure-t-il pas bien la qualité d'un classifieur hiérarchique ?`,
+ o:[`Il est trop lent`,`Toutes les erreurs se valent (alto/violon = alto/chat)`,`Il ne marche pas en multi-classe`,`Il dépend de la température`], a:[1], e:`D'où la distance hiérarchique moyenne @k et P/R/F<sub>LCA</sub>.`},
+{cm:"TD4", q:`TD4 : modèle à 15 classes ramené aux 3 superclasses → 78 % ; modèle direct à 3 superclasses → 83 %. Plus de la moitié des erreurs du modèle à 15 classes restaient dans la bonne superclasse. Ces erreurs sont :`,
+ o:[`Des erreurs graves`,`Des « better mistakes » (LCA faible)`,`Des erreurs de cohérence`,`Des faux positifs de détection`], a:[1], e:`Lion pris pour un tigre : erreur peu grave, qui disparaît quand on remonte aux superclasses.`},
+{cm:"TD4", q:`Dans le modèle hiérarchique du TD4, la tête superclasse branchée après <code>block2</code> a une entrée de taille :`,
+ o:[`128 × 4 × 4 = 2 048`,`64 × 8 × 8 = 4 096`,`32 × 16 × 16 = 8 192`,`512`], a:[1], e:`32 → 16 (bloc 1) → 8 (bloc 2), avec 64 canaux.`},
+{cm:"TD4", q:`Pourquoi faut-il réindexer les labels (0..14 et 0..2) avant <code>CrossEntropyLoss</code> ?`,
+ o:[`Elle attend des labels entiers de 0 à C − 1`,`Pour équilibrer les classes`,`Pour la normalisation`,`Ce n'est pas nécessaire`], a:[0], e:`Un label 88 pour un modèle à 15 sorties provoque une erreur d'indice.`},
+// ===================== CM5 + TD5 =====================
+{cm:"CM5", q:`Parmi ces méthodes, laquelle est agnostique au modèle (boîte noire) ? <span class="multi">(plusieurs réponses)</span>`,
+ o:[`LIME`,`SHAP`,`Occlusion`,`Grad-CAM`], a:[0,1,2], e:`L'occlusion n'utilise que des forwards. Grad-CAM a besoin des gradients et des cartes internes.`},
+{cm:"CM5", q:`Dans le TD5, pourquoi met-on les pixels cachés à 0 pour l'occlusion ?`,
+ o:[`Pour qu'ils soient noirs`,`Parce qu'après la normalisation ImageNet, 0 correspond au gris moyen`,`Pour accélérer le calcul`,`Parce que ReLU met tout à 0`], a:[1], e:`(pixel − mean)/std = 0 quand pixel = mean.`},
+{cm:"CM5", q:`Sur une carte d'occlusion (valeur = P(classe) quand la zone est cachée), une zone importante est :`,
+ o:[`Une zone de valeur haute`,`Une zone de valeur basse`,`Une zone de valeur 0,5`,`Le bord de l'image`], a:[1], e:`Cacher une zone importante fait chuter la probabilité. Exemple du cours : éléphant 0,95 → 0,75 en cachant la tête.`},
+{cm:"CM5", q:`Une occlusion avec stride 8 sur une image 224×224 nécessite combien de forwards ?`,
+ o:[`224`,`784`,`50 176`,`28`], a:[1], e:`28 positions par axe → 28 × 28 = 784 (contre 50 176 avec un stride de 1).`},
+{cm:"CM5", q:`La saliency map de Simonyan se calcule par :`,
+ o:[`|∂score/∂pixel|, puis max sur les 3 canaux RGB`,`La moyenne des activations`,`Le produit des poids de la dernière couche`,`Une régression linéaire`], a:[0], e:`Les pixels deviennent la variable : <code>requires_grad_(True)</code> sur l'image, puis <code>backward()</code> sur le score.`},
+{cm:"CM5", q:`La CAM d'origine nécessite :`,
+ o:[`Un réseau quelconque`,`Une architecture avec GAP puis une seule couche dense`,`Un transformer`,`Des superpixels`], a:[1], e:`CAM<sub>c</sub> = Σ<sub>k</sub> w<sub>k</sub><sup>c</sup>·M<sub>k</sub>. C'est ce qui a été préparé dans le TD5 (VGG16 + GAP + Linear(512, 3)).`},
+{cm:"CM5", q:`Dans le TD5, comment récupère-t-on les poids w<sup>c</sup> pour la CAM de la classe <code>predClass</code> ?`,
+ o:[`<code>vggmodel.classifier[0].weight[predClass]</code> (forme 512)`,`<code>vggmodel.features[-1].weight</code>`,`<code>vggmodel.avgpool.weight</code>`,`<code>vggmodel.classifier[1].weight</code>`], a:[0], e:`<code>classifier[0]</code> est la Linear(512, 3) de poids (3, 512). <code>classifier[1]</code> est le Softmax.`},
+{cm:"CM5", q:`Dans Grad-CAM, les poids α<sub>k</sub><sup>c</sup> sont :`,
+ o:[`Les poids de la couche dense`,`La moyenne spatiale (GAP) des gradients de y<sup>c</sup> par rapport à la carte A<sup>k</sup>`,`Les valeurs max des cartes`,`Des poids aléatoires`], a:[1], e:`Puis L = ReLU(Σ α<sub>k</sub>·A<sup>k</sup>).`},
+{cm:"CM5", q:`Pourquoi applique-t-on une ReLU dans Grad-CAM ?`,
+ o:[`Pour garder seulement les zones qui augmentent le score de la classe`,`Pour normaliser la carte`,`Pour éviter les gradients nuls`,`Pour réduire la taille`], a:[0], e:`Les contributions négatives correspondent plutôt à d'autres classes.`},
+{cm:"CM5", q:`Quand on calcule Grad-CAM pour les 3 classes à la suite en PyTorch, il faut :`,
+ o:[`Remettre les gradients à zéro (ou recréer les tenseurs) entre deux backward`,`Changer de modèle`,`Désactiver la ReLU`,`Utiliser <code>torch.no_grad()</code>`], a:[0], e:`Les gradients s'accumulent par défaut : la carte de la classe 2 contiendrait aussi ceux de la classe 1.`},
+{cm:"CM5", q:`Guided Backpropagation modifie la rétropropagation :`,
+ o:[`En ne laissant passer que les gradients positifs à travers les ReLU`,`En inversant les gradients`,`En sautant les convolutions`,`En multipliant par la température`], a:[0], e:`Implémenté avec un hook : <code>torch.clamp(grad_in[0], min=0.)</code>. Résultat net mais non discriminant.`},
+{cm:"CM5", q:`Guided Grad-CAM est :`,
+ o:[`La somme de la saliency et de la CAM`,`Le produit pixel à pixel de Guided Backprop et de Grad-CAM agrandie`,`Grad-CAM sans ReLU`,`LIME avec des gradients`], a:[1], e:`Net (Guided BP) et discriminant (Grad-CAM). Exemple du papier : les rayures du chat sans le chien.`},
+{cm:"CM5", q:`Score-CAM :`,
+ o:[`Utilise chaque carte d'activation agrandie comme masque, et le score obtenu comme poids (sans gradient)`,`Est identique à CAM`,`Utilise les gradients au carré`,`Ne marche que sur les transformers`], a:[0], e:`Meilleur résultat mais coûteux (un forward par carte).`},
+{cm:"CM5", q:`LIME, pour une image, perturbe :`,
+ o:[`Des pixels isolés au hasard`,`Des superpixels (zones contiguës) en les grisant`,`Les poids du réseau`,`La température`], a:[1], e:`Puis régression linéaire locale pondérée par la proximité à l'image d'origine.`},
+{cm:"CM5", q:`Quelle limite de LIME le papier illustre-t-il avec les images sépia classées « rétro » ?`,
+ o:[`LIME est trop lent`,`Une propriété globale (la teinte) ne s'explique pas par la présence ou l'absence de superpixels`,`LIME ne marche que pour le texte`,`LIME a besoin des gradients`], a:[1], e:`Le modèle linéaire sur des zones est trop restrictif.`},
+{cm:"CM5", q:`L'axiome d'efficacité de Shapley dit que :`,
+ o:[`Les valeurs sont toutes positives`,`La somme des valeurs de Shapley est égale à la valeur de la coalition totale`,`Un joueur inutile reçoit 0`,`Deux joueurs identiques reçoivent la même valeur`], a:[1], e:`Exemple L, M, N : 34,17 + 41,67 + 24,17 = 100. (Les autres options sont les axiomes « joueur nul » et « symétrie ».)`},
+{cm:"CM5", q:`Le calcul exact des valeurs de Shapley pour n features demande d'évaluer :`,
+ o:[`n coalitions`,`n² coalitions`,`2ⁿ coalitions`,`n! / 2 coalitions`], a:[2], e:`D'où l'approximation par échantillonnage (Monte-Carlo).`},
+{cm:"CM5", q:`Les plus proches voisins dans l'espace des features 4096-d d'AlexNet sont des images :`,
+ o:[`De même couleur dominante`,`De même sens (même objet) même si l'apparence diffère`,`Aléatoires`,`De même taille`], a:[1], e:`Dans l'espace des pixels, les voisins se ressemblent visuellement sans être de la même classe.`},
+{cm:"TD5", q:`Dans le TD5, quelles modifications rendent VGG16 compatible avec la CAM ? <span class="multi">(plusieurs réponses)</span>`,
+ o:[`<code>avgpool</code> passe de (7, 7) à (1, 1) : c'est le GAP`,`Le classifier devient une seule <code>Linear(512, 3)</code> + Softmax`,`On ajoute des couches de 4096 neurones`,`On dégèle toutes les couches de <code>features</code>`], a:[0,1], e:`Un poids par carte et par classe, directement lisible.`},
+{cm:"TD5", q:`Le modèle du TD5 a un Softmax dans son classifier ET est entraîné avec <code>CrossEntropyLoss</code>. Conséquence ?`,
+ o:[`Aucune`,`Double softmax : l'apprentissage marche mais il est moins efficace (gradients plus faibles)`,`Erreur à l'exécution`,`La loss devient négative`], a:[1], e:`<code>CrossEntropyLoss</code> applique déjà un log-softmax : elle attend des logits.`},
+{cm:"TD5", q:`Dans le TD5, <code>X.permute(0, 3, 2, 1)</code> sur des images (N, H, W, C) donne :`,
+ o:[`(N, C, H, W)`,`(N, C, W, H) : hauteur et largeur inversées`,`(N, H, W, C)`,`(N, W, H, C)`], a:[1], e:`Il fallait <code>permute(0, 3, 1, 2)</code>. Les cartes d'explication doivent être transposées (<code>.T</code>) pour se superposer à l'image.`},
+// ===================== CM6 + TD6 =====================
+{cm:"CM6", q:`La segmentation d'instances est :`,
+ o:[`La segmentation sémantique seule`,`La détection d'objets + la segmentation sémantique (un masque par objet)`,`Les instances + le fond`,`La classification + localisation`], a:[1], e:`Panoptique = instances + « stuff » (ciel, herbe, eau).`},
+{cm:"CM6", q:`À quoi sert le Spatial Pyramid Pooling (SPP) ?`,
+ o:[`À produire un vecteur de taille fixe quelle que soit la taille de l'image`,`À augmenter la résolution`,`À remplacer les convolutions`,`À faire de l'attention`], a:[0], e:`Max pooling dans des grilles 4×4, 2×2, 1×1 → (16 + 4 + 1) × canaux valeurs.`},
+{cm:"CM6", q:`Dans SegNet, le décodeur réutilise :`,
+ o:[`Les indices du max pooling de l'encodeur`,`Les poids de l'encodeur`,`Les labels`,`Des ancres`], a:[0], e:`Pour remettre chaque valeur au bon endroit lors de l'upsampling.`},
+{cm:"CM6", q:`L'idée clé des FCN (Fully Convolutional Networks) :`,
+ o:[`Une couche dense équivaut à une convolution qui couvre toute la région d'entrée, donc le réseau accepte toute taille d'image`,`Ajouter des couches denses`,`Utiliser des ancres`,`Supprimer le pooling`], a:[0], e:`On obtient une carte (heatmap) au lieu d'une seule classe, puis on sur-échantillonne.`},
+{cm:"CM6", q:`La convolution transposée :`,
+ o:[`Inverse exactement la convolution`,`Est un upsampling apprenable (multiplication par Cᵀ), qui peut créer des artefacts en damier`,`Réduit la taille de l'image`,`N'a pas de paramètres`], a:[1], e:`On retrouve la taille d'origine, pas l'image d'origine.`},
+{cm:"CM6", q:`Dans U-Net, les skip connections :`,
+ o:[`Additionnent l'entrée à la sortie du réseau`,`Concatènent les features de l'encodeur avec celles du décodeur au même niveau`,`Relient les ancres`,`Remplacent le pooling`], a:[1], e:`Elles réinjectent les détails de localisation perdus pendant la descente.`},
+{cm:"CM6", q:`R-CNN (« Slow R-CNN ») :`,
+ o:[`Fait passer chaque région proposée (~2000) dans le CNN, puis classe avec des SVM`,`Fait un seul forward pour l'image`,`Utilise un RPN`,`Est one-stage`], a:[0], e:`Les régions viennent de Selective Search et sont déformées à la taille du CNN.`},
+{cm:"CM6", q:`Que permet le RoI Pooling de Fast R-CNN ?`,
+ o:[`Transformer chaque région de la carte de features, quelle que soit sa taille, en une carte de taille fixe`,`Proposer des régions`,`Calculer l'IoU`,`Supprimer les doublons`], a:[0], e:`C'est un SPP à un seul niveau. L'image ne passe qu'une fois dans le CNN.`},
+{cm:"CM6", q:`Avec k = 9 ancres, combien de sorties le RPN produit-il par position ?`,
+ o:[`9 scores et 9 coordonnées`,`18 scores (objet / pas objet) et 36 coordonnées`,`2 scores et 4 coordonnées`,`9 scores et 36 coordonnées`], a:[1], e:`2k scores et 4k coordonnées, par des conv 1×1.`},
+{cm:"CM6", q:`Quelle est la forme de sortie de YOLO v1 sur Pascal VOC (S = 7, B = 2, C = 20) ?`,
+ o:[`7 × 7 × 20`,`7 × 7 × 30`,`7 × 7 × 40`,`448 × 448 × 30`], a:[1], e:`S × S × (B·5 + C) = 7 × 7 × (10 + 20).`},
+{cm:"CM6", q:`Quels détecteurs sont one-stage ? <span class="multi">(plusieurs réponses)</span>`,
+ o:[`YOLO`,`SSD`,`RetinaNet`,`Faster R-CNN`], a:[0,1,2], e:`Faster R-CNN est two-stage (propositions puis classification).`},
+{cm:"CM6", q:`IoU entre la vérité [0, 0, 10, 10] et la prédiction [5, 0, 15, 10] (x1, y1, x2, y2) :`,
+ o:[`0,5`,`0,33`,`0,25`,`0,66`], a:[1], e:`Intersection 5 × 10 = 50, union 100 + 100 − 50 = 150, IoU = 1/3.`},
+{cm:"CM6", q:`Une boîte prédite « chien » a une IoU de 0,86 avec une vérité « chat » (seuil 0,75). C'est :`,
+ o:[`Un TP chien`,`Un FP pour chien et un FN pour chat`,`Un TP chat`,`Rien, on l'ignore`], a:[1], e:`Bonne boîte mais mauvaise classe.`},
+{cm:"CM6", q:`Deux boîtes « chien » (IoU 0,92 et 0,85) recouvrent la même vérité chien. Résultat ?`,
+ o:[`2 TP`,`1 TP (0,92) et 1 FP (0,85)`,`2 FP`,`1 TP et 1 FN`], a:[1], e:`Une vérité ne peut être associée qu'une fois, à la meilleure IoU. C'est ce que règle la NMS en pratique.`},
+{cm:"CM6", q:`L'AP (Average Precision) d'une classe est :`,
+ o:[`La moyenne des précisions des images`,`L'aire sous la courbe précision-rappel`,`La précision au seuil 0,5`,`Le rappel moyen`], a:[1], e:`La mAP est la moyenne des AP sur les classes.`},
+{cm:"CM6", q:`Le Feature Pyramid Network (FPN) améliore surtout :`,
+ o:[`La détection des petits objets`,`La vitesse du backbone`,`Le nombre de classes`,`Les grands objets uniquement`], a:[0], e:`Voie descendante : upsampling ×2 des cartes profondes + addition aux cartes moins profondes (conv 1×1), prédiction à chaque niveau.`},
+{cm:"CM6", q:`Focal loss avec γ = 0 :`,
+ o:[`Vaut zéro`,`Est égale à la cross-entropy`,`Est égale à la MSE`,`Ignore les exemples difficiles`], a:[1], e:`FL = −(1 − p)^γ·log(p). γ = 2 par défaut.`},
+{cm:"CM6", q:`À quoi sert la NMS (Non-Maximum Suppression) ?`,
+ o:[`Garder, parmi des boîtes qui se recouvrent fortement pour le même objet, celle de plus haut score`,`Supprimer les classes rares`,`Réduire la taille du réseau`,`Calculer l'AP`], a:[0], e:`YOLOv10 et DETR s'en passent grâce à un appariement un-pour-un.`},
+{cm:"CM6", q:`Comment YOLOv10 supprime-t-il la NMS ?`,
+ o:[`Têtes one-to-many et one-to-one entraînées ensemble ; seule la one-to-one sert à l'inférence`,`En utilisant un transformer`,`En augmentant le seuil d'IoU`,`En supprimant les ancres`], a:[0], e:`Conception guidée par le compromis précision / latence.`},
+{cm:"CM6", q:`RoI Align (Mask R-CNN) se distingue de RoI Pooling par :`,
+ o:[`L'absence d'arrondi des coordonnées et une interpolation, pour aligner les masques sur les pixels`,`L'utilisation d'ancres`,`L'absence de backbone`,`Une loss focale`], a:[0], e:`Indispensable pour des masques précis.`},
+{cm:"CM6", q:`Dans DETR, pourquoi utilise-t-on l'algorithme hongrois ?`,
+ o:[`Pour calculer les ancres`,`Pour associer chaque objet vrai à exactement une des N prédictions en minimisant le coût total (classe + boîte)`,`Pour faire la NMS`,`Pour entraîner le backbone`], a:[1], e:`La vérité est complétée par des ∅ jusqu'à N.`},
+{cm:"CM6", q:`D'après le tableau du papier DETR (COCO), DETR est :`,
+ o:[`Meilleur sur les petits objets`,`Meilleur sur les grands objets, moins bon sur les petits`,`Moins bon partout`,`Identique à Faster R-CNN`], a:[1], e:`AP<sub>L</sub> 61,1 contre 52,0 ; AP<sub>S</sub> 20,5 contre 24,2 (Faster R-CNN-FPN).`},
+{cm:"CM6", q:`Combien de catégories d'objets dans COCO et dans Pascal VOC ?`,
+ o:[`80 et 20`,`1000 et 20`,`91 et 80`,`20 et 80`], a:[0], e:`COCO : 80 objets + 91 « stuff », 330 k images. VOC 2012 : 20 classes d'objets.`},
+{cm:"CM6", q:`Que signifie « anchor-free » (YOLOv6 et suivants) ?`,
+ o:[`Le modèle prédit les boîtes sans boîtes de référence prédéfinies`,`Le modèle n'a pas de backbone`,`Il n'y a pas de classe background`,`Il n'y a pas de NMS`], a:[0], e:`YOLOv6 : anchor-free (51 % plus rapide), distillation, decoupled head.`},
+{cm:"TD6", q:`Dans le dataset YOLO du TD6, une ligne de fichier label <code>0 0.52 0.40 0.20 0.30</code> signifie :`,
+ o:[`classe 0, x1 y1 x2 y2 en pixels`,`classe 0, centre (x, y) et largeur, hauteur, normalisés entre 0 et 1`,`classe 0, coin haut-gauche et taille en pixels`,`4 classes avec leurs probabilités`], a:[1], e:`D'où le dessin du rectangle en (xc − w/2, yc − h/2) après multiplication par la largeur et la hauteur de l'image.`},
+{cm:"TD6", q:`Dans <code>model.train(data='miniDeepfish/data.yaml', epochs=1, batch=-1, imgsz=640)</code>, <code>batch=-1</code> signifie :`,
+ o:[`Pas de batch`,`Taille de batch choisie automatiquement selon la mémoire GPU`,`Batch inversé`,`Un seul exemple par batch`], a:[1], e:`Et <code>imgsz=640</code> réduit les images en gardant le ratio. La détection de poissons est un problème à 1 classe.`}
+);
+DATA.exos.push(
+{cm:"CM1 · TD1 · TD3", title:"Exercice 1 — Choisir et adapter un modèle pré-entraîné",
+ctx:`Une entreprise veut classer automatiquement des photos de <b>5 espèces de poissons</b> (≈ 400 images d'entraînement par espèce, images couleur de tailles variables). Vous disposez d'un GPU.`,
+parts:[
+{pts:2, q:`Quel modèle proposez-vous ? Justifiez votre choix (au moins 3 arguments).`,
+a:`<p>Exemple de réponse attendue : <b>EfficientNet-B4 pré-entraîné sur ImageNet</b> (<code>torchvision</code>).</p><ul>
+<li><b>Peu de données</b> (≈ 2 000 images) : entraîner un CNN de zéro surapprendrait. Il faut du <b>transfer learning</b> à partir de poids ImageNet, dont les features (bords, textures, formes) sont génériques.</li>
+<li>EfficientNet = <b>compound scaling</b> (profondeur, largeur, résolution) : état de l'art sur ImageNet avec <b>peu de paramètres</b> et une inférence rapide.</li>
+<li>Résolution d'entrée 380×380 pour B4 : utile pour des détails fins (nageoires, motifs).</li>
+<li>Disponible avec ses poids et son pré-traitement dans <code>torchvision</code>, déjà utilisé en TD.</li></ul>
+<p>Autres réponses acceptables si justifiées : ResNet-50 (connexions résiduelles, robuste), ou un backbone transformer <b>DINOv2</b> (features auto-supervisées très générales, linear probing efficace avec peu de labels), ou DeiT. Un ViT entraîné <b>de zéro</b> est à éviter (pas de biais inductif, il faut énormément de données).</p>`},
+{pts:1, q:`Quel pré-traitement faut-il appliquer aux images ? Pourquoi ?`,
+a:`<p>Le <b>même</b> que celui utilisé pour l'entraînement du modèle : <code>weights = EfficientNet_B4_Weights.DEFAULT</code> puis <code>preprocess = weights.transforms()</code> (redimensionnement / crop à 380, passage en float, normalisation <code>mean=[0.485, 0.456, 0.406]</code>, <code>std=[0.229, 0.224, 0.225]</code>). Le réseau a appris sur des images préparées ainsi : sinon ses features n'ont plus de sens.</p>`},
+{pts:3, q:`Écrivez le code qui charge le modèle, adapte la sortie à 5 classes et gèle la partie de description. Justifiez chaque étape.`,
+a:`${C(`
+import torch
+import torch.nn as nn
+import torchvision.models as tm
+from torchvision.models import EfficientNet_B4_Weights
+
+# 1. modèle pré-entraîné + son pré-traitement
+weights = EfficientNet_B4_Weights.DEFAULT
+model = tm.get_model("efficientnet_b4", weights="DEFAULT")
+preprocess = weights.transforms()
+
+# 2. adapter la sortie : classifier = [Dropout, Linear(1792, 1000)]
+model.classifier[1] = nn.Linear(in_features=1792, out_features=5)
+
+# 3. geler la partie description (features)
+for param in model.features.parameters():
+    param.requires_grad = False
+
+# vérification : seul le classifier apprend
+for param in model.classifier.parameters():
+    print(param.requires_grad)      # True
+
+model.to(device)
+`)}
+<ul><li>On remplace <b>uniquement la dernière couche</b> : 1000 sorties ImageNet → 5 espèces. Les 1792 entrées restent celles du GAP d'EfficientNet-B4.</li>
+<li>On <b>gèle</b> <code>features</code> : ces poids sont déjà bons, et la nouvelle tête aléatoire produirait au début de gros gradients qui les abîmeraient. Moins de paramètres à apprendre = moins de surapprentissage avec peu de données, et apprentissage plus rapide.</li></ul>`},
+{pts:3, q:`Écrivez la boucle d'apprentissage de la tête, avec early stopping sur la validation.`,
+a:`${C(`
+import copy
+import torch.nn.functional as F
+from sklearn.metrics import accuracy_score
+
+myLoss = F.cross_entropy
+myOptim = torch.optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()),
+                              lr=0.001, alpha=0.9)
+nbEpochs, max_patience, delta = 100, 10, 0.0001
+best_acc, patience, best_state = 0, 0, None
+
+for epoch in range(nbEpochs):
+    model.train()
+    for X, y in train_loader:
+        X, y = X.to(device), y.to(device)
+        logits = model(X)
+        loss = myLoss(logits, y)
+        myOptim.zero_grad()
+        loss.backward()
+        myOptim.step()
+
+    model.eval()
+    val_acc = 0
+    with torch.inference_mode():
+        for X, y in val_loader:
+            pred = torch.argmax(model(X.to(device)), dim=1).cpu()
+            val_acc += accuracy_score(y, pred)
+    val_acc /= len(val_loader)
+
+    if val_acc - best_acc > delta:            # amélioration
+        best_acc, patience = val_acc, 0
+        best_state = copy.deepcopy(model.state_dict())
+    else:
+        patience += 1
+        if patience >= max_patience:          # early stopping
+            break
+
+model.load_state_dict(best_state)             # on garde le meilleur modèle
+`)}`},
+{pts:3, q:`Faites maintenant un fine-tuning : que dégelez-vous, avec quel learning rate, combien d'époques ? Écrivez le code et justifiez.`,
+a:`${C(`
+# dégeler les 2 derniers blocs de features (les plus spécifiques à ImageNet)
+for param in model.features[-2:].parameters():
+    param.requires_grad = True
+
+# recréer l'optimiseur pour qu'il voie les nouveaux paramètres, lr 10x plus petit
+myOptim = torch.optim.RMSprop(filter(lambda p: p.requires_grad, model.parameters()),
+                              lr=0.0001, alpha=0.9)
+nbEpochs, max_patience = 10, 5     # quelques époques seulement
+# ... même boucle que précédemment
+`)}
+<ul><li>Les <b>derniers blocs</b> codent des features haut niveau propres aux classes d'ImageNet : ce sont eux qu'il faut adapter aux poissons. Les premiers blocs (bords, textures) sont génériques et restent gelés.</li>
+<li><b>lr plus petit</b> (1e-4 au lieu de 1e-3) : on ajuste légèrement, sans détruire les poids pré-entraînés.</li>
+<li><b>Peu d'époques</b> + early stopping : beaucoup plus de paramètres entraînables, donc risque de surapprentissage.</li>
+<li>Il faut <b>recréer l'optimiseur</b> : l'ancien ne contenait que les paramètres du classifier.</li>
+<li>Comparer ensuite les métriques test (accuracy, F1 macro, matrice de confusion) avant et après fine-tuning.</li></ul>`},
+{pts:2, q:`Vous voulez essayer un backbone transformer DINOv2 ViT-S/14. Que changez-vous (pré-traitement, tête, ce qui est gelé) ?`,
+a:`${C(`
+model = torch.hub.load("facebookresearch/dinov2", "dinov2_vits14")
+model.head = nn.Linear(384, 5)          # ViT-S : embedding de dimension 384
+
+for p in model.parameters():            # backbone entièrement gelé
+    p.requires_grad = False
+for p in model.head.parameters():       # seule la tête apprend (linear probing)
+    p.requires_grad = True
+`)}
+<p>Pré-traitement : <code>Resize(256)</code> + <code>CenterCrop(224)</code> + <code>ToTensor</code> + <code>Normalize</code> ImageNet. Avec des patchs de 14, 224/14 = 16, soit 256 patchs. DINOv2 est auto-supervisé (pas de labels ImageNet) : ses features sont très générales et un simple classifieur linéaire suffit souvent.</p>`}
+]},
+
+{cm:"CM2-3 · TD2", title:"Exercice 2 — Distillation de connaissances",
+ctx:`On souhaite déployer un classifieur de chiffres manuscrits (MNIST, 28×28 en niveaux de gris, 10 classes) sur un microcontrôleur. On dispose d'un GPU pour l'entraînement.`,
+parts:[
+{pts:3, q:`Proposez un teacher et un student. Détaillez leur architecture (taille des couches, dropout ou non, régularisation) et justifiez.`,
+a:`${T(["","Teacher","Student"],[
+["Architecture","MLP : 784 → <b>1200</b> → <b>1200</b> → 10, ReLU","MLP : 784 → <b>800</b> → <b>800</b> → 10, ReLU"],
+["Régularisation","<b>dropout</b> (ex : 0,2) + contraintes de norme des poids (max-norm) + <b>data augmentation</b> : images décalées jusqu'à 2 pixels (jitter)","<b>aucune</b> : pas de dropout"],
+["Paramètres","≈ 2,4 M","≈ 1,3 M"],
+["Rôle","modèle le plus précis possible, entraîné seul d'abord","modèle léger à déployer"]])}
+<ul><li>Le teacher doit être <b>gros et bien régularisé</b> : c'est sa connaissance (y compris la similarité entre classes) qu'on transfère. Le dropout et le jitter l'empêchent de surapprendre.</li>
+<li>Le student est <b>plus petit</b> (contrainte de déploiement) et <b>sans régularisation</b> : la distillation joue elle-même le rôle de régularisation (Hinton : le student distillé est « régularisé seulement par la tâche de matcher les soft targets »).</li>
+<li>Variante CNN acceptée : teacher = CNN profond (ou EfficientNet), student = petit CNN (2 conv + 1 FC), à condition de détailler les tailles.</li></ul>`},
+{pts:3, q:`Faites le schéma de la distillation (teacher, student, losses).`,
+a:`${C(`
+                    ┌─────────── TEACHER (figé, eval) ───────────┐
+ image x ──────────►│ conv/FC ... ─► logits z_t ─► softmax(z_t/T) │──┐  soft targets
+   │                └────────────────────────────────────────────┘  │
+   │                                                                ▼
+   │                ┌─────────────── STUDENT ────────────────────┐ ┌──────────┐
+   └───────────────►│ conv/FC ... ─► logits z_s ─┬► softmax(z_s/T)├►│ KL loss  │× λ·T²
+                    └────────────────────────────┼───────────────┘ └──────────┘
+                                                 │                       │
+                                                 └► softmax(z_s) ──► ┌──────────┐
+                              vraies classes y ─────────────────────►│ CE loss  │× (1−λ)
+                                                                     └──────────┘
+                    L = (1 − λ)·CE(softmax(z_s), y) + λ·T²·KL(softmax(z_t/T) ‖ softmax(z_s/T))
+                    seul le student reçoit les gradients
+`)}
+<p>Variantes à mentionner : loss <b>cosinus ou MSE</b> entre features (avant/après flatten, avec projection linéaire si les dimensions diffèrent) ; <b>hard distillation</b> avec les labels prédits par le teacher ; <b>distillation token</b> (DeiT).</p>`},
+{pts:3, q:`Écrivez en PyTorch la fonction de loss de distillation et une itération d'entraînement du student.`,
+a:`${C(`
+import torch.nn.functional as F
+
+def distillation_loss(student_logits, teacher_logits, y, T=20, alpha=0.5):
+    # terme hard : vraies classes
+    loss_hard = F.cross_entropy(student_logits, y)
+    # terme soft : imiter le teacher à température T
+    soft_teacher = F.softmax(teacher_logits / T, dim=1)
+    log_soft_student = F.log_softmax(student_logits / T, dim=1)
+    loss_soft = F.kl_div(log_soft_student, soft_teacher, reduction='batchmean') * (T * T)
+    return (1 - alpha) * loss_hard + alpha * loss_soft
+
+teacher.eval()                                  # teacher figé
+optimizer = torch.optim.Adam(student.parameters(), lr=0.001)
+
+for X, y in train_loader:
+    student.train()
+    X, y = X.to(device), y.to(device)
+    with torch.inference_mode():                # pas de gradient pour le teacher
+        teacher_logits = teacher(X)
+    student_logits = student(X)
+    loss = distillation_loss(student_logits, teacher_logits, y)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+`)}`},
+{pts:2, q:`Quelle température choisir ? Que se passe-t-il si T = 1 ? Pourquoi le facteur T² ? À quelle température évalue-t-on le student ?`,
+a:`<ul><li>Hinton utilise <b>T = 20</b> sur MNIST. Avec T = 1, le teacher très sûr de lui donne des probabilités presque one-hot : le terme soft n'apporte presque rien de plus que les vraies classes.</li>
+<li>T grand rend visibles les petites probabilités (« ce 2 ressemble un peu à un 7 ») : c'est la connaissance utile. Trop grand, tout devient uniforme.</li>
+<li><b>T²</b> : les gradients du terme soft sont en 1/T². On compense pour garder l'équilibre avec le terme hard.</li>
+<li>Évaluation : <b>T = 1</b> (argmax des logits, softmax normal).</li></ul>`},
+{pts:2, q:`Quels résultats attendre (référence Hinton 2015) ? Comment présenter la comparaison ?`,
+a:`<p>Teacher 67 erreurs, student seul 146 erreurs, student distillé 74 erreurs sur les 10 000 images de test. Présenter un tableau : nombre de paramètres, accuracy, nombre d'erreurs, temps d'inférence, pour teacher / student seul / student distillé. Le student distillé doit être bien meilleur que le student seul, avec la même taille.</p>`},
+{pts:4, q:`Expliquez la distillation, étape par étape, à un élève de 4<sup>e</sup> année qui sait entraîner un CNN mais ne connaît rien d'autre.`,
+a:`<p>« Tu sais déjà entraîner un réseau avec la cross-entropy et les vraies étiquettes. La distillation, c'est faire apprendre un <b>petit</b> réseau (l'élève) avec l'aide d'un <b>gros</b> réseau déjà entraîné (le professeur). »</p>
+<ol><li><b>Entraîne le professeur</b> normalement : un gros réseau, avec dropout et augmentation de données, pour qu'il soit le meilleur possible. Une fois fini, tu ne le modifies plus (<code>eval()</code>, pas de gradient).</li>
+<li><b>Choisis l'élève</b> : un réseau plus petit, assez léger pour ton cas d'usage.</li>
+<li><b>Pourquoi le professeur aide</b> : pour une image de 2, l'étiquette dit juste « 2 ». Le professeur, lui, sort des probabilités : « 2 à 90 %, un peu 7, un peu 3, pas du tout 1 ». Ces petites probabilités disent quels chiffres se ressemblent : c'est une information en plus que l'étiquette ne donne pas.</li>
+<li><b>Adoucis les probabilités</b> avec une température : on divise les logits par T (par exemple 20) avant le softmax. Les petites probabilités deviennent plus visibles.</li>
+<li><b>Pour chaque batch</b> : tu passes les images dans le professeur (sans gradient) et dans l'élève. Tu calcules deux erreurs : (a) la cross-entropy habituelle entre l'élève et les vraies étiquettes ; (b) une distance (KL) entre les probabilités adoucies de l'élève et celles du professeur, multipliée par T².</li>
+<li><b>Mélange les deux</b> : loss = (1 − λ)·(a) + λ·(b), par exemple λ = 0,5. Puis backward et step <b>uniquement sur l'élève</b>.</li>
+<li><b>Évalue l'élève</b> normalement (T = 1) et compare-le au même petit réseau entraîné sans professeur : il doit être meilleur. »</li></ol>`}
+]},
+
+{cm:"CM4 · TD4", title:"Exercice 3 — Hiérarchie à trois niveaux (Hierarchy-Aware CNN)",
+ctx:`On reprend le TD4 : CIFAR-100 (images 32×32×3), <b>15 classes</b> fines regroupées en <b>3 superclasses</b> (food containers, aquatic mammals, large carnivores). On ajoute un niveau au-dessus : <b>2 super-superclasses</b> (« objets » = food containers ; « animaux » = aquatic mammals + large carnivores). Le réseau de base est celui du TD : [2 conv 32 + maxpool] → [2 conv 64 + maxpool] → [2 conv 128 + maxpool] → dropout 0,4 → flatten → linear.`,
+parts:[
+{pts:2, q:`Dessinez la hiérarchie des labels.`,
+a:`${C(`
+racine
+├── objets (super-super 0)
+│     └── food containers (super 0) : bottle, bowl, can, cup, plate
+└── animaux (super-super 1)
+      ├── aquatic mammals (super 1) : beaver, dolphin, otter, seal, whale
+      └── large carnivores (super 2) : bear, leopard, lion, tiger, wolf
+2 super-superclasses → 3 superclasses → 15 classes (arbre à 3 niveaux)
+`)}`},
+{pts:4, q:`Faites le schéma du modèle comme dans le cours : entrée, blocs conv + pooling, et les 3 sorties, en indiquant les dimensions à chaque étape. Justifiez la position des branches.`,
+a:`${C(`
+entrée 3×32×32
+  │
+  ▼ block1 : conv3×3(3→32)+ReLU, conv3×3(32→32)+ReLU, maxpool 2
+32×16×16 ──┬──► flatten (8192) ─► FC 200 + ReLU ─► dropout ─► FC 2   ─► loss super-super
+           │
+           ▼ block2 : conv(32→64)+ReLU, conv(64→64)+ReLU, maxpool 2
+64×8×8  ───┬──► flatten (4096) ─► FC 200 + ReLU ─► dropout ─► FC 3   ─► loss super
+           │
+           ▼ block3 : conv(64→128)+ReLU, conv(128→128)+ReLU, maxpool 2
+128×4×4 ──► dropout 0.4 ─► flatten (2048) ─► FC 15 ─────────────────► loss fine
+
+loss totale = α1·CE(super-super) + α2·CE(super) + CE(fine)
+`)}
+<ul><li>Toutes les convolutions ont <code>padding=1</code> : seul le maxpool divise la taille (32 → 16 → 8 → 4).</li>
+<li>Comme dans le papier (Bilal et al.) : les <b>niveaux grossiers</b> sortent <b>tôt</b>, car les premières couches suffisent à séparer de grandes catégories (objets vs animaux : couleurs, formes). Le niveau fin a besoin de toute la profondeur.</li>
+<li>Chaque branche = FC 200 → FC n<sub>classes</sub> → loss (les 200 neurones reprennent le schéma du cours).</li></ul>`},
+{pts:5, q:`Écrivez le modèle en PyTorch : les 3 blocs et les 3 têtes dans <code>__init__</code>, et un <code>forward</code> qui renvoie les 3 sorties.`,
+a:`${C(`
+import torch
+import torch.nn as nn
+
+class HierModel3(nn.Module):
+    def __init__(self, n_supsup=2, n_sup=3, n_fine=15):
+        super().__init__()
+        self.block1 = nn.Sequential(
+            nn.Conv2d(3, 32, 3, padding=1), nn.ReLU(),
+            nn.Conv2d(32, 32, 3, padding=1), nn.ReLU(),
+            nn.MaxPool2d(2))                                  # -> 32x16x16
+        self.block2 = nn.Sequential(
+            nn.Conv2d(32, 64, 3, padding=1), nn.ReLU(),
+            nn.Conv2d(64, 64, 3, padding=1), nn.ReLU(),
+            nn.MaxPool2d(2))                                  # -> 64x8x8
+        self.block3 = nn.Sequential(
+            nn.Conv2d(64, 128, 3, padding=1), nn.ReLU(),
+            nn.Conv2d(128, 128, 3, padding=1), nn.ReLU(),
+            nn.MaxPool2d(2))                                  # -> 128x4x4
+
+        self.head_supsup = nn.Sequential(nn.Flatten(), nn.Linear(32*16*16, 200), nn.ReLU(),
+                                         nn.Dropout(0.4), nn.Linear(200, n_supsup))
+        self.head_sup = nn.Sequential(nn.Flatten(), nn.Linear(64*8*8, 200), nn.ReLU(),
+                                      nn.Dropout(0.4), nn.Linear(200, n_sup))
+        self.head_fine = nn.Sequential(nn.Dropout(0.4), nn.Flatten(),
+                                       nn.Linear(128*4*4, n_fine))
+
+    def forward(self, x):
+        x1 = self.block1(x)
+        out_supsup = self.head_supsup(x1)      # niveau le plus grossier, sortie la plus tôt
+        x2 = self.block2(x1)
+        out_sup = self.head_sup(x2)
+        x3 = self.block3(x2)
+        out_fine = self.head_fine(x3)          # niveau le plus fin, en bout de réseau
+        return out_supsup, out_sup, out_fine
+`)}
+<p>Test : <code>[o.shape for o in HierModel3()(torch.zeros(4, 3, 32, 32))]</code> doit donner (4, 2), (4, 3), (4, 15).</p>`},
+{pts:3, q:`Écrivez la loss et une itération d'entraînement. Comment obtenir les labels des 3 niveaux à partir du label fin ?`,
+a:`${C(`
+fine_to_sup    = torch.tensor([0,0,0,0,0, 1,1,1,1,1, 2,2,2,2,2])   # 15 -> 3
+sup_to_supsup  = torch.tensor([0, 1, 1])                           # 3 -> 2
+
+loss_fn = nn.CrossEntropyLoss()
+alpha1, alpha2 = 0.5, 1.0
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+for X, y_fine in train_loader:
+    X, y_fine = X.to(device), y_fine.to(device)
+    y_sup = fine_to_sup.to(device)[y_fine]          # on remonte l'arbre
+    y_supsup = sup_to_supsup.to(device)[y_sup]
+
+    model.train()
+    out_ss, out_s, out_f = model(X)
+    loss = (alpha1 * loss_fn(out_ss, y_supsup)
+          + alpha2 * loss_fn(out_s, y_sup)
+          + loss_fn(out_f, y_fine))
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+`)}
+<p>Les α règlent l'importance de chaque niveau (comme la somme pondérée de B-CNN). Le gradient de la loss super-super ne remonte que dans <code>block1</code> ; <code>block1</code> est donc supervisé par les 3 losses.</p>`},
+{pts:2, q:`Les 3 sorties peuvent être incohérentes. Comment le mesurer ? Comment garantir la cohérence ?`,
+a:`<ul><li>Mesure : prédire les 3 niveaux, remonter la prédiction fine (<code>fine_to_sup[pred_fine]</code>) et vérifier qu'elle correspond à <code>pred_sup</code>, puis à <code>pred_supsup</code>. Pourcentage d'images cohérentes sur le test (85 % dans le TD4 à 2 niveaux).</li>
+<li>Garantir : (a) n'utiliser que la sortie fine et remonter l'arbre (flat) ; (b) approche de type <b>C-HMCNN</b> : score d'un parent = max des scores de ses descendants (MCM), cohérent par construction ; (c) prédictions conditionnelles le long de l'arbre comme YOLO9000 / HXE : p(fine) = p(fine | sup)·p(sup | supsup)·p(supsup).</li></ul>`},
+{pts:2, q:`Comment évaluez-vous ce modèle ? Citez des métriques classiques et hiérarchiques.`,
+a:`<ul><li>Par niveau : accuracy, F1 macro, matrice de confusion (2×2, 3×3, 15×15).</li>
+<li>Comparer avec un modèle flat (15 classes ramenées aux niveaux supérieurs) et un modèle direct par niveau.</li>
+<li>Hiérarchiques : part des erreurs <b>intra-superclasse</b> (« better mistakes »), distance hiérarchique moyenne (LCA), P/R/F<sub>LCA</sub>.</li></ul>`}
+]}
+);
+DATA.exos.push(
+{cm:"CM5 · TD5", title:"Exercice 4 — Expliquer les décisions d'un classifieur chat / chien / oiseau",
+ctx:`On reprend le modèle du TD5 : VGG16 pré-entraîné, <code>features</code> gelées, <code>avgpool = AdaptiveAvgPool2d((1,1))</code>, <code>classifier = Sequential(Linear(512, 3), Softmax(dim=-1))</code>. Images Pascal VOC 224×224 normalisées ImageNet. Accuracy test : 88 %. <code>x</code> est une image pré-traitée de forme (1, 3, 224, 224), <code>predClass</code> sa classe prédite.`,
+parts:[
+{pts:2, q:`Pourquoi les modifications de <code>avgpool</code> et du <code>classifier</code> rendent-elles possible le calcul de la CAM ?`,
+a:`<ul><li><code>features</code> sort <b>512 cartes 7×7</b>. Le GAP les résume en 512 moyennes, puis une seule Linear(512, 3) donne score<sub>c</sub> = Σ<sub>k</sub> w<sub>k</sub><sup>c</sup>·moyenne(M<sub>k</sub>) + b.</li>
+<li>La moyenne étant linéaire, on peut pondérer les cartes <b>avant</b> de moyenner : CAM<sub>c</sub> = Σ<sub>k</sub> w<sub>k</sub><sup>c</sup>·M<sub>k</sub>, une carte 7×7 dont la moyenne redonne le score.</li>
+<li>Avec l'<code>avgpool</code> d'origine (7×7) et les FC de 4096, il n'y a plus un poids par carte et par classe : la CAM n'est pas calculable. C'est le défaut de CAM (modifier et ré-entraîner le réseau), corrigé par Grad-CAM.</li></ul>`},
+{pts:3, q:`Écrivez le code de la carte d'occlusion (carré 101×101, stride 8) et expliquez comment la lire.`,
+a:`${C(`
+size, stride = 101, 8
+half = size // 2
+positions = list(range(0, 224, stride))          # 28 positions
+occ = np.zeros((len(positions), len(positions)))
+
+with torch.no_grad():
+    for a, i in enumerate(positions):
+        batch = x.repeat(len(positions), 1, 1, 1)  # 28 copies de l'image
+        for b, j in enumerate(positions):
+            batch[b, :, max(0, i-half):i+half+1, max(0, j-half):j+half+1] = 0   # gris = 0
+        occ[a] = vggmodel(batch)[:, predClass].cpu().numpy()
+
+occMap = skimage.transform.resize(occ, (224, 224))
+plt.imshow(imgDisplay); plt.imshow(occMap.T, cmap='jet_r', alpha=0.5)
+`)}
+<p>0 = gris moyen après normalisation. Valeur de la carte = P(predClass) quand la zone est cachée : <b>valeur basse = zone importante</b>. 784 forwards au lieu de 50 176 grâce au stride ; le batch de 28 accélère sur GPU. Le <code>.T</code> corrige l'inversion hauteur/largeur du <code>permute(0,3,2,1)</code> du TD.</p>`},
+{pts:3, q:`Écrivez le code de la saliency map par rétropropagation.`,
+a:`${C(`
+xs = x.clone().detach().requires_grad_(True)     # les pixels deviennent la variable
+vggmodel.zero_grad()
+score = vggmodel(xs)[0, predClass]
+score.backward()                                 # d score / d pixels
+saliency = xs.grad[0].abs().max(dim=0)[0]        # |grad| puis max sur RGB -> (224, 224)
+`)}
+<p>Rapide (1 forward + 1 backward), précise au pixel mais bruitée et peu discriminante entre classes. Le modèle finit par un softmax : quand P ≈ 1, les gradients sont faibles (saturation) ; le papier dérive plutôt le score avant softmax.</p>`},
+{pts:4, q:`Écrivez le code de la CAM pour la classe prédite, puis pour chacune des 3 classes.`,
+a:`${C(`
+with torch.no_grad():
+    maps = vggmodel.features(x)[0]               # (512, 7, 7)
+W = vggmodel.classifier[0].weight                # (3, 512)
+
+def cam_for(c):
+    w = W[c]                                     # (512,)
+    cam = torch.einsum('k,kij->ij', w, maps)     # somme pondérée des cartes -> (7, 7)
+    cam = cam.detach().cpu().numpy()
+    return skimage.transform.resize(cam, (224, 224))   # upsampling
+
+fig, axes = plt.subplots(1, 3)
+for c in range(3):
+    axes[c].imshow(imgDisplay)
+    axes[c].imshow(cam_for(c).T, cmap='jet', alpha=0.5)
+    axes[c].set_title(f'CAM {classesNames[c]}')
+`)}
+<p>Équivalent sans einsum : <code>(w[:, None, None] * maps).sum(0)</code>. Pour une image de chat prédite à 100 %, la CAM « cat » éclaire la tête du chat, les CAM « dog » et « bird » sont diffuses.</p>`},
+{pts:4, q:`Écrivez le code de Grad-CAM. Pourquoi le recalcul pour les 3 classes demande-t-il une précaution ?`,
+a:`${C(`
+def gradcam(c):
+    feat = vggmodel.features(x).detach().requires_grad_(True)   # A^k : (1, 512, 7, 7)
+    pooled = vggmodel.avgpool(feat).flatten(1)
+    out = vggmodel.classifier(pooled)                           # fin du réseau
+    out[0, c].backward()                                        # dy^c / dA^k
+    alphas = feat.grad[0].mean(dim=(1, 2))                      # GAP des gradients -> (512,)
+    cam = torch.relu((alphas[:, None, None] * feat[0]).sum(0))  # ReLU(somme pondérée)
+    return cam.detach().cpu().numpy()
+`)}
+<p>Comme dans la slide 28 : on découpe le réseau en deux (jusqu'aux cartes, puis des cartes à la sortie) et on rend les cartes dérivables. Précaution : PyTorch <b>accumule</b> les gradients. Ici <code>feat</code> est recréé à chaque appel, donc son <code>.grad</code> repart de zéro ; si on réutilise le même tenseur, il faut <code>feat.grad = None</code> (ou zero_grad) entre deux classes. Sur cette architecture (GAP + une Linear), si l'on dérive le score <b>avant</b> le softmax, Grad-CAM redonne exactement la CAM (à un facteur près). Ici le classifier se termine par un Softmax, donc le résultat en est seulement proche.</p>`},
+{pts:2, q:`Comment obtenir une carte à la fois nette et discriminante ? Écrivez l'idée du code.`,
+a:`${C(`
+def relu_hook_function(module, grad_in, grad_out):
+    if isinstance(module, torch.nn.ReLU):
+        return (torch.clamp(grad_in[0], min=0.),)     # ne garder que les gradients positifs
+
+for layer in vggmodel.modules():
+    if isinstance(layer, torch.nn.ReLU):
+        layer.register_backward_hook(relu_hook_function)
+
+# guided backprop = saliency calculée avec ces hooks : gb de forme (3, 224, 224)
+guided_gradcam = gb * resize(gradcam(predClass), (224, 224))   # produit pixel à pixel
+`)}
+<p><b>Guided Grad-CAM</b> = Guided Backprop (haute résolution, non discriminant) ⊙ Grad-CAM agrandie (discriminante, basse résolution).</p>`},
+{pts:2, q:`Une image d'oiseau est classée « chat ». Comment utiliseriez-vous ces méthodes pour comprendre l'erreur ?`,
+a:`<p>Calculer occlusion et Grad-CAM pour la classe prédite (« cat ») <b>et</b> pour la vraie classe (« bird »). Si la zone qui fait dire « chat » est le fond (canapé, intérieur) et non l'animal, le modèle a appris un <b>biais de contexte</b> (comme l'exemple NNTP de 20 Newsgroups). Si la zone est sur l'animal, c'est une vraie ambiguïté (oiseau petit, flou, de dos). Conséquences : ajouter des données variées, faire de l'augmentation, recadrer.</p>`}
+]},
+
+{cm:"CM2-3", title:"Exercice 5 — Un Vision Transformer sur MNIST",
+ctx:`On construit un petit ViT pour MNIST (images 1×28×28, 10 classes), avec des patchs 4×4 et une dimension d'embedding D = 64, 4 têtes d'attention.`,
+parts:[
+{pts:2, q:`Combien de patchs ? Quelle est la dimension d'un patch aplati ? Combien de tokens entrent dans l'encodeur ? Quelle est la taille de la matrice d'attention d'une tête ?`,
+a:`<ul><li>28/4 = 7 → <b>7 × 7 = 49 patchs</b>.</li><li>Patch aplati : 4 × 4 × 1 = <b>16 valeurs</b> (d'où <code>nn.Linear(16, embed_dim)</code> dans la slide).</li>
+<li>49 + 1 [CLS] = <b>50 tokens</b> de dimension 64.</li><li>Matrice d'attention : <b>50 × 50</b> par tête. Avec 4 têtes, d<sub>k</sub> = 64/4 = 16.</li></ul>`},
+{pts:3, q:`Écrivez le module de patch embedding avec une convolution, le token [CLS] et le position embedding.`,
+a:`${C(`
+class PatchEmbedding(nn.Module):
+    def __init__(self, patch_size=4, embed_dim=64, n_patches=49):
+        super().__init__()
+        self.proj = nn.Conv2d(1, embed_dim, kernel_size=patch_size, stride=patch_size)
+        self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
+        self.pos_embed = nn.Parameter(torch.zeros(1, n_patches + 1, embed_dim))
+
+    def forward(self, x):                      # x : (B, 1, 28, 28)
+        x = self.proj(x)                       # (B, 64, 7, 7)
+        x = x.flatten(2).transpose(1, 2)       # (B, 49, 64)
+        cls = self.cls_token.expand(x.shape[0], -1, -1)   # (B, 1, 64)
+        x = torch.cat([cls, x], dim=1)         # (B, 50, 64)
+        return x + self.pos_embed              # position embedding appris, ajouté
+`)}
+<p>Paramètres de la conv : 64 × (16 + 1) = 1 088, exactement ceux de <code>Linear(16, 64)</code>. La conv évite d'écrire le découpage en patchs à la main (la « première solution » de la slide, plus pénible à implémenter).</p>`},
+{pts:3, q:`Écrivez la fonction d'attention (dot-product) et expliquez les formes.`,
+a:`${C(`
+import math
+
+def attention(Q, K, V):
+    # Q, K : (B, h, T, dk)   V : (B, h, T, dv)
+    dk = Q.shape[-1]
+    scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(dk)   # (B, h, T, T)
+    weights = torch.softmax(scores, dim=-1)                          # somme à 1 par ligne
+    return torch.matmul(weights, V), weights                         # (B, h, T, dv)
+`)}
+<p>On transpose seulement les deux dernières dimensions. Les poids d'attention (B, h, T, T) servent aussi à l'<b>attention rollout</b> : moyenne sur les têtes, + identité, normalisation, produit sur les blocs, puis <code>rollout[index, 1:, 0]</code> remis en 7×7.</p>`},
+{pts:2, q:`Classification : [CLS] ou GAP ? Et pourquoi ce ViT risque-t-il de faire moins bien qu'un petit CNN sur MNIST ?`,
+a:`<p>ViT utilise la sortie du <b>[CLS]</b> (point de vue transformer) ; le GAP sur les tokens (point de vue CNN) donne des résultats proches avec un bon lr. Sans biais inductif (localité, partage des poids), un ViT a besoin de beaucoup de données : sur 60 000 petites images, un CNN de quelques couches est souvent meilleur et plus rapide. Solutions : distillation depuis un CNN (DeiT), augmentation de données, ou partir d'un ViT pré-entraîné.</p>`}
+]},
+
+{cm:"CM2-3 · TD3", title:"Exercice 6 — Poissons méditerranéens : quelle stratégie ?",
+ctx:`<i>Question posée en CM3.</i> « Vous disposez d'une base de données contenant des images de poissons de 12 espèces méditerranéennes. Certaines espèces font partie des classes présentes dans ImageNet mais pas toutes. On vous demande de mettre en place un modèle permettant de classer au mieux ces espèces. Que proposez-vous ? Détaillez bien vos hypothèses et solutions. »`,
+parts:[
+{pts:6, q:`Rédigez votre proposition (hypothèses, modèles, protocole, évaluation).`,
+a:`<p><b>Hypothèses</b> : peu d'images par espèce (centaines), classes parfois très proches visuellement, certaines espèces absentes d'ImageNet, déséquilibre possible entre espèces.</p>
+<p><b>Solution 1 : transfer learning CNN</b> (EfficientNet-B4 ou ResNet). Pré-traitement du modèle, nouvelle tête Linear(1792, 12), backbone gelé, entraînement de la tête, puis fine-tuning des 2 derniers blocs avec un lr 10× plus petit. Les features ImageNet sont génériques, donc utiles même pour les espèces absentes d'ImageNet. Le fine-tuning adapte les features haut niveau.</p>
+<p><b>Solution 2 : backbone transformer auto-supervisé</b> (DINOv2 ViT-S/14 ou ViT-B/14), en linear probing (tête Linear(384, 12)). DINOv2 n'a pas été entraîné avec les labels d'ImageNet mais sur LVD-142M sans labels : ses features ne sont pas biaisées vers les 1 000 classes, ce qui aide pour les espèces inconnues. DeiT est aussi possible (ViT distillé depuis un CNN).</p>
+<p><b>Solution 3, si le modèle doit être léger</b> : <b>distiller</b> le meilleur modèle (teacher) vers un petit réseau (student).</p>
+<p><b>Protocole</b> : découpage stratifié train / validation / test ; <b>data augmentation</b> (flips, crops, variations de couleur) ; early stopping sur la validation ; même nombre d'époques et mêmes données pour comparer.</p>
+<p><b>Évaluation</b> : accuracy, <b>F1 macro</b> (classes déséquilibrées), matrice de confusion pour repérer les espèces confondues ; Grad-CAM pour vérifier que le modèle regarde le poisson et pas le fond (biais de contexte : aquarium, filet, étal).</p>
+<p><b>Si les espèces ont une taxonomie</b> (famille, genre) : on peut ajouter une sortie hiérarchique (CM4) pour que les erreurs restent dans la même famille.</p>`}
+]},
+
+{cm:"CM6 · TD6", title:"Exercice 7 — Détection de poissons avec YOLO",
+ctx:`On veut détecter les poissons dans des vidéos sous-marines (dataset miniDeepfish du TD6). Les annotations sont au format YOLO : un fichier <code>.txt</code> par image, une ligne par objet.`,
+parts:[
+{pts:2, q:`Le cours propose plusieurs familles de détecteurs. Lequel choisissez-vous pour ce problème ? Justifiez.`,
+a:`<p><b>YOLO</b> (par exemple YOLOv5mu ou YOLOv8 via Ultralytics) : détecteur <b>one-stage</b>, temps réel (vidéo), facile à fine-tuner, pré-entraîné sur COCO. Faster R-CNN (two-stage) est plus lent. DETR est très bon sur les grands objets mais lent à entraîner et moins bon sur les petits objets (or les poissons peuvent être petits). Avec beaucoup de petits poissons, une version avec FPN / multi-échelle est préférable.</p>`},
+{pts:2, q:`La ligne <code>0 0.50 0.40 0.20 0.30</code> annote une image de 1920×1080. Donnez les coordonnées du rectangle en pixels (coin haut-gauche, largeur, hauteur).`,
+a:`<p>Format : classe, x<sub>centre</sub>, y<sub>centre</sub>, largeur, hauteur, <b>normalisés</b>.</p>
+<ul><li>x<sub>c</sub> = 0,50 × 1920 = 960 ; y<sub>c</sub> = 0,40 × 1080 = 432 ; w = 0,20 × 1920 = 384 ; h = 0,30 × 1080 = 324.</li>
+<li>Coin haut-gauche : (960 − 192, 432 − 162) = <b>(768, 270)</b>, largeur 384, hauteur 324.</li></ul>
+${C(`
+rect = patches.Rectangle((b1 - 0.5*b3, b2 - 0.5*b4), b3, b4, edgecolor='yellow', facecolor='none')
+`)}`},
+{pts:2, q:`Écrivez le code Ultralytics pour fine-tuner un YOLO pré-entraîné et prédire sur une image de test.`,
+a:`${C(`
+from ultralytics import YOLO
+
+model = YOLO('yolov5mu.pt')          # modèle pré-entraîné, pas trop gourmand
+results = model.train(data='miniDeepfish/data.yaml', epochs=30, batch=-1, imgsz=640)
+
+results = model('test/images/7268_F1_f000304.jpg')
+results[0].show()
+`)}
+<p><code>batch=-1</code> : taille de batch automatique selon la mémoire GPU. <code>imgsz=640</code> : images réduites en gardant le ratio. Le fichier <code>data.yaml</code> donne les chemins train/valid/test et la liste des classes (1 seule : poisson).</p>`},
+{pts:3, q:`Vérité terrain : G1 = [100, 100, 200, 200], G2 = [300, 100, 380, 160]. Prédictions (avec score) : P1 = [110, 110, 210, 210] (0,9), P2 = [300, 100, 380, 160] (0,8), P3 = [500, 500, 550, 550] (0,6), P4 = [105, 100, 205, 200] (0,5). Seuil d'IoU 0,5. Calculez TP, FP, FN, précision et rappel.`,
+a:`<ul><li>IoU(P1, G1) : intersection [110, 110, 200, 200] = 90 × 90 = 8 100 ; union 10 000 + 10 000 − 8 100 = 11 900 → <b>0,68</b> → TP.</li>
+<li>IoU(P2, G2) = <b>1</b> → TP.</li>
+<li>P3 ne recouvre rien → <b>FP</b>.</li>
+<li>IoU(P4, G1) : intersection [105, 100, 200, 200] = 95 × 100 = 9 500 ; union 10 000 + 10 000 − 9 500 = 10 500 → 0,90. Mais G1 est <b>déjà associée</b> à P1 (traitée en premier car score plus élevé) → <b>FP</b> (doublon : c'est ce que la NMS aurait supprimé).</li></ul>
+<p>TP = 2, FP = 2, FN = 0 → précision = 2/4 = <b>0,5</b>, rappel = 2/2 = <b>1</b>.</p>`},
+{pts:2, q:`Expliquez ce qu'est la NMS et pourquoi YOLOv10 ou DETR peuvent s'en passer.`,
+a:`<p>La NMS trie les boîtes par score et supprime celles qui ont une forte IoU avec une boîte de meilleur score de la même classe : il ne reste qu'une boîte par objet (P4 serait supprimée). YOLOv10 entraîne une tête one-to-one (en plus de one-to-many) et n'utilise qu'elle à l'inférence. DETR associe chaque objet à une seule query par matching hongrois. Dans les deux cas, pas de doublons, donc pas de NMS.</p>`},
+{pts:2, q:`Comment évaluez-vous le modèle ? Que signifient mAP50 et mAP50-95 affichés par Ultralytics ?`,
+a:`<p>Précision, rappel, AP = aire sous la courbe précision-rappel (en faisant varier le seuil de confiance), mAP = moyenne des AP sur les classes (ici une seule classe, donc mAP = AP). <b>mAP50</b> : seuil d'IoU 0,5. <b>mAP50-95</b> : moyenne des mAP pour les seuils 0,50, 0,55, …, 0,95 (métrique COCO, plus exigeante sur la précision des boîtes).</p>`}
+]},
+
+{cm:"CM4", title:"Exercice 8 — Multi-label",
+ctx:`Des photos de plage peuvent contenir plusieurs éléments parmi : <b>personne, chien, parasol, bateau</b> (4 labels non exclusifs). Ex : x₀ = {personne, parasol}, x₁ = {chien}, x₂ = {personne, chien, parasol}, x₃ = {bateau}.`,
+parts:[
+{pts:2, q:`Écrivez les vecteurs cibles de x₀ à x₃. Pourquoi ne peut-on pas utiliser un softmax ?`,
+a:`${T(["","personne","chien","parasol","bateau"],[["x₀","1","0","1","0"],["x₁","0","1","0","0"],["x₂","1","1","1","0"],["x₃","0","0","0","1"]])}
+<p>Un softmax impose que les probabilités somment à 1, donc des classes exclusives. Ici x₂ a trois labels vrais : il faut une sigmoïde indépendante par label.</p>`},
+{pts:3, q:`Appliquez Label Powerset à ces 4 exemples, puis expliquez ce que ferait Classifier Chains dans l'ordre personne → chien → parasol → bateau.`,
+a:`<p><b>Label Powerset</b> : chaque combinaison vue devient une classe : λ₀ = {personne, parasol}, λ₁ = {chien}, λ₂ = {personne, chien, parasol}, λ₃ = {bateau}. Problème multi-classe à 4 classes (au maximum 2⁴ = 16). Impossible de prédire {chien, bateau}, jamais vue.</p>
+<p><b>Classifier Chains</b> : c₀ prédit « personne » à partir de x ; c₁ prédit « chien » à partir de (x, personne) ; c₂ prédit « parasol » à partir de (x, personne, chien) ; c₃ prédit « bateau » à partir de (x, personne, chien, parasol). Labels vrais en entraînement, prédits en test. Le modèle peut apprendre que « parasol » va souvent avec « personne ».</p>`},
+{pts:3, q:`Adaptez un CNN pré-entraîné en multi-label : écrivez la tête, la loss et la prédiction.`,
+a:`${C(`
+model.classifier[1] = nn.Linear(1792, 4)        # 4 sorties = 4 labels
+loss_fn = nn.BCEWithLogitsLoss()                # sigmoïde + binary cross-entropy
+
+logits = model(X)                               # (B, 4)
+loss = loss_fn(logits, Y.float())               # Y : vecteurs binaires (B, 4)
+
+probs = torch.sigmoid(logits)
+pred = (probs > 0.5).int()                      # un seuil par label
+`)}
+<p>C'est l'équivalent « réseau » de Binary Relevance (une décision indépendante par label), mais avec des features partagées. Métriques : F1 micro/macro par label, Hamming loss.</p>`}
+]}
+);
+DATA.code.push(
+{cm:"CM1", pts:3, title:"Trouver les erreurs dans une boucle d'apprentissage",
+q:`Ce code contient <b>5 erreurs</b>. Trouvez-les et corrigez-les.${C(`
+model = MyCNN()
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+for epoch in range(nbEpochs):
+    for X, y in train_loader:
+        logits = model(X.to(device))
+        loss = F.cross_entropy(logits, y.to(device)).item()
+        loss.backward()
+        optimizer.step()
+    # validation
+    val_acc = 0
+    for X, y in val_loader:
+        pred = torch.argmax(model(X.to(device)), dim=1).cpu()
+        val_acc += accuracy_score(y, pred)
+    print(val_acc)
+`)}`,
+a:`<ol><li><code>model</code> n'est jamais envoyé sur le GPU : ajouter <code>model.to(device)</code>.</li>
+<li><code>.item()</code> transforme la loss en float Python : <code>backward()</code> est impossible. Garder le tenseur, et utiliser <code>.item()</code> seulement pour l'affichage.</li>
+<li>Pas de <code>optimizer.zero_grad()</code> : les gradients s'accumulent d'un batch à l'autre.</li>
+<li>Pas de <code>model.train()</code> au début de l'époque ni de <code>model.eval()</code> avant la validation (dropout, batch norm).</li>
+<li>La validation n'est pas sous <code>torch.inference_mode()</code> / <code>no_grad()</code>, et <code>val_acc</code> n'est pas divisé par <code>len(val_loader)</code>.</li></ol>
+${C(`
+model = MyCNN().to(device)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+for epoch in range(nbEpochs):
+    model.train()
+    for X, y in train_loader:
+        X, y = X.to(device), y.to(device)
+        loss = F.cross_entropy(model(X), y)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    model.eval()
+    val_acc = 0
+    with torch.inference_mode():
+        for X, y in val_loader:
+            pred = torch.argmax(model(X.to(device)), dim=1).cpu()
+            val_acc += accuracy_score(y, pred)
+    print(val_acc / len(val_loader))
+`)}`},
+
+{cm:"CM1", pts:2, title:"Prédire la sortie d'autograd",
+q:`Que s'affiche-t-il ?${C(`
+def g(a, b):
+    return 3*(a*a) + 5*(a*b + 10)
+
+x1 = torch.tensor(100.0, requires_grad=True)
+x2 = torch.tensor(-10.0, requires_grad=True)
+out = g(x1, x2)
+out.backward()
+print(out.item(), x1.grad.item(), x2.grad.item())
+out = g(x1, x2)
+out.backward()
+print(x1.grad.item())
+`)}`,
+a:`<ul><li>g = 3·10 000 + 5·(−1 000 + 10) = 30 000 − 4 950 = <b>25 050</b>.</li>
+<li>∂g/∂a = 6a + 5b = 600 − 50 = <b>550</b> ; ∂g/∂b = 5a = <b>500</b>.</li>
+<li>Deuxième backward sans remise à zéro : les gradients <b>s'accumulent</b>, donc <code>x1.grad</code> = 550 + 550 = <b>1 100</b>.</li></ul>
+<p>Affichage : <code>25050.0 550.0 500.0</code> puis <code>1100.0</code>.</p>`},
+
+{cm:"CM1", pts:3, title:"Compléter un CNN et calculer les dimensions",
+q:`Complétez la taille de la couche <code>fc</code> et donnez la forme du tenseur après chaque couche pour une entrée (8, 3, 64, 64).${C(`
+class Net(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, padding=1)
+        self.conv3 = nn.Conv2d(32, 64, kernel_size=3)       # pas de padding
+        self.pool = nn.MaxPool2d(2)
+        self.fc = nn.Linear(???, 10)
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = self.pool(F.relu(self.conv3(x)))
+        return self.fc(torch.flatten(x, 1))
+`)}`,
+a:`${T(["Étape","Forme"],[["entrée","(8, 3, 64, 64)"],["conv1 (padding 1)","(8, 16, 64, 64)"],["pool","(8, 16, 32, 32)"],["conv2 (padding 1)","(8, 32, 32, 32)"],["pool","(8, 32, 16, 16)"],["conv3 (sans padding : −2)","(8, 64, 14, 14)"],["pool","(8, 64, 7, 7)"],["flatten","(8, 3136)"],["fc","(8, 10)"]])}
+<p><code>self.fc = nn.Linear(64*7*7, 10)</code>, soit 3 136 entrées. Astuce : <code>print(Net().pool(...)...)</code> ou faire passer <code>torch.zeros(1, 3, 64, 64)</code> dans la partie convolutive et afficher <code>.shape</code>.</p>`},
+
+{cm:"CM1 · TD4", pts:2, title:"Pourquoi ce modèle plante-t-il ?",
+q:`L'appel <code>model(x)</code> lève <code>TypeError: 'set' object is not callable</code>. Pourquoi ?${C(`
+class M(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.features = {
+            nn.Conv2d(3, 32, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2)
+        }
+        self.classif = nn.Linear(32*16*16, 10)
+    def forward(self, x):
+        return self.classif(torch.flatten(self.features(x), 1))
+`)}`,
+a:`<p>Les accolades créent un <b>set</b> Python (non ordonné, non appelable, et ses couches ne sont pas enregistrées comme paramètres du modèle). Il faut <code>nn.Sequential( ... )</code> avec des parenthèses. Il faut aussi relancer la cellule de la classe avant de tester.</p>`},
+
+{cm:"CM1 · TD1", pts:3, title:"Écrire le gel, le remplacement de tête et le dégel",
+q:`Pour un <code>resnet50</code> de torchvision (dernière couche <code>model.fc = Linear(2048, 1000)</code>, blocs <code>layer1</code> à <code>layer4</code>), écrivez le code pour : (1) l'adapter à 7 classes ; (2) n'entraîner que la tête ; (3) puis dégeler <code>layer4</code> avec un lr de 1e-4.`,
+a:`${C(`
+model = tm.get_model("resnet50", weights="DEFAULT")
+model.fc = nn.Linear(2048, 7)
+
+# (2) tout geler sauf la tête
+for p in model.parameters():
+    p.requires_grad = False
+for p in model.fc.parameters():
+    p.requires_grad = True
+optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=1e-3)
+# ... entraînement de la tête ...
+
+# (3) fine-tuning du dernier bloc
+for p in model.layer4.parameters():
+    p.requires_grad = True
+optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=1e-4)
+`)}
+<p>Même logique que <code>model.features[-2:]</code> pour EfficientNet : le nom des parties dépend du modèle, il faut faire <code>print(model)</code>.</p>`},
+
+{cm:"CM2-3 · TD2", pts:3, title:"Erreurs dans une loss de distillation",
+q:`Ce code de distillation contient <b>4 erreurs</b>. Lesquelles ?${C(`
+T = 20
+teacher.train()
+for X, y in train_loader:
+    teacher_logits = teacher(X)
+    student_logits = student(X)
+    soft_t = F.softmax(teacher_logits, dim=1)
+    soft_s = F.softmax(student_logits / T, dim=1)
+    loss = 0.5 * F.cross_entropy(student_logits, y) + 0.5 * F.kl_div(soft_s, soft_t)
+    optimizer.zero_grad(); loss.backward(); optimizer.step()
+`)}`,
+a:`<ol><li><code>teacher.train()</code> : le teacher doit être en <code>eval()</code> (sinon son dropout est actif et ses sorties bruitées), et ses logits calculés sous <code>torch.inference_mode()</code> / <code>no_grad()</code>.</li>
+<li>Le teacher n'est pas divisé par T : <code>F.softmax(teacher_logits / T, dim=1)</code>.</li>
+<li><code>F.kl_div</code> attend des <b>log-probabilités</b> pour le student : <code>F.log_softmax(student_logits / T, dim=1)</code> (et <code>reduction='batchmean'</code>).</li>
+<li>Il manque le facteur <b>T²</b> sur le terme KL.</li></ol>`},
+
+{cm:"CM2-3", pts:2, title:"Mise à jour EMA du teacher dans DINO",
+q:`Écrivez la mise à jour des poids du teacher dans DINO, avec λ = 0,996.`,
+a:`${C(`
+lam = 0.996
+with torch.no_grad():
+    for p_t, p_s in zip(teacher.parameters(), student.parameters()):
+        p_t.mul_(lam).add_((1 - lam) * p_s)      # θt ← λ·θt + (1 − λ)·θs
+`)}
+<p>Le teacher ne reçoit aucun gradient : seul le student est optimisé ; le teacher suit une moyenne lissée de ses poids (momentum encoder).</p>`},
+
+{cm:"CM4 · TD4", pts:2, title:"Remonter des prédictions fines aux superclasses",
+q:`<code>pred_fine</code> et <code>true_fine</code> sont des tableaux numpy de labels 0..14, et <code>new_fine_to_new_coarse = [0,0,0,0,0,1,1,1,1,1,2,2,2,2,2]</code>. Écrivez le code qui calcule l'accuracy sur les superclasses et la proportion d'erreurs fines qui restent dans la bonne superclasse.`,
+a:`${C(`
+f2c = np.array(new_fine_to_new_coarse)
+pred_sup, true_sup = f2c[pred_fine], f2c[true_fine]     # indexation par tableau
+acc_sup = (pred_sup == true_sup).mean()
+
+errors = pred_fine != true_fine
+intra = errors & (pred_sup == true_sup)                  # "better mistakes"
+print(acc_sup, intra.sum() / errors.sum())
+`)}`},
+
+{cm:"CM5 · TD5", pts:2, title:"Bug d'affichage d'une carte d'explication",
+q:`Les images ont été préparées avec <code>X.permute(0, 3, 2, 1)</code>. La carte d'occlusion, superposée à l'image avec <code>plt.imshow(occMap, alpha=0.5)</code>, éclaire une zone « en miroir » de l'animal. Pourquoi, et comment corriger ?`,
+a:`<p><code>permute(0, 3, 2, 1)</code> donne (N, C, <b>W</b>, H) : hauteur et largeur sont échangées. La carte est calculée dans ce repère transposé. Correction : afficher <code>occMap.T</code>, ou utiliser <code>permute(0, 3, 1, 2)</code> dès le départ (mais il faut alors réentraîner le modèle, qui a appris sur des images transposées).</p>`},
+
+{cm:"CM5", pts:2, title:"Grad-CAM : gradients accumulés",
+q:`On calcule Grad-CAM pour les classes 0, 1, 2 dans une boucle, en réutilisant le même tenseur <code>featureMaps</code> (avec <code>requires_grad=True</code>). Les cartes des classes 1 et 2 sont bizarres. Pourquoi ?${C(`
+featureMaps = modelA(x).detach().requires_grad_(True)
+for c in range(3):
+    probas = modelP(featureMaps)
+    probas[0, c].backward()
+    alphas = featureMaps.grad.mean(dim=(2, 3))[0]
+    cams.append(torch.relu((alphas[:, None, None] * featureMaps[0]).sum(0)))
+`)}`,
+a:`<p>Les gradients s'<b>accumulent</b> dans <code>featureMaps.grad</code> : pour c = 1, on obtient grad<sub>0</sub> + grad<sub>1</sub>. Il faut remettre à zéro avant chaque backward : <code>featureMaps.grad = None</code> (ou <code>featureMaps.grad.zero_()</code> après le premier passage). Il faut aussi détacher la carte (<code>.detach()</code>) avant de l'afficher.</p>`},
+
+{cm:"CM6", pts:3, title:"Écrire une fonction IoU",
+q:`Écrivez une fonction <code>iou(a, b)</code> pour deux boîtes au format (x1, y1, x2, y2), puis une fonction qui convertit une ligne YOLO (xc, yc, w, h normalisés) en (x1, y1, x2, y2) en pixels.`,
+a:`${C(`
+def iou(a, b):
+    x1, y1 = max(a[0], b[0]), max(a[1], b[1])
+    x2, y2 = min(a[2], b[2]), min(a[3], b[3])
+    inter = max(0, x2 - x1) * max(0, y2 - y1)          # 0 si pas de recouvrement
+    area_a = (a[2] - a[0]) * (a[3] - a[1])
+    area_b = (b[2] - b[0]) * (b[3] - b[1])
+    return inter / (area_a + area_b - inter)
+
+def yolo_to_xyxy(xc, yc, w, h, W, H):
+    xc, yc, w, h = xc * W, yc * H, w * W, h * H
+    return (xc - w/2, yc - h/2, xc + w/2, yc + h/2)
+`)}`},
+
+{cm:"CM6", pts:2, title:"Focal loss en PyTorch",
+q:`Écrivez la focal loss pour une classification multi-classe à partir des logits.`,
+a:`${C(`
+def focal_loss(logits, y, gamma=2.0):
+    log_p = F.log_softmax(logits, dim=1)
+    log_pt = log_p.gather(1, y.unsqueeze(1)).squeeze(1)   # log p de la vraie classe
+    pt = log_pt.exp()
+    return (-(1 - pt) ** gamma * log_pt).mean()
+`)}
+<p>Avec <code>gamma=0</code>, on retrouve <code>F.cross_entropy</code>.</p>`},
+
+{cm:"CM1", pts:2, title:"Early stopping avec sauvegarde du meilleur modèle",
+q:`Dans le TD2, le student est arrêté par early stopping, mais on garde le modèle de la <b>dernière</b> époque. Que faut-il ajouter ?`,
+a:`${C(`
+if val_acc - best_acc > delta:
+    best_acc, patience = val_acc, 0
+    best_state = copy.deepcopy(model.state_dict())   # copie profonde, sinon simple référence
+else:
+    patience += 1
+    if patience >= max_patience:
+        break
+model.load_state_dict(best_state)                    # recharger le meilleur
+`)}
+<p>Sans <code>deepcopy</code>, <code>state_dict()</code> renvoie des références vers les poids actuels, qui continuent d'évoluer.</p>`},
+
+{cm:"TD1", pts:2, title:"Pré-traitement d'images pour un modèle pré-entraîné",
+q:`Dans le TD5, les images sont préparées à la main. Écrivez ce pré-traitement pour une image <code>img</code> (numpy, H×W×3, valeurs 0–255) afin d'obtenir un tenseur (1, 3, 224, 224) pour VGG16.`,
+a:`${C(`
+mean = np.array([0.485, 0.456, 0.406])
+std  = np.array([0.229, 0.224, 0.225])
+im = skimage.transform.resize(img, (224, 224))     # -> float 0..1
+im = (im - mean) / std                              # normalisation ImageNet
+x = torch.tensor(im, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0)   # (1, 3, 224, 224)
+`)}
+<p>Ou, plus simple : <code>preprocess = weights.transforms()</code>. Le modèle doit être en <code>eval()</code> pour prédire.</p>`}
+);
+DATA.calc.push(
+{cm:"CM1", pts:2, title:"Nombre de paramètres",
+q:`Calculez le nombre de paramètres de : (a) <code>Conv2d(64, 128, kernel_size=3)</code> ; (b) <code>Linear(1792, 5)</code> ; (c) <code>Linear(512, 3)</code> du TD5 ; (d) 3 couches conv 3×3 de 64 → 64 canaux, comparées à une conv 7×7 64 → 64 (sans biais).`,
+a:`<ul><li>(a) 128 × (64 × 9 + 1) = <b>73 856</b>.</li><li>(b) 1792 × 5 + 5 = <b>8 965</b>.</li><li>(c) 512 × 3 + 3 = <b>1 539</b>.</li>
+<li>(d) 3 × 9 × 64 × 64 = <b>110 592</b> contre 49 × 64 × 64 = <b>200 704</b> : presque 2× moins, même champ réceptif, 3 non-linéarités.</li></ul>`},
+
+{cm:"CM1", pts:2, title:"Coût d'un module Inception",
+q:`Entrée 28×28×192, convolution 5×5 avec 32 filtres (padding same). Calculez le nombre de multiplications : (a) directement ; (b) avec une conv 1×1 de réduction à 16 canaux avant.`,
+a:`<ul><li>(a) w·h·nb·25·ch = 28 × 28 × 32 × 25 × 192 = <b>120 422 400</b>.</li>
+<li>(b) 1×1 : 28 × 28 × 16 × 192 = 2 408 448 ; puis 5×5 : 28 × 28 × 32 × 25 × 16 = 10 035 200 ; total <b>12 443 648</b>, soit ~10× moins.</li></ul>
+<p>C'est le rôle des conv 1×1 dans Inception : réduire la profondeur avant les grosses convolutions.</p>`},
+
+{cm:"CM1", pts:2, title:"Métriques depuis une matrice de confusion",
+q:`Lignes = vraies classes, colonnes = prédictions.${T(["","prédit cat","prédit dog","prédit bird"],[["cat","45","3","2"],["dog","5","40","5"],["bird","0","10","40"]])}Calculez l'accuracy, le rappel et la précision de chaque classe, le F1 macro.`,
+a:`<ul><li>Accuracy = (45 + 40 + 40)/150 = <b>0,833</b>.</li>
+<li>Rappels : cat 45/50 = 0,90 ; dog 40/50 = 0,80 ; bird 40/50 = 0,80 (rappel macro 0,833).</li>
+<li>Précisions : cat 45/50 = 0,90 ; dog 40/53 = 0,755 ; bird 40/47 = 0,851.</li>
+<li>F1 : cat 0,90 ; dog 0,777 ; bird 0,825 → <b>F1 macro = 0,834</b>.</li></ul>`},
+
+{cm:"CM2-3", pts:2, title:"Softmax avec température",
+q:`Logits du teacher z = [4, 2, 0]. Calculez softmax(z/T) pour T = 1, 4 et 20. Que conclure ?`,
+a:`${T(["T","p₀","p₁","p₂"],[["1","0,867","0,117","0,016"],["4","0,506","0,307","0,186"],["20","0,367","0,332","0,301"]])}
+<p>Plus T est grand, plus la distribution est douce : à T = 1 la troisième classe est quasi invisible (1,6 %), à T = 4 on voit clairement l'ordre de similarité. À T = 20 on approche l'uniforme.</p>`},
+
+{cm:"CM2-3", pts:2, title:"Dimensions d'un ViT-B/16",
+q:`ViT-Base : image 224×224×3, patchs 16×16, D = 768, 12 têtes. Donnez : le nombre de patchs, la taille d'un patch aplati, le nombre de paramètres de la projection linéaire, la forme du position embedding, la taille d'une matrice d'attention, d<sub>k</sub>.`,
+a:`<ul><li>(224/16)² = <b>196 patchs</b> ; + [CLS] = 197 tokens.</li><li>Patch aplati : 16 × 16 × 3 = <b>768</b> valeurs.</li>
+<li>Projection <code>Linear(768, 768)</code> : 768 × 768 + 768 = <b>590 592</b> paramètres.</li>
+<li>Position embedding : <b>(1, 197, 768)</b>.</li><li>Attention : <b>197 × 197</b> par tête ; d<sub>k</sub> = 768/12 = <b>64</b>.</li></ul>`},
+
+{cm:"CM4", pts:2, title:"Distance hiérarchique (LCA)",
+q:`Arbre : animal (6) → domestic animal (5) → dog (4) → working dog (3) → shepherd dog (2) → Belgian sheepdog (1) → groenendael, malinois (0). Border collie est un shepherd dog, egyptian cat un domestic animal, jellyfish un animal. Vraie classe : groenendael. Calculez la distance hiérarchique moyenne @2 (normalisée par 6) pour : (a) malinois + border collie ; (b) groenendael + jellyfish. Lequel est le meilleur ?`,
+a:`<ul><li>(a) LCA(groenendael, malinois) = 1, LCA(groenendael, border collie) = 2 → (1 + 2)/6/2 = <b>0,25</b>.</li>
+<li>(b) LCA = 0 et 6 → (0 + 6)/6/2 = <b>0,50</b>.</li></ul>
+<p>(a) est meilleur alors que (b) est correct en top-2 : la mesure hiérarchique récompense les « better mistakes ».</p>`},
+
+{cm:"CM4", pts:2, title:"P / R / F<sub>LCA</sub>",
+q:`Même arbre. Vraie classe groenendael, prédiction malinois. Calculez P<sub>LCA</sub>, R<sub>LCA</sub>, F<sub>LCA</sub>.`,
+a:`<p>LCA = Belgian sheepdog. Ensembles augmentés jusqu'au LCA : pred = {malinois, Belgian sheepdog}, vrai = {groenendael, Belgian sheepdog}. Intersection = {Belgian sheepdog}. P = 1/2, R = 1/2, F = <b>0,5</b>.</p>`},
+
+{cm:"CM5", pts:3, title:"Valeurs de Shapley",
+q:`Trois features A, B, C. Valeur des coalitions : v(∅) = 0, v(A) = 20, v(B) = 10, v(C) = 0, v(AB) = 40, v(AC) = 30, v(BC) = 20, v(ABC) = 60. Calculez les valeurs de Shapley et vérifiez l'axiome d'efficacité.`,
+a:`${T(["Ordre","A","B","C"],[["A, B, C","20","40−20 = 20","60−40 = 20"],["A, C, B","20","60−30 = 30","30−20 = 10"],["B, A, C","40−10 = 30","10","20"],["B, C, A","60−20 = 40","10","20−10 = 10"],["C, A, B","30−0 = 30","30","0"],["C, B, A","40","20−0 = 20","0"],["<b>Moyenne</b>","<b>180/6 = 30</b>","<b>120/6 = 20</b>","<b>60/6 = 10</b>"]])}
+<p>Efficacité : 30 + 20 + 10 = 60 = v(ABC). ✓</p>`},
+
+{cm:"CM6", pts:2, title:"Calculs d'IoU",
+q:`Calculez l'IoU (format x1, y1, x2, y2) : (a) [0, 0, 4, 4] et [2, 2, 6, 6] ; (b) [0, 0, 10, 10] et [2, 2, 10, 10] ; (c) [20, 20, 60, 80] et [30, 40, 70, 90].`,
+a:`<ul><li>(a) inter 2 × 2 = 4 ; union 16 + 16 − 4 = 28 → <b>0,143</b>.</li>
+<li>(b) inter 8 × 8 = 64 ; union 100 + 64 − 64 = 100 → <b>0,64</b>.</li>
+<li>(c) inter 30 × 40 = 1 200 ; union 2 400 + 2 000 − 1 200 = 3 200 → <b>0,375</b>.</li></ul>`},
+
+{cm:"CM6", pts:2, title:"Tenseur de sortie et ancres",
+q:`(a) Tenseur de sortie d'un YOLO v1 avec S = 13, B = 3, C = 80 (COCO). (b) Un RPN avec k = 9 ancres sur une carte de features 40×60 : combien d'ancres au total, et combien de sorties cls et reg par position ?`,
+a:`<ul><li>(a) 13 × 13 × (3 × 5 + 80) = 13 × 13 × 95 = <b>16 055</b> valeurs.</li>
+<li>(b) 40 × 60 × 9 = <b>21 600</b> ancres ; par position 2k = <b>18</b> scores et 4k = <b>36</b> coordonnées.</li></ul>`},
+
+{cm:"CM6", pts:2, title:"Focal loss",
+q:`Calculez la cross-entropy et la focal loss (γ = 2) pour un exemple bien classé (p = 0,9) et un exemple difficile (p = 0,1). Concluez.`,
+a:`<ul><li>p = 0,9 : CE = −ln 0,9 = 0,105 ; FL = (0,1)² × 0,105 = <b>0,00105</b> (divisée par 100).</li>
+<li>p = 0,1 : CE = −ln 0,1 = 2,303 ; FL = (0,9)² × 2,303 = <b>1,865</b> (divisée par 1,23 seulement).</li></ul>
+<p>Les exemples faciles (le fond) ne pèsent presque plus : l'apprentissage se concentre sur les difficiles.</p>`},
+
+{cm:"CM6", pts:3, title:"Matching hongrois (DETR)",
+q:`Coûts (lignes = vérités, colonnes = prédictions) :${T(["","p0","p1","p2"],[["g0","1","2","8"],["g1","2","9","9"],["g2","7","8","3"]])}Trouvez l'affectation optimale et son coût. Pourquoi l'affectation gloutonne (chaque vérité prend sa prédiction la moins chère) échoue-t-elle ?`,
+a:`<p>Optimal : g0 → p1 (2), g1 → p0 (2), g2 → p2 (3), coût total <b>7</b>.</p>
+<p>Glouton : g0 prend p0 (1), puis g1 n'a plus que p1 (9) ou p2 (9), puis g2 prend le reste : 1 + 9 + 3 = 13. g0 ne doit pas prendre son minimum car p0 est bien plus utile à g1. L'algorithme hongrois minimise la <b>somme</b> (soustraire les minima par ligne / colonne, barrer les zéros, ajuster jusqu'à N barres).</p>`},
+
+{cm:"CM6", pts:2, title:"Convolution transposée",
+q:`Une convolution 3×3, stride 1, padding valid transforme une image 4×4 en 2×2. Quelles sont les dimensions de la matrice C telle que I₂ = C·I₁ ? Et de la matrice qui fait l'upsampling ?`,
+a:`<p>I₁ (image aplatie) a 16 valeurs, I₂ en a 4 : C est de taille <b>4 × 16</b>, chaque ligne contient le filtre placé à une position. L'upsampling utilise <b>Cᵀ</b>, de taille <b>16 × 4</b> : I₁' = Cᵀ·I₂ redonne 16 valeurs, soit une image 4×4 (pas l'image d'origine). Dans un réseau, les coefficients sont appris.</p>`},
+
+{cm:"CM5", pts:2, title:"Coût de l'occlusion",
+q:`Image 224×224, carré 101×101. Combien de forwards avec un stride de 1 ? de 8 ? de 16 ? Quelle est la taille de la carte avant agrandissement ?`,
+a:`<ul><li>Stride 1 : 224² = <b>50 176</b> forwards, carte 224×224.</li><li>Stride 8 : 28² = <b>784</b>, carte 28×28.</li><li>Stride 16 : 14² = <b>196</b>, carte 14×14.</li></ul>
+<p>Ensuite <code>resize</code> vers 224×224 pour la superposition.</p>`}
+);
+(function(){
+  const TABS = [
+    {id:"exos",  label:"Exercices type examen", count:()=>DATA.exos.reduce((n,e)=>n+e.parts.length,0)},
+    {id:"cours", label:"Questions de cours", count:()=>DATA.cours.length},
+    {id:"qcm",   label:"QCM", count:()=>DATA.qcm.length},
+    {id:"code",  label:"Code", count:()=>DATA.code.length},
+    {id:"calc",  label:"Calculs", count:()=>DATA.calc.length},
+  ];
+  const CMS = ["CM1","TD1","CM2-3","TD3","CM4","TD4","CM5","TD5","CM6","TD6"];
+  const store = {
+    get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+    set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  };
+  let current = store.get("eb_tab", "exos");
+  if(!TABS.some(t=>t.id===current)) current = "exos";
+  let qcmFilter = store.get("eb_filter", "all");
+  let qcmState = store.get("eb_qcm", {});   // index -> {sel:[...], done:true}
+
+  const tabsEl = document.getElementById("tabs");
+  const main = document.getElementById("main");
+
+  // en-tête : volumes
+  const totalPts = DATA.exos.reduce((s,e)=>s+e.parts.reduce((a,p)=>a+(p.pts||0),0),0)
+    + DATA.cours.reduce((s,c)=>s+(c.pts||0),0) + DATA.code.reduce((s,c)=>s+(c.pts||0),0) + DATA.calc.reduce((s,c)=>s+(c.pts||0),0);
+  document.getElementById("meta").innerHTML =
+    `<span><b>${DATA.qcm.length}</b> QCM</span><span><b>${DATA.cours.length}</b> questions de cours</span>`+
+    `<span><b>${DATA.exos.length}</b> exercices (${DATA.exos.reduce((n,e)=>n+e.parts.length,0)} sous-questions)</span>`+
+    `<span><b>${DATA.code.length}</b> questions de code</span><span><b>${DATA.calc.length}</b> calculs</span><span><b>${totalPts}</b> points de questions ouvertes</span>`;
+
+  function renderTabs(){
+    tabsEl.innerHTML = "";
+    TABS.forEach(t=>{
+      const b = document.createElement("button");
+      b.type = "button"; b.id = "tab-"+t.id; b.setAttribute("role","tab");
+      b.setAttribute("aria-selected", String(t.id===current));
+      b.innerHTML = `${t.label}<span class="n">${t.count()}</span>`;
+      b.addEventListener("click", ()=>{ current = t.id; store.set("eb_tab", current); renderTabs(); render(); window.scrollTo({top: 0}); });
+      tabsEl.appendChild(b);
+    });
+  }
+
+  function corrBlock(html, label){
+    return `<details class="corr"><summary>${label||"Voir le corrigé"}</summary><div class="corrbody">${html}</div></details>`;
+  }
+  function toolbarOpenAll(){
+    const bar = document.createElement("div"); bar.className = "toolbar";
+    bar.innerHTML = `<div class="left"><button class="btn ghost" type="button" id="openall">Déplier tous les corrigés</button><button class="btn ghost" type="button" id="closeall">Tout replier</button></div>`;
+    bar.querySelector("#openall").onclick = ()=>main.querySelectorAll("details.corr").forEach(d=>d.open=true);
+    bar.querySelector("#closeall").onclick = ()=>main.querySelectorAll("details.corr").forEach(d=>d.open=false);
+    return bar;
+  }
+
+  function renderExos(){
+    main.appendChild(toolbarOpenAll());
+    const intro = document.createElement("div"); intro.className = "intro";
+    intro.innerHTML = `<b>Format du partiel.</b> Chaque exercice part d'un contexte, puis enchaîne choix justifié, schéma et code PyTorch. Rédige ta réponse sur papier avant d'ouvrir le corrigé : la prof note la justification autant que le résultat.`;
+    main.appendChild(intro);
+    const list = document.createElement("div"); list.className = "list";
+    DATA.exos.forEach((e)=>{
+      const pts = e.parts.reduce((a,p)=>a+(p.pts||0),0);
+      const el = document.createElement("section"); el.className = "exo";
+      el.innerHTML = `<div class="ehead"><div class="qhead"><span class="tag">${e.cm}</span><span class="pts">${pts} pts</span></div><h2>${e.title}</h2><div class="ctx">${e.ctx}</div></div>` +
+        e.parts.map((p,j)=>`<div class="sub"><div class="subq"><div class="qtext"><span class="qnum">${j+1}.</span> ${p.q}</div><span class="pts">${p.pts} pt${p.pts>1?"s":""}</span></div>${corrBlock(p.a)}</div>`).join("");
+      list.appendChild(el);
+    });
+    main.appendChild(list);
+  }
+
+  function renderOpenList(arr, introHtml){
+    main.appendChild(toolbarOpenAll());
+    if(introHtml){ const i = document.createElement("div"); i.className = "intro"; i.innerHTML = introHtml; main.appendChild(i); }
+    const list = document.createElement("div"); list.className = "list";
+    arr.forEach((c,i)=>{
+      const el = document.createElement("article"); el.className = "q";
+      el.innerHTML = `<div class="qhead"><span class="qnum">Q${i+1} · <span class="tag">${c.cm}</span></span><span class="pts">${c.pts} pt${c.pts>1?"s":""}</span></div>` +
+        (c.title ? `<div class="qtext"><b>${c.title}</b></div>` : "") +
+        `<div class="qtext">${c.q}</div>${corrBlock(c.a)}`;
+      list.appendChild(el);
+    });
+    main.appendChild(list);
+  }
+
+  function scoreQcm(){
+    let done = 0, ok = 0;
+    DATA.qcm.forEach((q,i)=>{ const s = qcmState[i]; if(s && s.done){ done++; if(isRight(q, s.sel)) ok++; } });
+    return {done, ok};
+  }
+  function isRight(q, sel){
+    const a = [...q.a].sort().join(","), b = [...(sel||[])].sort().join(",");
+    return a === b;
+  }
+
+  function renderQcm(){
+    const bar = document.createElement("div"); bar.className = "toolbar";
+    const left = document.createElement("div"); left.className = "left";
+    const mk = (key, label)=>{ const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = label;
+      b.setAttribute("aria-pressed", String(qcmFilter===key));
+      b.onclick = ()=>{ qcmFilter = key; store.set("eb_filter", key); render(); }; return b; };
+    left.appendChild(mk("all","Tout"));
+    CMS.filter(cm=>DATA.qcm.some(q=>q.cm===cm)).forEach(cm=>left.appendChild(mk(cm, cm)));
+    bar.appendChild(left);
+    const right = document.createElement("div"); right.className = "left";
+    const sc = scoreQcm();
+    right.innerHTML = `<span class="score" id="qscore">Score <b>${sc.ok}</b> / ${sc.done} répondues · ${DATA.qcm.length} au total</span>`;
+    const reset = document.createElement("button"); reset.type = "button"; reset.className = "btn ghost"; reset.textContent = "Recommencer";
+    reset.onclick = ()=>{ qcmState = {}; store.set("eb_qcm", qcmState); render(); };
+    right.appendChild(reset);
+    bar.appendChild(right);
+    main.appendChild(bar);
+
+    const list = document.createElement("div"); list.className = "list";
+    let shown = 0;
+    DATA.qcm.forEach((q,i)=>{
+      if(qcmFilter!=="all" && q.cm!==qcmFilter) return;
+      shown++;
+      const multi = q.a.length > 1 || /plusieurs réponses/.test(q.q);
+      const type = multi ? "checkbox" : "radio";
+      const st = qcmState[i] || {sel:[], done:false};
+      const el = document.createElement("article"); el.className = "q";
+      el.innerHTML = `<div class="qhead"><span class="qnum">QCM ${i+1}</span><span class="tag">${q.cm}</span></div><div class="qtext">${q.q}</div>`;
+      const opts = document.createElement("div"); opts.className = "opts";
+      q.o.forEach((o,k)=>{
+        const id = `q${i}o${k}`;
+        const lab = document.createElement("label"); lab.className = "opt"; lab.htmlFor = id;
+        lab.innerHTML = `<input type="${type}" name="q${i}" id="${id}" value="${k}" ${st.sel.includes(k)?"checked":""} ${st.done?"disabled":""}><span>${o}</span>`;
+        if(st.done){
+          const inA = q.a.includes(k), inS = st.sel.includes(k);
+          if(inA && inS) lab.classList.add("good"); else if(!inA && inS) lab.classList.add("wrong"); else if(inA && !inS) lab.classList.add("missed");
+        }
+        opts.appendChild(lab);
+      });
+      el.appendChild(opts);
+      const act = document.createElement("div"); act.className = "actions";
+      if(!st.done){
+        const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = "Valider";
+        b.onclick = ()=>{
+          const sel = [...opts.querySelectorAll("input:checked")].map(x=>+x.value);
+          if(!sel.length){ b.textContent = "Choisis une réponse"; return; }
+          qcmState[i] = {sel, done:true}; store.set("eb_qcm", qcmState); render(true);
+        };
+        act.appendChild(b);
+      } else {
+        const ok = isRight(q, st.sel);
+        act.innerHTML = `<span class="verdict ${ok?"okv":"badv"}">${ok?"Juste":"Faux"}</span>`;
+        const again = document.createElement("button"); again.type = "button"; again.className = "btn ghost"; again.textContent = "Refaire";
+        again.onclick = ()=>{ delete qcmState[i]; store.set("eb_qcm", qcmState); render(true); };
+        act.appendChild(again);
+      }
+      el.appendChild(act);
+      if(st.done){ const ex = document.createElement("div"); ex.className = "expl"; ex.innerHTML = q.e; el.appendChild(ex); }
+      list.appendChild(el);
+    });
+    if(!shown){ list.innerHTML = `<p class="empty">Aucune question pour ce filtre.</p>`; }
+    main.appendChild(list);
+  }
+
+  function render(keepScroll){
+    const y = window.scrollY;
+    main.innerHTML = "";
+    if(current==="exos") renderExos();
+    else if(current==="cours") renderOpenList(DATA.cours, `<b>Partie 1 du partiel.</b> Réponds en quelques lignes structurées, puis compare avec les points attendus.`);
+    else if(current==="qcm") renderQcm();
+    else if(current==="code") renderOpenList(DATA.code, `<b>Lire, corriger et écrire du PyTorch.</b> Les erreurs viennent des TD et des pièges vus en cours.`);
+    else renderOpenList(DATA.calc, `<b>Calculs à savoir refaire à la main</b> : paramètres, dimensions, métriques, IoU, Shapley, matching.`);
+    if(keepScroll) window.scrollTo({top: y});
+  }
+
+  renderTabs(); render();
+})();
+</script>
+
+<script>/* sync thème avec le site Révisions */(function(){function a(t){if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme")}var m=location.search.match(/[?&]theme=(light|dark)/);if(m)a(m[1]);addEventListener("message",function(e){if(e.data&&e.data.revisionTheme)a(e.data.revisionTheme)})})();</script>
+</body></html>

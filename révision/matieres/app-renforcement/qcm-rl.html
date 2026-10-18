@@ -1,0 +1,1041 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Grand QCM de RL</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout : une colonne de lecture (cartes-questions) sous une barre de score collante ; la carte des questions est une « grille d'états » comme au TD. */
+:root{
+  --bg:#EDF1F0; --surface:#FFFFFF; --surface-2:#F5F8F7; --ink:#13201D; --muted:#56645F; --line:#D3DBD8;
+  --accent:#2347B5; --accent-soft:#E2E8FA; --accent-ink:#FFFFFF;
+  --good:#1D7448; --good-soft:#DFF1E6; --bad:#B03238; --bad-soft:#F7E1E2; --goal:#A86A12; --goal-soft:#F7EBD6;
+  --code-bg:#F1F4F3;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1514; --surface:#171F1E; --surface-2:#1C2625; --ink:#E5ECEA; --muted:#9AA9A5; --line:#2C3836;
+  --accent:#8DA8F5; --accent-soft:#1F2A47; --accent-ink:#0F1514;
+  --good:#5FC48D; --good-soft:#163024; --bad:#F07C80; --bad-soft:#3A1B1D; --goal:#E3AE52; --goal-soft:#33281A;
+  --code-bg:#111918; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0F1514; --surface:#171F1E; --surface-2:#1C2625; --ink:#E5ECEA; --muted:#9AA9A5; --line:#2C3836;
+  --accent:#8DA8F5; --accent-soft:#1F2A47; --accent-ink:#0F1514;
+  --good:#5FC48D; --good-soft:#163024; --bad:#F07C80; --bad-soft:#3A1B1D; --goal:#E3AE52; --goal-soft:#33281A;
+  --code-bg:#111918; color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:780px;margin:0 auto}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* En-tête */
+.top{padding-block:36px 18px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,6vw,44px);line-height:1.05;letter-spacing:-.01em;margin:6px 0 10px;text-wrap:balance}
+.lede{color:var(--muted);max-width:62ch;margin:0}
+.track{display:flex;gap:4px;margin-top:18px;flex-wrap:wrap;align-items:center}
+.track span{font-family:var(--mono);font-size:11.5px;padding:3px 8px;border:1px solid var(--line);border-radius:3px;color:var(--muted);background:var(--surface)}
+.track .trap{color:var(--bad);border-color:var(--bad)}
+.track .goal{color:var(--goal);border-color:var(--goal)}
+.track .start{color:var(--accent);border-color:var(--accent)}
+
+/* Filtres */
+.filters{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px}
+.frow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.flabel{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);min-width:64px}
+.chip{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:4px 11px;font-size:13.5px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip .n{font-family:var(--mono);font-size:11.5px;opacity:.75;margin-left:4px}
+select.sel{border:1px solid var(--line);background:var(--surface-2);border-radius:6px;padding:5px 8px;font-size:13.5px;max-width:100%}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:7px 12px;font-size:14px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.warn{border-color:var(--bad);color:var(--bad)}
+.actions-row{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Barre de score */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;margin-top:14px;border-bottom:1px solid var(--line)}
+.bar-inner{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline}
+.stat{display:flex;gap:6px;align-items:baseline}
+.stat b{font-family:var(--display);font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
+.stat small{color:var(--muted);font-size:12.5px}
+.stat.g b{color:var(--goal)}
+.meter{flex:1 1 160px;height:6px;background:var(--line);border-radius:3px;overflow:hidden;min-width:120px;align-self:center}
+.meter i{display:block;height:100%;background:var(--good);width:0;transition:width .3s}
+
+details.map{margin-top:10px}
+details.map summary{cursor:pointer;font-size:13.5px;color:var(--muted)}
+.cells{display:flex;flex-wrap:wrap;gap:3px;margin-top:8px}
+.cell{width:18px;height:18px;border:1px solid var(--line);background:var(--surface);border-radius:2px;padding:0;cursor:pointer;font-size:0}
+.cell.ok{background:var(--good);border-color:var(--good)}
+.cell.ko{background:var(--bad);border-color:var(--bad)}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px;border:1px solid var(--line)}
+
+/* Bandeau examen */
+.exam{margin-top:14px;border:1px solid var(--goal);background:var(--goal-soft);border-radius:8px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.exam p{margin:0}
+.exam .note{font-family:var(--display);font-weight:800;font-size:26px;color:var(--goal)}
+
+/* Questions */
+.list{display:grid;gap:14px;margin-top:16px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;min-width:0;scroll-margin-top:90px}
+.q.ok{border-left:4px solid var(--good)}
+.q.ko{border-left:4px solid var(--bad)}
+.qhead{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}
+.qnum{font-family:var(--display);font-weight:700;font-size:15px;margin-right:4px}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.03em;padding:2px 7px;border-radius:3px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+.tag.cm{color:var(--accent);border-color:var(--accent-soft);background:var(--accent-soft)}
+.prompt{margin:0 0 10px;max-width:68ch}
+.hint{font-size:12.5px;color:var(--muted);margin:-4px 0 10px}
+pre.code{background:var(--code-bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.5;margin:0 0 12px}
+.opts{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.opts label{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:8px 10px;cursor:pointer;background:var(--surface-2)}
+.opts label:hover{border-color:var(--accent)}
+.opts input{margin-top:4px;accent-color:var(--accent);flex:none}
+.opts li.is-correct label{border-color:var(--good);background:var(--good-soft)}
+.opts li.is-wrong label{border-color:var(--bad);background:var(--bad-soft)}
+.num-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.num-row input{border:1px solid var(--line);background:var(--surface-2);border-radius:6px;padding:7px 10px;width:12ch;font-family:var(--mono)}
+.num-row input.ok{border-color:var(--good);background:var(--good-soft)}
+.num-row input.ko{border-color:var(--bad);background:var(--bad-soft)}
+ol.order{margin:0;padding:0;list-style:none;display:grid;gap:6px;counter-reset:o}
+ol.order li{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--surface-2);counter-increment:o}
+ol.order li::before{content:counter(o);font-family:var(--mono);font-size:12px;color:var(--muted);width:18px;flex:none;text-align:center}
+ol.order li span{flex:1;min-width:0}
+ol.order li.is-correct{border-color:var(--good);background:var(--good-soft)}
+ol.order li.is-wrong{border-color:var(--bad);background:var(--bad-soft)}
+.mv{border:1px solid var(--line);background:var(--surface);border-radius:4px;width:30px;height:28px;cursor:pointer;flex:none;font-size:13px;line-height:1}
+.mv:disabled{opacity:.35;cursor:default}
+.match{display:grid;gap:8px}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:8px;align-items:center;border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--surface-2)}
+.mrow select{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:5px;padding:5px 6px;font-size:13.5px}
+.mrow.is-correct{border-color:var(--good);background:var(--good-soft)}
+.mrow.is-wrong{border-color:var(--bad);background:var(--bad-soft)}
+.mrow .fix{grid-column:1/-1;font-size:13px;color:var(--bad)}
+@media (max-width:520px){.mrow{grid-template-columns:1fr}}
+.qfoot{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.msg{font-size:13px;color:var(--bad)}
+.fb{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.verdict{font-weight:600}
+.verdict.ok{color:var(--good)}
+.verdict.ko{color:var(--bad)}
+.expl{margin:4px 0 0;color:var(--ink);max-width:68ch}
+.expected{font-family:var(--mono);font-size:13.5px}
+.empty{text-align:center;color:var(--muted);padding:30px 10px;border:1px dashed var(--line);border-radius:8px}
+sub,sup{line-height:0}
+</style>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Apprentissage par renforcement · Polytech SI5</div>
+    <h1>Grand QCM de RL</h1>
+    <p class="lede" id="lede">Questions sur les 6 CM et les labs. Chaque réponse est corrigée tout de suite, avec une explication.</p>
+    <div class="track" aria-hidden="true">
+      <span class="trap">TRAP −1</span><span class="start">START</span><span>CM1</span><span>CM2</span><span>CM3</span><span>CM4</span><span>CM5</span><span>CM6</span><span>LABS</span><span class="goal">GOAL +1</span>
+    </div>
+  </header>
+
+  <section class="filters" aria-label="Filtres">
+    <div class="frow"><span class="flabel">Cours</span><div class="frow" id="cmChips"></div></div>
+    <div class="frow">
+      <span class="flabel">Type</span>
+      <select class="sel" id="typeSel" aria-label="Type de question"></select>
+      <span class="flabel" style="min-width:auto;margin-left:6px">Afficher</span>
+      <div class="frow" id="viewChips"></div>
+    </div>
+    <div class="actions-row">
+      <button class="btn primary" id="examBtn" type="button">Examen blanc · 30 questions</button>
+      <button class="btn" id="orderBtn" type="button">Ordre aléatoire</button>
+      <button class="btn warn" id="resetBtn" type="button">Effacer mes réponses</button>
+    </div>
+  </section>
+
+  <div id="examBox"></div>
+
+  <div class="bar" id="bar">
+    <div class="bar-inner">
+      <div class="stat"><b id="sAns">0/0</b><small>répondues</small></div>
+      <div class="stat"><b id="sOk">0</b><small>justes</small></div>
+      <div class="stat"><b id="sPct">–</b><small>de réussite</small></div>
+      <div class="stat g" title="Récompense cumulée : +1 par bonne réponse, −1 par erreur"><b id="sG">0</b><small>return G</small></div>
+      <div class="meter" aria-hidden="true"><i id="sMeter"></i></div>
+    </div>
+    <details class="map">
+      <summary>Carte des questions (clique une case pour y aller)</summary>
+      <div class="cells" id="cells"></div>
+      <div class="legend"><span><i></i>à faire</span><span><i style="background:var(--good);border-color:var(--good)"></i>juste</span><span><i style="background:var(--bad);border-color:var(--bad)"></i>fausse</span></div>
+    </details>
+  </div>
+
+  <main class="list" id="list" aria-live="polite"></main>
+</div>
+<script>
+const QUESTIONS = [
+/* ======================= CM1 — Introduction, MDP, TD, Q-learning ======================= */
+{c:1,t:`qcu`,q:`Quel paradigme correspond à « apprendre à se comporter », en ligne, par une suite de décisions prises sous incertitude ?`,
+o:[`Apprentissage supervisé`,`Apprentissage non supervisé`,`Apprentissage par renforcement`,`Apprentissage par transfert`],a:2,
+e:`Le RL apprend à agir (« learn to behave ») : décision séquentielle, en ligne, sous incertitude. Le supervisé apprend un mapping entrée → sortie à partir d'exemples étiquetés ; le non supervisé cherche une structure sans oracle.`},
+
+{c:1,t:`qcm`,q:`Quelles affirmations décrivent l'apprentissage <b>non supervisé</b> ?`,
+o:[`Il cherche une structure dans un jeu de données`,`Un oracle fournit des exemples étiquetés`,`Il cherche à capturer la distribution des données`,`Il s'appuie sur un signal de récompense`],a:[0,2],
+e:`Non supervisé = apprendre une structure (capturer la distribution), sans oracle. L'oracle étiqueté, c'est le supervisé ; la récompense, c'est le RL.`},
+
+{c:1,t:`match`,q:`Associe chaque paradigme au type de retour (feedback) qu'il reçoit.`,
+o:[[`Supervisé`,`Des exemples étiquetés fournis par un oracle`],[`Non supervisé`,`Aucun oracle, seulement les données`],[`Renforcement`,`Un signal de récompense après chaque action`]],
+e:`C'est la compétence C1 du cours : distinguer les paradigmes par la structure du feedback (étiquettes / aucun oracle / récompense).`},
+
+{c:1,t:`qcm`,q:`Parmi ces problèmes, lesquels se formulent <b>naturellement</b> comme un problème de RL ?`,
+o:[`Ajuster en continu la ventilation d'un data center pour limiter la consommation`,`Classer des photos de chats et de chiens à partir d'un jeu étiqueté`,`Apprendre à jouer au backgammon`,`Regrouper des clients en segments sans étiquettes`],a:[0,2],
+e:`Le cours cite le refroidissement de data center et les jeux (backgammon, échecs, Atari, Go) comme exemples de RL : une suite de décisions dont l'effet se mesure par une récompense. La classification étiquetée est du supervisé, la segmentation du non supervisé.`},
+
+{c:1,t:`order`,q:`Remets dans l'ordre un pas de temps de la boucle agent–environnement.`,
+o:[`L'agent est dans l'état sₜ`,`Il choisit une action aₜ selon sa politique`,`L'environnement renvoie le nouvel état sₜ₊₁ et la récompense rₜ₊₁`,`L'agent met à jour son estimation (par ex. sa Q-table)`,`sₜ₊₁ devient l'état courant et on recommence`],
+e:`À chaque pas t : état sₜ → action aₜ → l'environnement répond par sₜ₊₁ et rₜ₊₁. L'agent apprend de cette transition puis continue depuis sₜ₊₁.`},
+
+{c:1,t:`num`,q:`Un agent reçoit les récompenses r₁ = 1, r₂ = 0, r₃ = 2 puis l'épisode se termine. Avec γ = 0,5, que vaut le return actualisé G₀ ?`,a:1.5,tol:0.001,
+e:`G₀ = r₁ + γ·r₂ + γ²·r₃ = 1 + 0,5×0 + 0,25×2 = 1,5.`},
+
+{c:1,t:`num`,q:`Dans la grille du cours, chaque déplacement coûte −0,01. L'agent fait 3 déplacements (−0,01 chacun) puis atteint le goal (+1). Sans actualisation (γ = 1), que vaut le return G ?`,a:0.97,tol:0.001,
+e:`G = −0,01 − 0,01 − 0,01 + 1 = 0,97. Plus le chemin est long, plus G baisse : c'est ce qui pousse l'agent vers le plus court chemin.`},
+
+{c:1,t:`num`,q:`On utilise la récursion Gₜ = rₜ₊₁ + γ·Gₜ₊₁. Si rₜ₊₁ = 2, γ = 0,9 et Gₜ₊₁ = 10, que vaut Gₜ ?`,a:11,tol:0.001,
+e:`Gₜ = 2 + 0,9 × 10 = 11. Cette récursion est la base du TD : la valeur d'un état s'écrit à partir de la valeur de l'état suivant.`},
+
+{c:1,t:`match`,q:`Associe chaque valeur du facteur d'actualisation γ au comportement de l'agent.`,
+o:[[`γ = 0`,`Myope : seule la récompense immédiate compte`],[`0 < γ < 1`,`Préfère obtenir les récompenses plus tôt`],[`γ = 1`,`Une récompense au pas 1000 vaut autant qu'au pas 3`]],
+e:`γ dit à quel point on se soucie du futur. γ = 0 ignore le futur, γ = 1 met présent et futur au même niveau.`},
+
+{c:1,t:`qcu`,q:`Pourquoi préfère-t-on souvent le return actualisé Gₜ = ∑ γᵏ rₜ₊ₖ₊₁ (avec γ < 1) à la simple somme rₜ₊₁ + … + r_T ?`,
+o:[`Parce que l'horizon peut être infini : avec γ < 1 la somme reste finie et les récompenses proches comptent davantage`,`Parce que la somme simple est impossible à calculer sur ordinateur`,`Parce que γ < 1 garantit que l'agent trouve toujours la politique optimale`,`Parce que l'actualisation supprime le besoin d'explorer`],a:0,
+e:`L'horizon peut être fini, infini ou indéfini. Avec γ < 1, une somme infinie de récompenses bornées reste finie, et l'agent préfère les récompenses obtenues tôt.`},
+
+{c:1,t:`qcu`,q:`Que représente V<sup>π</sup>(sₜ) ?`,
+o:[`Le return espéré (somme actualisée des récompenses) en partant de sₜ et en suivant π`,`La récompense immédiate obtenue en sₜ`,`La probabilité de choisir chaque action dans sₜ`,`Le nombre de pas restants avant un état terminal`],a:0,
+e:`V<sup>π</sup>(sₜ) = E<sub>π</sub>[Gₜ | sₜ] = E<sub>π</sub>[∑ γᵏ rₜ₊ₖ₊₁ | sₜ].`},
+
+{c:1,t:`qcu`,q:`Quelle est la différence entre V<sup>π</sup>(s) et Q<sup>π</sup>(s, a) ?`,
+o:[`Q<sup>π</sup>(s, a) est le return espéré en prenant d'abord l'action a dans s, puis en suivant π ; V<sup>π</sup>(s) suit π dès le départ`,`Q<sup>π</sup> ne prend pas en compte l'actualisation`,`V<sup>π</sup> n'est défini que pour les états terminaux`,`Il n'y a aucune différence, ce sont deux notations de la même fonction`],a:0,
+e:`V évalue un état, Q évalue un couple (état, action). Q dit directement quelle action est la meilleure : il suffit de prendre l'argmax.`},
+
+{c:1,t:`vf`,q:`Une politique π(a|s) associe à chaque état une distribution de probabilité sur les actions possibles.`,a:0,
+e:`Vrai : π(a|s) est une correspondance états → probabilités de choisir chaque action. La politique optimale se note π*.`},
+
+{c:1,t:`vf`,q:`La propriété de Markov signifie que l'état courant résume toute l'information utile du passé : p(sₜ₊₁ | sₜ) = p(sₜ₊₁ | s₁, …, sₜ).`,a:0,
+e:`Vrai : « le futur est indépendant du passé sachant le présent ». On suppose aussi le système stationnaire (les règles ne changent pas).`},
+
+{c:1,t:`qcu`,q:`À Pong, on définit l'état comme <b>une seule image</b> du jeu. Cet état respecte-t-il la propriété de Markov ?`,
+o:[`Non : une image seule ne donne pas la direction ni la vitesse de la balle, il faut au moins deux images (ou leur différence)`,`Oui, car l'image contient tous les pixels du jeu`,`Oui, car Pong est un jeu déterministe`,`La propriété de Markov ne concerne pas les images`],a:0,
+e:`Avec une seule image, deux situations identiques à l'œil (balle qui monte / balle qui descend) mènent à des futurs différents. L'état ne capture pas toute l'information utile : il faut ajouter l'information temporelle.`},
+
+{c:1,t:`order`,q:`Range ces modèles du plus simple au plus riche.`,
+o:[`Processus de Markov (MP)`,`Markov Reward Process (MRP) : un MP avec une récompense à chaque état`,`Markov Decision Process (MDP) : un MRP avec des décisions`],
+e:`MP → on ajoute une récompense → MRP → on ajoute des actions (décisions) → MDP.`},
+
+{c:1,t:`match`,q:`Associe chaque élément du tuple MDP {S, A, P, R, γ} à sa signification.`,
+o:[[`S`,`L'ensemble des états`],[`A`,`L'ensemble des actions`],[`P`,`Le modèle de dynamique p(sₜ₊₁ | sₜ, aₜ)`],[`R`,`Le modèle de récompense immédiate R(sₜ)`],[`γ`,`Le facteur d'actualisation`]],
+e:`Le MDP est la description formelle d'un environnement de décision.`},
+
+{c:1,t:`num`,q:`Dans la grille du cours, une action réussit avec la probabilité 0,8 ; sinon l'agent part sur le côté (0,1 pour chaque côté). L'agent choisit UP. Quelle est la probabilité qu'il aille à GAUCHE ?`,a:0.1,tol:0.0001,
+e:`UP → 0,8 en haut, 0,1 à gauche, 0,1 à droite. L'environnement est stochastique : c'est le modèle de transition P.`},
+
+{c:1,t:`num`,q:`Toujours dans cette grille stochastique : l'agent choisit UP. Avec 0,8 il arrive dans une case de valeur 10 ; avec 0,1 + 0,1 il arrive dans des cases de valeur 0. Récompense immédiate 0, γ = 1. Que vaut Q(s, UP) ?`,a:8,tol:0.001,
+e:`Q(s, UP) = ∑ p(s'|s,a)·[r + γV(s')] = 0,8×10 + 0,1×0 + 0,1×0 = 8. On fait la moyenne des valeurs pondérée par les probabilités de transition.`},
+
+{c:1,t:`num`,q:`On observe rₜ₊₁ = 1, avec γ = 0,9, V(sₜ₊₁) = 5 et V(sₜ) = 4. Que vaut l'erreur TD δₜ ?`,a:1.5,tol:0.001,
+e:`δₜ = rₜ₊₁ + γV(sₜ₊₁) − V(sₜ) = 1 + 4,5 − 4 = 1,5. δ > 0 : l'état valait plus que ce qu'on pensait.`},
+
+{c:1,t:`num`,q:`Q-learning : Q(s, a) = 2, α = 0,5, r = 1, γ = 1 et max<sub>a'</sub> Q(s', a') = 3. Quelle est la nouvelle valeur de Q(s, a) ?`,a:3,tol:0.001,
+e:`Q ← 2 + 0,5 × (1 + 1×3 − 2) = 2 + 0,5 × 2 = 3.`},
+
+{c:1,t:`qcu`,q:`Pourquoi Q-learning est-il un algorithme <b>off-policy</b> ?`,
+o:[`Sa cible utilise max<sub>a</sub> Q(sₜ₊₁, a), et pas l'action réellement jouée ensuite par la politique d'exploration`,`Parce qu'il n'utilise pas de table`,`Parce qu'il n'utilise jamais ε-greedy`,`Parce qu'il met à jour la valeur seulement à la fin de l'épisode`],a:0,
+e:`La politique qui agit (ε-greedy) diffère de la politique évaluée (greedy, via le max). C'est la définition d'off-policy.`},
+
+{c:1,t:`vf`,q:`Une méthode est dite on-policy quand la politique évaluée et la politique utilisée pour prendre les décisions sont les mêmes.`,a:0,
+e:`Vrai. Off-policy : elles sont différentes (cas de Q-learning).`},
+
+{c:1,t:`qcu`,q:`En ε-greedy avec ε = 0,2, on tire r = 0,3. Que fait l'agent ?`,
+o:[`Il exploite : il prend l'action qui maximise Q`,`Il explore : il prend une action aléatoire`,`Il ne fait rien ce tour-ci`,`Il diminue ε avant de choisir`],a:0,
+e:`Si r < ε → exploration ; si r ≥ ε → exploitation. Ici 0,3 ≥ 0,2, donc exploitation.`},
+
+{c:1,t:`num`,q:`ε démarre à 1 et on applique ε ← ε × 0,9 à la fin de chaque épisode (sans plancher). Que vaut ε après 3 épisodes ?`,a:0.729,tol:0.0005,
+e:`ε = 1 × 0,9³ = 0,729. C'est une décroissance exponentielle : rapide au début, puis de plus en plus lente.`},
+
+{c:1,t:`qcm`,q:`Quelles affirmations sur l'algorithme Q-learning du cours sont correctes ?`,
+o:[`On construit une Q-table de taille |S| × |A| initialisée à 0`,`Un épisode se termine sur un état terminal (ou au nombre maximal d'itérations)`,`On itère sur quelques centaines d'épisodes`,`On réinitialise la Q-table au début de chaque épisode`],a:[0,1,2],
+e:`La Q-table est conservée d'un épisode à l'autre : c'est elle qui accumule l'apprentissage. Seul l'état de l'agent est remis au départ.`},
+
+{c:1,t:`qcu`,q:`Que signifie ε = 1 au début de l'apprentissage ?`,
+o:[`L'agent n'explore que (actions aléatoires), car il ne sait encore rien`,`L'agent n'exploite que`,`L'agent apprend le plus vite possible`,`L'agent ignore les récompenses`],a:0,
+e:`ε commence à 1 (exploration pure) puis décroît pour exploiter de plus en plus ce qui a été appris.`},
+
+{c:1,t:`vf`,q:`Si ε vaut 0 dès le début, l'agent risque de ne jamais découvrir le meilleur chemin.`,a:0,
+e:`Vrai : en exploitation pure avec une Q-table à 0, il répète la première action jugée « meilleure » sans jamais essayer les autres.`},
+
+{c:1,t:`qcm`,q:`Dans le lab 1D, les cases goal et trap restent à 0 dans la Q-table. Pourquoi ?`,
+o:[`Ce sont des états terminaux : l'épisode s'y arrête`,`On n'y exécute jamais d'action, donc leurs valeurs ne sont jamais mises à jour`,`La récompense y est nulle`,`C'est une erreur de code à corriger`],a:[0,1],
+e:`C'est normal : Q(terminal, ·) = 0 par convention, et aucune mise à jour n'y a lieu. La récompense de ces cases (+1 / −1) est reçue en y arrivant, elle est donc stockée dans la case d'avant.`},
+
+/* ======================= CM2 — Politique optimale, Bellman, SARSA ======================= */
+{c:2,t:`num`,q:`Combien de politiques déterministes existe-t-il pour un MDP à 3 états et 4 actions ?`,a:64,tol:0,
+e:`Il y a |A|<sup>|S|</sup> politiques : 4³ = 64. Ce nombre explose très vite, d'où l'inefficacité de l'énumération.`},
+
+{c:2,t:`num`,q:`Le lab 1D a 4 états non terminaux et 2 actions (LEFT, RIGHT). Combien de politiques déterministes peut-on définir sur ces états ?`,a:16,tol:0,
+e:`2⁴ = 16. Pour une grille 2D de 10 cases utiles et 4 actions, on passerait à 4¹⁰ ≈ 1 million.`},
+
+{c:2,t:`vf`,q:`La fonction de valeur optimale est unique, et la politique optimale est donc unique elle aussi.`,a:1,
+e:`Faux : la valeur optimale est unique, mais plusieurs actions (donc plusieurs politiques) peuvent donner cette même valeur.`},
+
+{c:2,t:`qcm`,q:`Pour un MDP à horizon infini, quelles sont les propriétés de la politique optimale ?`,
+o:[`Déterministe (toujours la même action dans un état donné)`,`Stationnaire (ne change pas avec le pas de temps)`,`Forcément unique`,`Forcément stochastique`],a:[0,1],
+e:`Déterministe, stationnaire, mais pas forcément unique.`},
+
+{c:2,t:`qcu`,q:`Dans la mise à jour Q-learning, que se passe-t-il si α = 1 ?`,
+o:[`La nouvelle valeur remplace entièrement l'ancienne : l'agent oublie tout le passé et ne converge pas`,`Aucune mise à jour n'a lieu`,`L'agent devient myope`,`L'agent n'explore plus`],a:0,
+e:`Q ← Q + 1×(cible − Q) = cible. Chaque nouvelle observation (bruitée) écrase l'historique. Avec α = 0 au contraire, rien ne bouge.`},
+
+{c:2,t:`qcu`,q:`Et si α = 0 ?`,
+o:[`Le crochet est multiplié par 0 : aucune mise à jour, l'agent n'apprend jamais`,`L'agent apprend le plus vite possible`,`L'agent explore en permanence`,`La Q-table devient égale à la récompense`],a:0,
+e:`α est le pas d'apprentissage. Plus il est grand, plus les mises à jour sont rapides, mais les deux extrêmes (0 et 1) empêchent la convergence.`},
+
+{c:2,t:`qcu`,q:`Dans Q(sₜ, aₜ) += α[rₜ₊₁ + γ max<sub>a</sub> Q(sₜ₊₁, a) − Q(sₜ, aₜ)], que signifie un crochet égal à 0 pour toutes les transitions ?`,
+o:[`L'estimation actuelle égale ce qu'on obtient réellement : l'apprentissage a convergé`,`Le learning rate est trop petit`,`L'agent est bloqué dans un état terminal`,`Il faut augmenter ε`],a:0,
+e:`Le crochet compare l'estimation actuelle et une meilleure estimation contenant une vraie récompense. S'il est nul, il n'y a plus rien à corriger.`},
+
+{c:2,t:`qcu`,q:`L'équation de Bellman pour V<sup>π</sup>, V<sup>π</sup>(s) = ∑<sub>a</sub> π(a|s) ∑<sub>s',r</sub> p(s',r|s,a)[r + γV<sup>π</sup>(s')], fait quoi ?`,
+o:[`Elle moyenne toutes les possibilités, pondérées par leur probabilité (choix de l'action par π, puis transition)`,`Elle prend la meilleure action dans chaque état`,`Elle ne regarde que la récompense immédiate`,`Elle tire une seule trajectoire au hasard`],a:0,
+e:`Pour V<sup>π</sup> on fait une moyenne sur les actions (selon π) et sur les transitions (selon p).`},
+
+{c:2,t:`qcu`,q:`Qu'est-ce qui distingue l'équation d'optimalité de Bellman de l'équation de Bellman pour V<sup>π</sup> ?`,
+o:[`On prend le max sur les actions au lieu de la moyenne pondérée par π`,`On supprime le facteur γ`,`On remplace la somme sur s' par un max`,`On ne considère plus la récompense`],a:0,
+e:`V*(s) = max<sub>a</sub> ∑ p(s',r|s,a)[r + γV*(s')]. Le max = agir optimalement ; la moyenne sur les transitions reste (on ne contrôle pas l'environnement).`},
+
+{c:2,t:`qcu`,q:`Que signifie l'acronyme SARSA ?`,
+o:[`State – Action – Reward – State – Action`,`Stochastic Approximation of Reward with Sampled Actions`,`State Action Return Sampling Algorithm`,`Sequential Action Reward Search Algorithm`],a:0,
+e:`La mise à jour utilise le quintuplet (sₜ, aₜ, rₜ₊₁, sₜ₊₁, aₜ₊₁).`},
+
+{c:2,t:`code`,q:`Quel algorithme cette fonction implémente-t-elle ?`,
+k:`def learn(state, state2, reward, action, action2):
+    predict = Q[state, action]
+    target = reward + gamma * Q[state2, action2]
+    Q[state, action] = Q[state, action] + lr_rate * (target - predict)`,
+o:[`SARSA (on-policy)`,`Q-learning (off-policy)`,`Monte Carlo`,`Itération de politique`],a:0,
+e:`La cible utilise Q[state2, action2], la valeur de l'action réellement choisie ensuite. Q-learning utiliserait np.max(Q[state2, :]).`},
+
+{c:2,t:`code`,q:`Cette boucle SARSA a une ligne manquante à l'endroit indiqué. Laquelle ?`,
+k:`action = choose_action(state)
+while t < max_steps:
+    state2, reward, terminated, truncated, info = env.step(action)
+    action2 = choose_action(state2)
+    learn(state, state2, reward, action, action2)
+    state = state2
+    # ← ligne manquante
+    t += 1
+    if terminated or truncated:
+        break`,
+o:[`action = action2`,`action2 = action`,`state2 = state`,`action = choose_action(state2)`],a:0,
+e:`C'est la signature de l'on-policy : l'action utilisée dans l'update devient l'action réellement jouée au pas suivant. Sans cette ligne, action ne change jamais. Rechoisir avec choose_action(state2) tirerait une autre action que celle de l'update.`},
+
+{c:2,t:`num`,q:`SARSA : Q(s, a) = 0,5, α = 0,1, r = 0, γ = 0,9 et Q(s', a') = 1 pour l'action a' réellement choisie. Nouvelle valeur de Q(s, a) ?`,a:0.54,tol:0.0005,
+e:`Q ← 0,5 + 0,1 × (0 + 0,9×1 − 0,5) = 0,5 + 0,1 × 0,4 = 0,54.`},
+
+{c:2,t:`num`,q:`Même situation, mais avec Q-learning, sachant que max<sub>a'</sub> Q(s', a') = 2. Nouvelle valeur de Q(s, a) ?`,a:0.63,tol:0.0005,
+e:`Q ← 0,5 + 0,1 × (0 + 0,9×2 − 0,5) = 0,5 + 0,1 × 1,3 = 0,63. Q-learning prend la meilleure action possible, même si l'agent ne la joue pas.`},
+
+{c:2,t:`qcu`,q:`Dans l'exemple de la falaise (cliff walking), quel chemin Q-learning apprend-il ?`,
+o:[`Le chemin le plus court, qui longe le bord de la falaise`,`Le chemin le plus long, loin de la falaise`,`Un chemin aléatoire`,`Il n'apprend aucun chemin`],a:0,
+e:`Q-learning met à jour en supposant un jeu parfait (max) : il ignore le risque de tomber pendant son exploration, donc il vise le chemin optimal, au bord.`},
+
+{c:2,t:`qcu`,q:`Pourquoi SARSA apprend-il un chemin plus prudent dans l'exemple de la falaise ?`,
+o:[`Il apprend avec l'action réellement jouée, y compris les actions d'exploration : il tient compte du risque de tomber par erreur`,`Il utilise un γ plus petit`,`Il n'utilise pas de récompense négative`,`Il apprend plus lentement`],a:0,
+e:`Q-learning = optimiste (suppose un jeu parfait). SARSA = réaliste (intègre sa propre exploration ε-greedy).`},
+
+{c:2,t:`vf`,q:`Q-learning et SARSA sont tous deux des algorithmes de Temporal Difference.`,a:0,
+e:`Vrai : les deux améliorent π à partir de la différence entre V<sup>π</sup>(sₜ) et rₜ₊₁ + γV<sup>π</sup>(sₜ₊₁). Seule la cible diffère (max vs action suivante).`},
+
+{c:2,t:`qcm`,q:`Quelles affirmations sur FrozenLake 4×4 (is_slippery=True) sont vraies ?`,
+o:[`L'environnement est stochastique : l'agent ne va pas toujours où il veut`,`Il y a 16 états et 4 actions`,`Tomber dans un trou donne une récompense de −1`,`Atteindre le frisbee (G) donne +1 et termine la partie`],a:[0,1,3],
+e:`Tomber dans un trou donne 0 (et termine la partie), pas −1. Les récompenses sont donc rares : il faut beaucoup d'épisodes.`},
+
+{c:2,t:`num`,q:`Quelle est la taille (nombre de cases) de la Q-table de FrozenLake 4×4 ?`,a:64,tol:0,
+e:`16 états × 4 actions = 64 valeurs : Q = np.zeros((env.observation_space.n, env.action_space.n)).`},
+
+{c:2,t:`match`,q:`Associe chaque remarque du retour sur le 1er lab à sa signification.`,
+o:[[`Épisode`,`Un essai complet, de l'état initial à un état terminal`],[`Itération (pas)`,`Un seul déplacement à l'intérieur d'un épisode`],[`Coût de déplacement`,`Ne doit pas être mis dans le modèle de récompense`],[`État initial`,`Toujours le même au début de chaque épisode`]],
+e:`Épisode et itération sont deux boucles imbriquées distinctes.`},
+
+/* ======================= CM3 — Programmation dynamique, MC, VFA ======================= */
+{c:3,t:`qcu`,q:`De quoi la programmation dynamique (DP) a-t-elle besoin ?`,
+o:[`D'un modèle parfait de l'environnement : P et R connus`,`D'épisodes qui se terminent`,`D'un réseau de neurones`,`D'une politique ε-greedy`],a:0,
+e:`La DP est model-based : elle calcule exactement l'espérance des récompenses grâce à P et R.`},
+
+{c:3,t:`order`,q:`Remets dans l'ordre les étapes de l'itération de politique (policy iteration).`,
+o:[`Initialiser une politique π₀ quelconque`,`Évaluer la politique : calculer V<sup>π</sup> (policy evaluation)`,`Améliorer la politique de façon gloutonne : π'(s) = argmax<sub>a</sub> Q<sup>π</sup>(s, a)`,`Recommencer jusqu'à ce que plus aucun état ne change d'action (policy-stable)`],
+e:`π₀ →E→ V<sup>π₀</sup> →I→ π₁ →E→ V<sup>π₁</sup> → … → π*.`},
+
+{c:3,t:`num`,q:`Évaluation itérative de politique : depuis s, la politique mène de façon certaine vers s' avec une récompense de 1. γ = 0,5 et V<sub>k</sub>(s') = 4. Que vaut V<sub>k+1</sub>(s) ?`,a:3,tol:0.001,
+e:`V<sub>k+1</sub>(s) = r + γV<sub>k</sub>(s') = 1 + 0,5 × 4 = 3.`},
+
+{c:3,t:`qcu`,q:`Quand arrête-t-on l'évaluation itérative de politique ?`,
+o:[`Quand le plus grand changement Δ sur une passe devient inférieur à un petit seuil θ`,`Après exactement |S| itérations`,`Quand V devient nul partout`,`Quand l'agent atteint un état terminal`],a:0,
+e:`On itère jusqu'à ‖V<sub>k</sub> − V<sub>k−1</sub>‖ < θ. La convergence vers V<sup>π</sup> est garantie quand k → ∞.`},
+
+{c:3,t:`qcu`,q:`Comment initialise-t-on V pour l'évaluation itérative de politique ?`,
+o:[`Valeurs quelconques (aléatoires) pour tous les états, sauf les états terminaux fixés à 0`,`Tout à 1`,`Avec les récompenses immédiates uniquement`,`Avec la valeur optimale V*`],a:0,
+e:`L'initialisation est arbitraire, à l'exception des états terminaux qui valent 0.`},
+
+{c:3,t:`vf`,q:`La version « en place » de l'évaluation de politique (un seul tableau modifié au fur et à mesure) converge aussi, et plus vite que la version à deux tableaux.`,a:0,
+e:`Vrai : les deux versions sont équivalentes, la version en place est plus rapide.`},
+
+{c:3,t:`qcu`,q:`Que dit le théorème d'amélioration de politique ?`,
+o:[`Si Q<sup>π</sup>(s, π'(s)) ≥ V<sup>π</sup>(s) pour tout s, alors π' est au moins aussi bonne que π partout`,`Toute politique gloutonne est optimale`,`π' est toujours strictement meilleure que π`,`La politique optimale est unique`],a:0,
+e:`Et si V<sup>π'</sup> = V<sup>π</sup>, alors V<sup>π</sup> = V* : π et π' sont optimales.`},
+
+{c:3,t:`qcu`,q:`Pourquoi l'itération de politique converge-t-elle en un nombre fini d'étapes ?`,
+o:[`Un MDP fini a un nombre fini de politiques, et chaque étape donne une politique au moins aussi bonne`,`Parce que γ < 1`,`Parce que la DP utilise un réseau de neurones`,`Parce qu'on arrête après 100 itérations`],a:0,
+e:`La suite de politiques est monotone et ne peut pas parcourir plus que les |A|<sup>|S|</sup> politiques existantes.`},
+
+{c:3,t:`match`,q:`Associe chaque méthode à sa caractéristique.`,
+o:[[`Programmation dynamique`,`Model-based : utilise P et R pour calculer l'espérance exacte`],[`Monte Carlo`,`Model-free, moyenne des returns, exige des épisodes qui se terminent`],[`TD (Q-learning, SARSA)`,`Model-free, met à jour à chaque pas, suppose Markov`]],
+e:`Ligne de partage : connaît-on P et R ? Oui → DP. Non → on interagit avec l'environnement (MC ou TD).`},
+
+{c:3,t:`qcm`,q:`Quelles affirmations sur les méthodes Monte Carlo sont vraies ?`,
+o:[`Elles échantillonnent des trajectoires et font la moyenne des returns`,`Elles exigent des épisodes qui se terminent`,`Elles sont model-free`,`Elles mettent à jour la valeur à chaque pas, sans attendre la fin`],a:[0,1,2],
+e:`MC attend la fin de l'épisode pour connaître le return réel. C'est le TD qui met à jour à chaque pas.`},
+
+{c:3,t:`vf`,q:`Les méthodes Monte Carlo exigent que l'environnement respecte la propriété de Markov.`,a:1,
+e:`Faux : MC additionne le return réel jusqu'à la fin de l'épisode, donc il ne repose pas sur Markov (le return peut dépendre de la façon dont on est arrivé en sₜ). La DP et le TD, eux, ont besoin de Markov.`},
+
+{c:3,t:`qcu`,q:`Mini-quiz du cours : Q<sup>π</sup>(−, L) = [0, 0, 1, 1, 0, 0] et Q<sup>π</sup>(−, R) = [0, 1, 1, 0, 0, 0] pour les états s1 à s6, ε = 0,9. Quelle action la politique choisit-elle en s4 quand elle exploite ?`,
+o:[`L (gauche)`,`R (droite)`,`Égalité, n'importe laquelle`,`Aucune, s4 est terminal`],a:0,
+e:`En s4 : Q(s4, L) = 1 > Q(s4, R) = 0, donc L. En s2 c'est R. Pour les autres états, il y a égalité. Et avec ε = 0,9, l'agent joue au hasard 90 % du temps.`},
+
+{c:3,t:`qcu`,q:`Pourquoi les méthodes tabulaires (DP, MC, TD) ne suffisent-elles plus pour Go, Atari ou la robotique ?`,
+o:[`Trop d'états (ou des états continus) et aucune généralisation entre états voisins`,`Elles ne savent pas gérer les récompenses négatives`,`Elles exigent un réseau de neurones`,`Elles ne fonctionnent qu'avec γ = 1`],a:0,
+e:`Go : ~2¹⁷⁰ états et 400 actions ; Atari : images 240×160 ; robotique : espaces continus. Une table ne passe pas à l'échelle et traite chaque état isolément.`},
+
+{c:3,t:`qcu`,q:`Le jeu de Go compte environ 2¹⁷⁰ états. À quoi le cours le compare-t-il ?`,
+o:[`Au nombre d'atomes dans l'univers (il le dépasse)`,`Au nombre de pixels d'une image Atari`,`Au nombre de neurones du cerveau`,`Au nombre de parties jouées par AlphaGo`],a:0,
+e:`2¹⁷⁰ dépasse le nombre d'atomes de l'univers : impossible de stocker une valeur par état.`},
+
+{c:3,t:`qcu`,q:`Dans V̂<sup>π</sup>(s) = V(s, θ), que représente θ ?`,
+o:[`Les paramètres (poids) de la fonction, bien moins nombreux que les états`,`Le seuil d'arrêt de l'évaluation de politique`,`La température du softmax`,`Le nombre d'épisodes`],a:0,
+e:`On n'apprend plus une valeur par état mais un petit vecteur de paramètres θ qui permet de calculer la valeur de n'importe quel état.`},
+
+{c:3,t:`qcu`,q:`Quel type d'approximateur le cours recommande-t-il pour la VFA ?`,
+o:[`De préférence une fonction différentiable (comme un réseau de neurones), pour optimiser θ par gradient`,`Uniquement un arbre de décision`,`Uniquement les k plus proches voisins`,`Une table de hachage`],a:0,
+e:`N'importe quel approximateur est possible (arbre, plus proches voisins, réseau…), mais un approximateur différentiable permet la descente de gradient.`},
+
+{c:3,t:`qcu`,q:`Si un oracle nous donnait la vraie valeur V<sup>π</sup>(s) pour certains états, à quel type de problème se ramènerait la VFA ?`,
+o:[`De l'apprentissage supervisé sur des paires (s, V<sup>π</sup>(s))`,`De l'apprentissage non supervisé`,`De la programmation dynamique`,`Un problème sans solution`],a:0,
+e:`On apprend une fonction qui reproduit ces valeurs et qui généralise aux états jamais vus : c'est le pont entre RL et ML classique.`},
+
+{c:3,t:`qcm`,q:`Quels sont les avantages de l'approximation de la fonction de valeur ?`,
+o:[`Une représentation compacte qui généralise entre états et actions`,`Moins de mémoire et de calcul`,`Moins d'expérience (de données) nécessaire`,`La garantie de trouver l'optimum global`],a:[0,1,2],
+e:`Aucune garantie d'optimum global : l'optimisation par gradient peut s'arrêter dans un minimum local.`},
+
+/* ======================= CM4 — Réseaux de neurones pour la VFA ======================= */
+{c:4,t:`match`,q:`Associe chaque partie du neurone biologique à son rôle dans le neurone artificiel.`,
+o:[[`Dendrites`,`Les entrées, chacune multipliée par un poids synaptique`],[`Soma (corps cellulaire)`,`La somme des entrées pondérées`],[`Axone`,`La fonction d'activation et la sortie`]],
+e:`Le neurone artificiel reprend ce schéma : entrées pondérées → somme → activation → sortie.`},
+
+{c:4,t:`qcu`,q:`Qu'est-ce que le biais dans un neurone artificiel ?`,
+o:[`Une entrée spéciale x₀ = 1 associée à un poids w₀`,`Une erreur systématique du réseau`,`La fonction d'activation`,`Le learning rate`],a:0,
+e:`Le biais décale la somme pondérée, comme l'ordonnée à l'origine d'une droite : z = w₀ + ∑ wᵢxᵢ.`},
+
+{c:4,t:`num`,q:`Un neurone a pour poids w₀ = −1 (biais), w₁ = 0,5, w₂ = 1. Les entrées valent x₁ = 3, x₂ = 2. Que vaut la somme pondérée z ?`,a:2.5,tol:0.001,
+e:`z = −1 + 0,5×3 + 1×2 = 2,5. La sortie est ensuite y = s(z).`},
+
+{c:4,t:`qcu`,q:`Un neurone seul à 2 entrées, avec une activation en marche (0/1), correspond géométriquement à…`,
+o:[`une droite w₀ + w₁x₁ + w₂x₂ = 0 qui coupe le plan en deux`,`un cercle`,`une parabole`,`une région quelconque du plan`],a:0,
+e:`Un neurone seul est un séparateur linéaire : c'est le principe du perceptron.`},
+
+{c:4,t:`vf`,q:`Un neurone seul (perceptron) peut apprendre la fonction OU exclusif (XOR).`,a:1,
+e:`Faux : les points de XOR ne sont pas séparables par une seule droite. Il faut au moins une couche cachée.`},
+
+{c:4,t:`qcm`,q:`Un neurone à activation en marche (sortie 1 si z > 0) a pour poids w₀ = −1,5, w₁ = 1, w₂ = 1. Pour quelles entrées (x₁, x₂) la sortie vaut-elle 1 ?`,
+o:[`(0, 0)`,`(0, 1)`,`(1, 0)`,`(1, 1)`],a:[3],
+e:`z = −1,5 + x₁ + x₂ n'est positif que pour (1, 1) : z = 0,5. Le neurone calcule le ET logique.`},
+
+{c:4,t:`qcm`,q:`Que garantit le théorème d'approximation universelle (Cybenko et successeurs) ?`,
+o:[`Toute fonction booléenne peut être représentée avec une seule couche cachée`,`Toute fonction continue bornée peut être approchée avec une seule couche cachée, avec une précision arbitraire`,`Toute fonction peut être approchée avec 2 couches cachées`,`Le nombre exact de neurones à mettre par couche`],a:[0,1,2],
+e:`Le théorème ne dit ni la topologie, ni le nombre de neurones, ni comment régler les poids.`},
+
+{c:4,t:`qcu`,q:`Pourquoi remplace-t-on l'activation en marche par une sigmoïde pour l'apprentissage ?`,
+o:[`Le gradient exige une activation continue et dérivable`,`La sigmoïde est plus rapide à calculer`,`La marche ne fonctionne qu'avec un seul neurone`,`La sigmoïde évite le surapprentissage`],a:0,
+e:`La descente de gradient a besoin de dériver l'erreur par rapport aux poids, donc de dériver l'activation.`},
+
+{c:4,t:`num`,q:`Que vaut la sigmoïde s(z) = 1 / (1 + e<sup>−z</sup>) en z = 0 ?`,a:0.5,tol:0.0001,
+e:`s(0) = 1 / (1 + 1) = 0,5.`},
+
+{c:4,t:`num`,q:`La sortie d'un neurone sigmoïde vaut y = 0,8. Que vaut la dérivée s'(z) en ce point ?`,a:0.16,tol:0.0001,
+e:`s'(z) = s(z)(1 − s(z)) = y(1 − y) = 0,8 × 0,2 = 0,16. On la calcule directement depuis la sortie.`},
+
+{c:4,t:`num`,q:`Un neurone sigmoïde sort y = 0,5 alors que la cible vaut yʲ = 1. Avec E = ½(y − yʲ)², que vaut δ = (y − yʲ)·y(1 − y) ?`,a:-0.125,tol:0.0001,
+e:`δ = (0,5 − 1) × 0,5 × 0,5 = −0,125.`},
+
+{c:4,t:`num`,q:`Avec ce δ = −0,125, un learning rate η = 0,1 et une entrée x = 2, le poids w = 0,2 est mis à jour par w ← w − η·δ·x. Nouvelle valeur de w ?`,a:0.225,tol:0.0001,
+e:`w ← 0,2 − 0,1 × (−0,125) × 2 = 0,2 + 0,025 = 0,225. Le poids augmente, ce qui rapproche la sortie de la cible 1.`},
+
+{c:4,t:`qcu`,q:`Dans la descente de gradient, pourquoi met-on à jour avec w ← w − η∇<sub>w</sub>E (signe moins) ?`,
+o:[`Le gradient pointe vers la hausse de l'erreur : on va dans la direction opposée pour la faire baisser`,`Pour garder les poids négatifs`,`Parce que l'erreur est toujours négative`,`Pour augmenter l'erreur et mieux explorer`],a:0,
+e:`On minimise l'erreur, donc on descend la pente. (En policy gradient, on maximise une performance : on fait une montée, avec un signe +.)`},
+
+{c:4,t:`qcu`,q:`Dans le réseau du cours (y = s(w₄₀ + w₄₁y₂ + w₄₂y₃)), comment s'écrit δ₃ pour le neurone caché 3 ?`,
+o:[`δ₃ = δ₄ · w₄₂ · y₃(1 − y₃)`,`δ₃ = (y − yʲ) · y₃`,`δ₃ = δ₄ + w₄₂`,`δ₃ = y₃(1 − y₃) · x₁`],a:0,
+e:`C'est une récursion : le δ d'un neurone caché se calcule à partir du δ de la couche suivante, du poids qui les relie et de la dérivée de sa propre activation.`},
+
+{c:4,t:`qcu`,q:`La slide « les étudiants doivent compléter » demande ∂y/∂w₂₁. Quelle est la bonne réponse ?`,
+o:[`y(1 − y) · w₄₁ · y₂(1 − y₂) · y₁`,`y(1 − y) · w₄₂ · y₃(1 − y₃) · y₁`,`y(1 − y) · y₂`,`y₂(1 − y₂) · x₁`],a:0,
+e:`On remonte la chaîne : w₂₁ → z₂ → y₂ → z₄ (via w₄₁) → y. D'où δ₂ = δ₄·w₄₁·y₂(1 − y₂) et w₂₁ ← w₂₁ − η·δ₂·y₁.`},
+
+{c:4,t:`qcu`,q:`Pourquoi δ₁ = (δ₂w₂₁ + δ₃w₃₁)·y₁(1 − y₁) contient-il une <b>somme</b> ?`,
+o:[`Parce que y₁ alimente deux neurones (y₂ et y₃) : l'erreur lui revient par deux chemins`,`Parce que le neurone 1 a deux entrées`,`Pour normaliser le gradient`,`Parce qu'il y a deux biais`],a:0,
+e:`C'est la règle delta généralisée : δᵢ = yᵢ(1 − yᵢ) ∑ₖ wᵢₖδₖ, somme sur les neurones que i alimente.`},
+
+{c:4,t:`order`,q:`Remets dans l'ordre l'algorithme de rétropropagation.`,
+o:[`Initialiser les poids à de petites valeurs aléatoires`,`Choisir un exemple d'entraînement au hasard (xʲ, yʲ)`,`Propagation avant : calculer zᵢ et yᵢ pour chaque neurone`,`Calculer δ pour la couche de sortie`,`Calculer δ pour les couches précédentes (rétropropagation)`,`Mettre à jour chaque poids par descente de gradient`],
+e:`C'est l'algorithme de la slide « Backpropagation Algorithm ».`},
+
+{c:4,t:`qcu`,q:`Pourquoi la rétropropagation est-elle devenue la méthode dominante pour entraîner les réseaux ?`,
+o:[`Chaque calcul n'utilise que des données locales au neurone : simple et efficace`,`Elle garantit l'optimum global`,`Elle n'a pas besoin de labels`,`Elle ne demande aucune dérivée`],a:0,
+e:`Simplicité, localité, donc efficacité : on n'a jamais besoin de sommer sur tout le réseau.`},
+
+{c:4,t:`num`,q:`On normalise un pixel u = 102 avec x = (u − u<sub>min</sub>) / (u<sub>max</sub> − u<sub>min</sub>), où u<sub>min</sub> = 0 et u<sub>max</sub> = 255. Que vaut x ?`,a:0.4,tol:0.0001,
+e:`x = 102 / 255 = 0,4. Les entrées d'un réseau doivent être dans [0, 1].`},
+
+{c:4,t:`qcu`,q:`Comment encoder une entrée discrète comme {farine, beurre, sucre} ?`,
+o:[`En encodage unaire (one-hot) : un neurone d'entrée par valeur, un seul à 1`,`farine = 1, beurre = 2, sucre = 3`,`Par la longueur du mot`,`On ne peut pas donner de valeurs discrètes à un réseau`],a:0,
+e:`Avec 1/2/3, le réseau croirait à un ordre (sucre > beurre > farine) qui n'a aucun sens.`},
+
+{c:4,t:`qcu`,q:`Pour une classification binaire avec un seul neurone de sortie sigmoïde, comment décide-t-on de la classe ?`,
+o:[`Classe 0 si y < 0,5, sinon classe 1`,`Classe 1 si y < 0,5`,`On prend toujours la classe majoritaire`,`On arrondit z à l'entier le plus proche`],a:0,
+e:`Pour n classes, on utilise plutôt n neurones de sortie, chacun donnant la probabilité d'une classe.`},
+
+{c:4,t:`match`,q:`Associe chaque sous-ensemble de données à son rôle dans l'entraînement.`,
+o:[[`Train`,`Ajuster les poids`],[`Validation`,`Décider quand arrêter l'entraînement`],[`Test`,`Évaluer la performance finale, jamais utilisé avant`]],
+e:`Le découpage se fait aléatoirement. Si le jeu est trop petit pour 3 sous-ensembles : validation croisée.`},
+
+{c:4,t:`qcu`,q:`Quel signe indique un surapprentissage (overfitting) ?`,
+o:[`L'erreur sur le train continue de baisser alors que l'erreur sur la validation remonte`,`Les deux erreurs baissent ensemble`,`L'erreur de train est plus haute que celle de validation`,`Le réseau prédit toujours la même classe`],a:0,
+e:`Le réseau apprend le train par cœur au lieu de généraliser : on arrête quand l'erreur de validation atteint son minimum (early stopping).`},
+
+{c:4,t:`qcu`,q:`Pourquoi le cours conseille-t-il de relancer l'entraînement plusieurs fois avec de nouveaux poids aléatoires ?`,
+o:[`Pour éviter de rester bloqué dans un minimum local`,`Pour augmenter la taille du dataset`,`Pour remplacer la validation`,`Pour réduire le nombre de neurones`],a:0,
+e:`Chaque initialisation peut mener à un minimum différent ; on garde les meilleurs poids, puis on mesure l'erreur sur le test.`},
+
+{c:4,t:`qcu`,q:`Que faire si le jeu de données est trop petit pour être coupé en train / validation / test ?`,
+o:[`Utiliser la validation croisée (cross-validation)`,`Entraîner sur tout et tester sur le train`,`Supprimer la validation`,`Dupliquer les données`],a:0,
+e:`C'est la recommandation de la slide « Training ».`},
+
+{c:4,t:`num`,q:`La dérivée de la sigmoïde vaut au plus 0,25. Au mieux, par quel facteur le gradient est-il multiplié en traversant 3 couches sigmoïdes ?`,a:0.015625,tol:0.000001,
+e:`0,25³ = 0,015625. Avec beaucoup de couches, le gradient devient minuscule : c'est le vanishing gradient.`},
+
+{c:4,t:`qcm`,q:`Quelles solutions le cours propose-t-il contre le vanishing gradient ?`,
+o:[`Passer à l'activation ReLU`,`Les réseaux résiduels (ResNet)`,`La batch normalisation`,`Ajouter davantage de couches sigmoïdes`],a:[0,1,2],
+e:`ReLU a une dérivée de 1 pour z > 0, donc le gradient ne rétrécit pas à chaque couche.`},
+
+{c:4,t:`num`,q:`Une couche softmax reçoit z = [ln 3 ; 0]. Quelle probabilité donne-t-elle à la première classe ?`,a:0.75,tol:0.0001,
+e:`e<sup>ln 3</sup> = 3 et e⁰ = 1, donc y₁ = 3 / (3 + 1) = 0,75.`},
+
+{c:4,t:`vf`,q:`Les sorties d'une couche softmax sont toutes dans [0, 1] et leur somme vaut 1.`,a:0,
+e:`Vrai : softmax est une approximation douce de argmax qui transforme les sorties en probabilités.`},
+
+{c:4,t:`match`,q:`Associe chaque type de problème à la fonction de perte recommandée par le cours.`,
+o:[[`Classification multi-classes`,`Categorical crossentropy`],[`Classification binaire`,`Binary crossentropy`],[`Régression`,`MSE (erreur quadratique moyenne)`]],
+e:`Côté activation de sortie : softmax pour la classification, linéaire pour la régression.`},
+
+{c:4,t:`qcu`,q:`Quelle activation de sortie utilise-t-on pour une régression ?`,
+o:[`Linéaire`,`Softmax`,`Sigmoïde obligatoirement`,`ReLU obligatoirement`],a:0,
+e:`Une sortie linéaire peut prendre n'importe quelle valeur réelle.`},
+
+{c:4,t:`qcm`,q:`Lesquels de ces optimiseurs ont un learning rate adaptatif ?`,
+o:[`Adam`,`RMSProp`,`Adagrad`,`Un taux fixe η = 0,01`],a:[0,1,2],
+e:`Le cours cite Momentum, Adagrad, RMSProp et Adam comme méthodes adaptatives. Un taux fixe ne doit être ni trop petit ni trop grand.`},
+
+{c:4,t:`num`,q:`ALVINN (1989) prend en entrée une image de 30 × 32 pixels. Combien de neurones d'entrée a-t-il ?`,a:960,tol:0,
+e:`30 × 32 = 960 entrées, 4 neurones cachés et 30 sorties (une par commande de direction). C'est le même principe que le lab Pong : image → action, appris en imitant un humain.`},
+
+{c:4,t:`code`,q:`En PyTorch, faut-il ajouter nn.Softmax() à la fin de ce réseau de classification ?`,
+k:`model = nn.Sequential(
+    nn.Linear(2720, 100),
+    nn.ReLU(),
+    nn.Linear(100, 3)
+)
+criterion = nn.CrossEntropyLoss()`,
+o:[`Non : CrossEntropyLoss applique déjà le (log-)softmax aux sorties brutes (logits)`,`Oui, sinon la perte ne fonctionne pas`,`Oui, et il faut aussi passer à la MSE`,`Non, car ReLU joue le rôle de softmax`],a:0,
+e:`En PyTorch, on donne les logits à CrossEntropyLoss avec des labels entiers (0, 1, 2). En Keras, on met souvent softmax dans le modèle et des labels one-hot.`},
+
+{c:4,t:`code`,q:`Ce modèle Keras utilise categorical_crossentropy. Que faut-il faire de y avant model.fit ?`,
+k:`model.add(layers.Dense(3, activation='softmax'))
+model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+y = np.array([0, 2, 1, 1, 0])`,
+o:[`Le passer en one-hot avec keras.utils.to_categorical(y, num_classes=3)`,`Rien, les entiers suffisent`,`Le normaliser en y / 2`,`L'aplatir avec y.flatten()`],a:0,
+e:`categorical_crossentropy attend des vecteurs one-hot. (Avec des entiers, on utiliserait sparse_categorical_crossentropy.)`},
+
+/* ======================= CM5 — VFA (suite) ======================= */
+{c:5,t:`qcu`,q:`Comment procéder pour des domaines d'actions (ou d'états) continus ?`,
+o:[`Utiliser l'approximation de la fonction de valeur, car les méthodes tabulaires ne passent pas à l'échelle`,`Agrandir la Q-table`,`Utiliser γ = 0`,`Utiliser uniquement l'exploration`],a:0,
+e:`Une infinité de valeurs possibles demanderait une infinité de cases.`},
+
+{c:5,t:`vf`,q:`En utilisant la descente de gradient, on est sûr d'atteindre la meilleure solution.`,a:1,
+e:`Faux : on peut atteindre un minimum local.`},
+
+{c:5,t:`qcu`,q:`Comment un réseau de neurones peut-il produire une action pour un état qu'il n'a jamais vu ?`,
+o:[`Il généralise et donne une estimation raisonnable à partir d'états ressemblants`,`Il choisit une action au hasard`,`Il renvoie toujours 0`,`Il ne peut pas : il faut avoir vu tous les états`],a:0,
+e:`Une table n'a rien à dire sur une case jamais visitée ; un réseau est une fonction continue : deux états proches donnent des sorties proches.`},
+
+{c:5,t:`qcu`,q:`Les ANN sont entraînés de façon supervisée. Fait-on encore du RL avec Pong ?`,
+o:[`On utilise du supervisé pour résoudre un problème de RL : une politique dans une décision séquentielle où chaque action influence l'état suivant, donc un dataset qui change en permanence`,`Non, c'est du supervisé pur, sans lien avec le RL`,`Oui, car le réseau reçoit des récompenses à chaque frame`,`Non, c'est de l'apprentissage non supervisé`],a:0,
+e:`Le réseau est entraîné avec des labels, mais il joue le rôle de politique dans un problème séquentiel.`},
+
+{c:5,t:`match`,q:`Associe chaque type de credit assignment problem à la solution vue en cours.`,
+o:[[`Temporel : quelle décision dans le temps mérite le crédit ?`,`Le TD learning (la valeur remonte dans le temps)`],[`Structurel : quelle partie du système mérite le crédit ?`,`La rétropropagation (l'erreur remonte dans les couches)`]],
+e:`La rétropropagation attribue le crédit (ou la faute) à chaque poids du réseau.`},
+
+{c:5,t:`qcu`,q:`On apprend à prédire la température de demain : entrée = aujourd'hui, label = la température réelle de demain. Comment le cours qualifie-t-il cet apprentissage ?`,
+o:[`Auto-supervisé : aucun superviseur externe, juste des observations de l'environnement`,`Supervisé par un expert humain`,`Non supervisé`,`Par renforcement avec récompense humaine`],a:0,
+e:`Il suffit d'attendre le lendemain pour connaître la bonne réponse.`},
+
+{c:5,t:`num`,q:`Idée de Sutton (« prédire ses propres prédictions ») : lundi, tu prédis V<sub>t</sub> = 20. Mardi, tu observes r<sub>t+1</sub> = 1 et ta nouvelle prédiction vaut V<sub>t+1</sub> = 22. Que vaut l'erreur TD (r<sub>t+1</sub> + V<sub>t+1</sub>) − V<sub>t</sub> ?`,a:3,tol:0.001,
+e:`(1 + 22) − 20 = 3. Ta prédiction de lundi était trop basse : tu la corriges dès mardi, sans attendre la fin.`},
+
+{c:5,t:`qcm`,q:`Comparaison entre rétropropagation (BP) et RL : quelles affirmations sont vraies selon le cours ?`,
+o:[`La BP est bien plus rapide pour entraîner un réseau profond`,`Le RL n'a pas besoin de labels`,`Le RL est biologiquement plausible (pas de labels dans le cerveau)`,`On utilise couramment le RL pour entraîner les réseaux profonds à la place de la BP`],a:[0,1,2],
+e:`Personne n'utilise le RL pour entraîner un réseau profond : c'est beaucoup plus long. En neurosciences, le signal d'apprentissage ressemble à une erreur TD.`},
+
+{c:5,t:`qcm`,q:`Quels conseils le cours donne-t-il pour le lab Pong avec VFA ?`,
+o:[`Avoir un X qui couvre une grande variété de situations`,`Faire varier la topologie (nombre de couches et de neurones)`,`Vérifier la précision sur les données de test AVANT d'utiliser le réseau dans l'agent`,`Viser uniquement la meilleure précision sur le train`],a:[0,1,2],
+e:`La précision sur le train ne dit rien de la capacité à généraliser.`},
+
+/* ======================= CM6 — Policy Gradient ======================= */
+{c:6,t:`qcu`,q:`À quoi sert la librairie imblearn conseillée dans le retour sur le lab Pong ?`,
+o:[`À gérer les jeux de données déséquilibrés (par ex. 90 % d'actions « rien faire »)`,`À accélérer l'émulateur Atari`,`À afficher le jeu`,`À calculer les récompenses actualisées`],a:0,
+e:`imbalanced-learn propose du sur-échantillonnage ou du sous-échantillonnage des classes. Une alternative : pondérer la perte par classe.`},
+
+{c:6,t:`qcu`,q:`L'agent Pong entraîné ne bouge pas du tout. Que faut-il vérifier en premier selon le cours ?`,
+o:[`Que les valeurs de y contiennent bien les 3 actions possibles, et la précision sur le test`,`Que le learning rate vaut exactement 0,01`,`Que l'image est en couleur`,`Que γ vaut 1`],a:0,
+e:`Si y est dominé par « rien faire », le réseau apprend à toujours prédire cette classe : précision élevée, agent immobile.`},
+
+{c:6,t:`qcu`,q:`Qu'est-ce que le DQN ?`,
+o:[`Du Q-learning avec un réseau de neurones profond pour approximer Q`,`Une variante de SARSA sans exploration`,`Un algorithme de programmation dynamique`,`Une méthode Monte Carlo`],a:0,
+e:`Deep Q-Learning = Q-learning + VFA avec un réseau profond.`},
+
+{c:6,t:`qcu`,q:`Quelle perte utilise-t-on pour apprendre une fonction de valeur approchée V(s, θ), en supposant un oracle ?`,
+o:[`L'erreur quadratique moyenne J(θ) = E<sub>π</sub>[(V<sup>π</sup>(s) − V(s, θ))²]`,`La categorical crossentropy`,`La somme des récompenses`,`Le nombre d'états visités`],a:0,
+e:`On minimise l'écart quadratique entre la vraie valeur et l'estimation.`},
+
+{c:6,t:`qcu`,q:`Avec une méthode basée sur la valeur, pourquoi est-il difficile de choisir la meilleure action dans un espace d'actions <b>continu</b> ?`,
+o:[`Il faut trouver le maximum de V<sub>θ</sub>(s, a) par montée de gradient sur l'action à chaque pas : lent, inefficace et avec un risque de maximum local`,`Parce que argmax n'existe pas en Python`,`Parce que les récompenses deviennent continues`,`Parce que γ doit valoir 0`],a:0,
+e:`En discret, un argmax suffit. En continu, il faudrait résoudre un problème d'optimisation à chaque décision.`},
+
+{c:6,t:`qcu`,q:`Quel autre argument pousse à estimer directement la politique π<sub>θ</sub>(s, a) ?`,
+o:[`La fonction de valeur est souvent beaucoup plus complexe que la politique`,`La politique ne dépend pas de l'état`,`On n'a plus besoin de récompenses`,`La politique est toujours linéaire`],a:0,
+e:`À Pong, « monter si la balle est au-dessus » est simple ; la probabilité exacte de gagner depuis chaque image ne l'est pas.`},
+
+{c:6,t:`qcu`,q:`Quelle est la règle de mise à jour du policy gradient ?`,
+o:[`θₜ₊₁ = θₜ + α ∇J(θₜ) : une montée de gradient sur une estimation stochastique de la performance`,`θₜ₊₁ = θₜ − α ∇J(θₜ) : une descente sur la performance`,`θₜ₊₁ = argmax Q`,`θₜ₊₁ = θₜ × γ`],a:0,
+e:`On maximise la performance J, d'où le signe +. ∇J est estimé à partir de parties jouées.`},
+
+{c:6,t:`match`,q:`Associe chaque terme à sa définition.`,
+o:[[`Critic`,`Estime la fonction de valeur`],[`Actor`,`Apprend la politique`],[`Stochastic Policy Gradient (SPG)`,`La sortie est une probabilité sur les actions`],[`Deterministic Policy Gradient (DPG)`,`La sortie est directement l'action (haut, bas…)`]],
+e:`Les méthodes actor-critic apprennent à la fois la valeur (critique) et la politique (acteur).`},
+
+{c:6,t:`qcu`,q:`Dans le prétraitement Pong du cours, pourquoi utilise-t-on la différence de deux images consécutives ?`,
+o:[`Pour obtenir la direction du déplacement de la balle`,`Pour réduire la taille de l'image de moitié`,`Pour supprimer le score affiché`,`Pour passer en niveaux de gris`],a:0,
+e:`Une image seule montre où est la balle, pas où elle va. La différence ne garde que ce qui a bougé.`},
+
+{c:6,t:`num`,q:`Prétraitement du cours : obs_t[34:194, :, 1], puis sous-échantillonnage d'un facteur 2 en x et en y, ce qui donne une image 80 × 80. Combien de pixels en entrée du réseau ?`,a:6400,tol:0,
+e:`80 × 80 = 6400 pixels : c'est ce qui rend impossible de « jouer au hasard et garder les meilleurs scores ».`},
+
+{c:6,t:`qcu`,q:`Quelle est la limite fondamentale de l'apprentissage supervisé (imitation) pour Pong ?`,
+o:[`Même parfaitement entraîné, l'agent ne fera jamais mieux que le joueur humain qu'il imite`,`Il ne peut pas utiliser d'images`,`Il demande un modèle de l'environnement`,`Il ne fonctionne qu'avec 2 actions`],a:0,
+e:`L'agent copie, il ne s'améliore pas au-delà de son professeur. D'où l'intérêt d'un agent qui apprend seul (policy gradient).`},
+
+{c:6,t:`qcu`,q:`En policy gradient on maximise ∑ᵢ Aᵢ × log p(yᵢ | xᵢ). Que se passe-t-il si Aᵢ < 0 ?`,
+o:[`L'action yᵢ devient moins probable à l'avenir dans l'état xᵢ`,`L'action yᵢ devient plus probable`,`Le réseau ignore cet exemple`,`On change d'état`],a:0,
+e:`Aᵢ > 0 renforce l'action, Aᵢ < 0 la décourage. C'est presque du supervisé, avec l'action tirée comme « faux label » pondéré par Aᵢ.`},
+
+{c:6,t:`qcu`,q:`Comment l'agent choisit-il ses actions en policy gradient stochastique ?`,
+o:[`Il tire l'action au hasard selon les probabilités données par le réseau : aᵢ = yᵢ ~ p(· | xᵢ)`,`Il prend toujours l'action de plus forte probabilité`,`Il utilise ε-greedy sur une Q-table`,`Il copie l'action d'un humain`],a:0,
+e:`Le tirage intègre l'exploration : pas besoin d'ε-greedy.`},
+
+{c:6,t:`num`,q:`On perd un round au temps t (récompense −1). Avec γ = 0,9, quelle récompense actualisée est attribuée à l'action jouée en t − 2 ?`,a:-0.81,tol:0.0001,
+e:`t : −1 ; t−1 : −γ = −0,9 ; t−2 : −γ² = −0,81. Les actions proches du résultat reçoivent plus de blâme.`},
+
+{c:6,t:`num`,q:`On gagne un round au temps t (récompense +1). Avec γ = 0,5, quelle récompense actualisée est attribuée à l'action jouée en t − 3 ?`,a:0.125,tol:0.0001,
+e:`γ³ = 0,5³ = 0,125.`},
+
+{c:6,t:`vf`,q:`Dans le policy gradient de Pong, si on perd un round, on considère que toutes les actions de ce round étaient mauvaises.`,a:0,
+e:`Vrai, même si seule la dernière action était fautive : c'est le credit assignment problem. En moyenne sur des milliers de rounds, les bonnes actions ressortent quand même.`},
+
+{c:6,t:`qcu`,q:`Pourquoi cette méthode échoue-t-elle sur un jeu comme Montezuma's Revenge ?`,
+o:[`En jouant au hasard, l'agent n'atteint jamais de récompense positive, donc il n'a aucun signal pour apprendre`,`Le jeu est trop simple`,`Le jeu n'a pas d'images`,`Le jeu a trop de récompenses`],a:0,
+e:`Il faut enchaîner beaucoup d'actions précises avant la première récompense.`},
+
+{c:6,t:`qcm`,q:`Quelles sont les limites du reward shaping (récompense intermédiaire conçue à la main) ?`,
+o:[`Il faut le refaire pour chaque nouvel environnement ou jeu`,`L'agent peut se focaliser sur les récompenses intermédiaires au lieu du vrai but`,`Pour le Go, il n'est pas optimal (il pousse à jouer comme un humain)`,`Il garantit la convergence vers la politique optimale`],a:[0,1,2],
+e:`Exemple à Pong : une petite récompense quand la balle touche la raquette peut aider, mais rien ne garantit l'optimalité.`},
+
+{c:6,t:`num`,q:`L'avantage vaut Âₜ = Rₜ − b(sₜ). Si le return observé vaut Rₜ = 12 et la baseline b(sₜ) = 10, que vaut Âₜ ?`,a:2,tol:0.0001,
+e:`Âₜ = 12 − 10 = 2 > 0 : l'action a fait mieux que prévu, sa probabilité augmente.`},
+
+{c:6,t:`qcu`,q:`À quoi sert la baseline b(sₜ) dans Âₜ = Rₜ − b(sₜ) ?`,
+o:[`À comparer le résultat à ce qui était attendu dans cet état, ce qui réduit le bruit de l'apprentissage`,`À remplacer la récompense`,`À choisir l'action`,`À fixer le learning rate`],a:0,
+e:`Sans baseline, dans un état qui rapporte toujours ~+10, toutes les actions seraient renforcées. La baseline est souvent une estimation de V(s), c'est le lien avec actor-critic.`},
+
+{c:6,t:`order`,q:`Remets dans l'ordre une itération du « Vanilla Policy Gradient ».`,
+o:[`Collecter des trajectoires en exécutant la politique actuelle`,`Calculer à chaque pas le return Rₜ = ∑ γ<sup>t'−t</sup> r<sub>t'</sub>`,`Calculer l'avantage Âₜ = Rₜ − b(sₜ)`,`Réajuster la baseline en minimisant ‖b(sₜ) − Rₜ‖²`,`Mettre à jour la politique avec ĝ = ∑ ∇<sub>θ</sub> log π(aₜ | sₜ, θ) Âₜ`],
+e:`C'est l'algorithme 1 de la slide « Policy gradient (2) ».`},
+
+{c:6,t:`qcu`,q:`Quelle est l'idée centrale de TRPO (Trust Region Policy Optimization) ?`,
+o:[`Éviter les mises à jour qui changent trop la politique d'un coup`,`Supprimer la baseline`,`Remplacer le réseau par une table`,`Utiliser ε-greedy`],a:0,
+e:`Une seule grosse mise à jour malchanceuse peut ruiner une politique qui marchait. PPO reprend l'idée avec une fonction objectif plus simple.`},
+
+{c:6,t:`qcu`,q:`Qu'apporte PPO par rapport à TRPO selon le cours ?`,
+o:[`Une fonction objectif plus simple`,`L'absence de réseau de neurones`,`Un modèle de l'environnement`,`Une Q-table`],a:0,
+e:`PPO (Proximal Policy Optimization) est aujourd'hui l'un des algorithmes de policy gradient les plus utilisés.`},
+
+{c:6,t:`qcu`,q:`Dans le code de policy gradient de Karpathy pour Pong, que donne le réseau en sortie ?`,
+o:[`Un seul neurone : la probabilité de monter`,`Trois neurones : haut, bas, rien`,`La valeur Q de chaque action`,`L'image suivante`],a:0,
+e:`Une couche cachée de 200 neurones et une seule sortie. L'action est tirée au hasard selon cette probabilité ; mise à jour par lot avec RMSprop.`},
+
+{c:6,t:`qcu`,q:`Qu'associe AlphaGo aux policy gradients ?`,
+o:[`Une recherche arborescente Monte Carlo (MCTS)`,`La programmation dynamique exacte`,`Une Q-table`,`L'apprentissage non supervisé`],a:0,
+e:`AlphaGo = policy gradients + Monte Carlo Tree Search.`},
+
+{c:6,t:`code`,q:`Pour adapter le code de Karpathy à Python 3, que faut-il modifier dans ces lignes ? (le code d'origine est en Python 2)`,
+k:`for k, v in model.iteritems():
+    print k, v.shape`,
+o:[`model.iteritems() → model.items() et print k, v.shape → print(k, v.shape)`,`Remplacer numpy par torch`,`Remplacer model par une liste`,`Rien, ce code est déjà compatible`],a:0,
+e:`Ce sont les deux adaptations citées par le cours. Le TD suggère aussi de passer le learning rate à 10⁻³ pour accélérer.`},
+
+{c:6,t:`qcm`,q:`Quelles pistes d'amélioration le lab propose-t-il pour le policy gradient sur Pong ?`,
+o:[`Reward shaping : récompense positive quand la balle touche la raquette`,`1 ou 2 couches de convolution puis une couche dense`,`Ajouter une sortie pour permettre de ne pas bouger`,`Supprimer les récompenses actualisées`],a:[0,1,2],
+e:`Les récompenses actualisées restent nécessaires pour répartir le crédit dans le temps.`},
+
+/* ======================= Labs (TD Q-learning, FrozenLake, Pong) ======================= */
+{c:7,t:`num`,q:`Lab Pong : on réduit l'image 210 × 160 × 3 avec obs_t[34:194:4, 12:148:2, 2]. Combien de valeurs reste-t-il par image ?`,a:2720,tol:0,
+e:`Lignes : (194 − 34) / 4 = 40. Colonnes : (148 − 12) / 2 = 68. Un seul canal. 40 × 68 = 2720 valeurs, contre 100 800 au départ.`},
+
+{c:7,t:`qcu`,q:`Dans obs_t[34:194:4, 12:148:2, 2], que fait la partie 34:194:4 ?`,
+o:[`Elle garde les lignes 34 à 193 (on coupe le haut et le bas) en n'en prenant qu'une sur 4`,`Elle garde 4 lignes`,`Elle choisit le canal 4`,`Elle multiplie l'image par 4`],a:0,
+e:`Syntaxe début:fin:pas. Les bornes recadrent (le score en haut, la bordure en bas), le pas sous-échantillonne. Le dernier indice (2) garde un seul canal de couleur.`},
+
+{c:7,t:`qcu`,q:`Avec gymnasium récent, quelle est la signature du callback de gymnasium.utils.play.play ?`,
+o:[`mycallback(obs_t, obs_tp1, action, rew, terminated, truncated, info)`,`mycallback(obs_t, obs_tp1, action, rew, done, info)`,`mycallback(obs, action)`,`mycallback(env)`],a:0,
+e:`L'ancien done a été séparé en terminated (fin naturelle) et truncated (coupure par une limite de temps). On reconstruit done = terminated or truncated.`},
+
+{c:7,t:`code`,q:`Qu'affiche ce code ?`,
+k:`temp_x = temp_y = []
+temp_x.append("image")
+temp_y.append(2)
+print(temp_x)`,
+o:[`['image', 2]`,`['image']`,`[]`,`Une erreur`],a:0,
+e:`temp_x et temp_y désignent la même liste. Pour deux listes séparées : temp_x, temp_y = [], [].`},
+
+{c:7,t:`code`,q:`Ce code enregistre les frames d'un point uniquement s'il est gagné. Que se passe-t-il si on gagne deux points d'affilée ?`,
+k:`if rew > 0:
+    sauvegarder(temp_x, temp_y)
+elif rew != 0:
+    temp_x, temp_y = [], []`,
+o:[`Les frames du 1er point sont réécrites une 2ᵉ fois, car le buffer n'est jamais vidé après un point gagné`,`Rien de particulier, le code est correct`,`Le 2ᵉ point n'est pas enregistré`,`Le programme plante`],a:0,
+e:`Il faut deux if séparés : écrire si rew > 0, puis vider dans tous les cas où rew != 0.`},
+
+{c:7,t:`qcu`,q:`Pourquoi ne garder que les frames des points gagnés dans le dataset de Pong ?`,
+o:[`Parce que le réseau imite les actions : garder les points perdus lui apprendrait les erreurs du joueur`,`Pour que le dataset soit plus gros`,`Parce que les points perdus n'ont pas d'image`,`Parce que gymnasium l'exige`],a:0,
+e:`En apprentissage par imitation, chaque exemple dit « dans cette situation, fais ça ». Les mauvaises actions ne doivent pas servir de modèle.`},
+
+{c:7,t:`qcu`,q:`Le dataset contient 4236 actions « rien », 221 « monter » et 222 « descendre ». Le réseau prédit toujours « rien ». Quelle correction garde toutes les données ?`,
+o:[`Pondérer la perte par classe (weight= dans cross_entropy), inversement à la fréquence`,`Supprimer la classe « rien »`,`Augmenter le nombre d'epochs`,`Passer à la MSE`],a:0,
+e:`Prédire toujours « rien » donne déjà 90 % de précision : un chiffre trompeur. La pondération rend une erreur sur une action rare plus coûteuse. L'alternative est de rééquilibrer (imblearn ou sous-échantillonnage).`},
+
+{c:7,t:`code`,q:`À l'entraînement, on a converti les actions Atari en classes avec mapping. Le réseau prédit la classe 2. Quelle action envoyer à env.step ?`,
+k:`mapping = {0: 0, 2: 1, 3: 2}   # action Atari -> classe
+pred_class = model(X_t).argmax(1).item()   # vaut 2
+action = ???`,
+o:[`3`,`2`,`1`,`0`],a:0,
+e:`Il faut le mapping inverse {0: 0, 1: 2, 2: 3}. Et le prétraitement de l'image en test doit être identique à celui de l'entraînement.`},
+
+{c:7,t:`code`,q:`Cette ligne lève « ValueError: too many values to unpack (expected 4) » avec gymnasium. Quelle est la bonne version ?`,
+k:`state2, reward, done, info = env.step(action)`,
+o:[`state2, reward, terminated, truncated, info = env.step(action) puis done = terminated or truncated`,`state2, reward = env.step(action)`,`state2 = env.step(action)[0]`,`env.step(action, done)`],a:0,
+e:`step renvoie 5 valeurs depuis gymnasium. De même, reset renvoie (state, info).`},
+
+{c:7,t:`qcu`,q:`Pourquoi env.render(mode="human") provoque-t-il une erreur avec gymnasium récent ?`,
+o:[`Le mode d'affichage se choisit à la création : gym.make(..., render_mode="human"), puis env.render() sans argument`,`Parce que le mode human n'existe plus`,`Parce qu'il faut appeler render avant reset`,`Parce que Pong n'a pas de rendu`],a:0,
+e:`Le mode human nécessite aussi pygame (gymnasium[toy-text]). Pour entraîner vite, on n'affiche rien et on regarde l'agent ensuite sur quelques épisodes.`},
+
+{c:7,t:`qcu`,q:`Projet backgammon : comment TD-Gammon (Tesauro, 1992) a-t-il appris à jouer au niveau des meilleurs humains ?`,
+o:[`Par self-play et TD learning, avec un réseau de neurones pour approximer la valeur (le jeu a ~10²⁰ états)`,`Avec une Q-table de toutes les positions`,`En imitant des parties d'experts uniquement`,`Par programmation dynamique avec un modèle exact`],a:0,
+e:`Une Q-table est impossible à cette échelle. Le hasard des dés aide aussi à explorer l'espace d'états.`}
+];
+(function(){
+const TYPE_LABEL={qcu:`Choix unique`,qcm:`Choix multiples`,vf:`Vrai / Faux`,num:`Calcul`,order:`Remise en ordre`,match:`Association`,code:`Lecture de code`};
+const CM_LABEL={1:`CM1`,2:`CM2`,3:`CM3`,4:`CM4`,5:`CM5`,6:`CM6`,7:`Labs`};
+const CM_TITLE={1:`Intro, MDP, Q-learning`,2:`Bellman, SARSA`,3:`DP, Monte Carlo, VFA`,4:`Réseaux de neurones`,5:`VFA (suite)`,6:`Policy Gradient`,7:`TD et labs`};
+QUESTIONS.forEach((q,i)=>{q.id=i+1;});
+const BY_ID={};QUESTIONS.forEach(q=>BY_ID[q.id]=q);
+const KEY=`rl-grand-qcm-v1`;
+const S={answers:{},cm:`all`,type:`all`,view:`all`,order:null,exam:null};
+const optOrder={};
+const $=id=>document.getElementById(id);
+
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||`null`);if(d){S.answers=d.answers||{};S.exam=d.exam||null;}}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({answers:S.answers,exam:S.exam}));}catch(e){}}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function range(n){return Array.from({length:n},(_,i)=>i);}
+function fmt(x){return String(x).replace(`.`,`,`);}
+function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+
+function orderFor(q){
+  if(optOrder[q.id])return optOrder[q.id];
+  let o;
+  if(q.t===`vf`)o=[0,1];
+  else if(q.t===`order`){o=shuffle(range(q.o.length));let guard=0;while(o.every((v,i)=>v===i)&&guard++<10)o=shuffle(o);}
+  else if(q.t===`match`)o=shuffle(range(q.o.length));
+  else if(q.o)o=shuffle(range(q.o.length));
+  else o=[];
+  optOrder[q.id]=o;return o;
+}
+
+/* ---------- filtres ---------- */
+function baseIds(){
+  if(S.exam)return S.exam.ids.slice();
+  return S.order?S.order.slice():QUESTIONS.map(q=>q.id);
+}
+function visibleIds(){
+  return baseIds().filter(id=>{
+    const q=BY_ID[id],a=S.answers[id];
+    if(!S.exam&&S.cm!==`all`&&String(q.c)!==S.cm)return false;
+    if(!S.exam&&S.type!==`all`&&q.t!==S.type)return false;
+    if(S.view===`todo`&&a)return false;
+    if(S.view===`wrong`&&!(a&&!a.ok))return false;
+    return true;
+  });
+}
+
+function buildFilters(){
+  const cmBox=$(`cmChips`);cmBox.innerHTML=``;
+  const counts={};QUESTIONS.forEach(q=>counts[q.c]=(counts[q.c]||0)+1);
+  const mk=(val,label,n,title)=>{const b=el(`button`,`chip`);b.type=`button`;b.innerHTML=label+(n!=null?`<span class="n">${n}</span>`:``);if(title)b.title=title;b.setAttribute(`aria-pressed`,String(S.cm===val));b.onclick=()=>{S.cm=val;buildFilters();render();};return b;};
+  cmBox.appendChild(mk(`all`,`Tous`,QUESTIONS.length));
+  Object.keys(CM_LABEL).forEach(k=>cmBox.appendChild(mk(k,CM_LABEL[k],counts[k]||0,CM_TITLE[k])));
+  const sel=$(`typeSel`);
+  if(!sel.options.length){
+    sel.appendChild(new Option(`Tous les types`,`all`));
+    Object.keys(TYPE_LABEL).forEach(t=>sel.appendChild(new Option(TYPE_LABEL[t],t)));
+    sel.onchange=()=>{S.type=sel.value;render();};
+  }
+  sel.value=S.type;
+  const vb=$(`viewChips`);vb.innerHTML=``;
+  [[`all`,`Toutes`],[`todo`,`À faire`],[`wrong`,`Mes erreurs`]].forEach(([v,l])=>{
+    const b=el(`button`,`chip`,l);b.type=`button`;b.setAttribute(`aria-pressed`,String(S.view===v));
+    b.onclick=()=>{S.view=v;buildFilters();render();};vb.appendChild(b);
+  });
+  const locked=!!S.exam;
+  cmBox.querySelectorAll(`button`).forEach(b=>b.disabled=locked);sel.disabled=locked;
+  $(`orderBtn`).textContent=S.order?`Ordre du cours`:`Ordre aléatoire`;
+  $(`orderBtn`).disabled=locked;
+}
+
+/* ---------- rendu d'une question ---------- */
+function renderCard(q){
+  const card=el(`article`,`q`);card.id=`q-`+q.id;card.dataset.id=q.id;
+  const head=el(`div`,`qhead`);
+  head.appendChild(el(`span`,`qnum`,`Q${q.id}`));
+  const cm=el(`span`,`tag cm`,CM_LABEL[q.c]);cm.title=CM_TITLE[q.c];head.appendChild(cm);
+  head.appendChild(el(`span`,`tag`,TYPE_LABEL[q.t]));
+  card.appendChild(head);
+  card.appendChild(el(`p`,`prompt`,q.q));
+  if(q.k){const pre=el(`pre`,`code`);pre.textContent=q.k;card.appendChild(pre);}
+  const body=el(`div`,`body`);
+  const ord=orderFor(q);
+  if(q.t===`qcm`)card.insertBefore(el(`p`,`hint`,`Plusieurs réponses possibles : coche toutes les bonnes.`),null);
+  if([`qcu`,`code`,`vf`,`qcm`].includes(q.t)){
+    const opts=q.t===`vf`?[`Vrai`,`Faux`]:q.o;
+    const ul=el(`ul`,`opts`);
+    ord.forEach(i=>{
+      const li=el(`li`);li.dataset.k=i;
+      const lab=el(`label`);
+      const inp=document.createElement(`input`);
+      inp.type=q.t===`qcm`?`checkbox`:`radio`;inp.name=`q${q.id}`;inp.value=i;inp.id=`q${q.id}-o${i}`;
+      lab.appendChild(inp);lab.appendChild(el(`span`,``,opts[i]));li.appendChild(lab);ul.appendChild(li);
+    });
+    body.appendChild(ul);
+  }else if(q.t===`num`){
+    const row=el(`div`,`num-row`);
+    const inp=document.createElement(`input`);inp.type=`text`;inp.inputMode=`decimal`;inp.id=`q${q.id}-num`;inp.placeholder=`Ta réponse`;inp.setAttribute(`aria-label`,`Réponse numérique`);
+    inp.addEventListener(`keydown`,e=>{if(e.key===`Enter`)check(q,card);});
+    row.appendChild(inp);row.appendChild(el(`span`,`hint`,`Virgule ou point acceptés.`));body.appendChild(row);
+  }else if(q.t===`order`){
+    const ol=el(`ol`,`order`);
+    ord.forEach(i=>ol.appendChild(orderItem(q,i)));
+    body.appendChild(ol);refreshMoves(ol);
+  }else if(q.t===`match`){
+    const box=el(`div`,`match`);
+    q.o.forEach((pair,i)=>{
+      const row=el(`div`,`mrow`);row.dataset.k=i;
+      row.appendChild(el(`div`,``,pair[0]));
+      const s=document.createElement(`select`);s.id=`q${q.id}-m${i}`;s.setAttribute(`aria-label`,`Associer : `+pair[0].replace(/<[^>]+>/g,``));
+      s.appendChild(new Option(`Choisir…`,``));
+      ord.forEach(j=>{const op=new Option(q.o[j][1].replace(/<[^>]+>/g,``),j);s.appendChild(op);});
+      row.appendChild(s);box.appendChild(row);
+    });
+    body.appendChild(box);
+  }
+  card.appendChild(body);
+  const foot=el(`div`,`qfoot`);
+  const btn=el(`button`,`btn primary`,`Valider`);btn.type=`button`;btn.onclick=()=>check(q,card);
+  foot.appendChild(btn);foot.appendChild(el(`span`,`msg`));card.appendChild(foot);
+  const a=S.answers[q.id];
+  if(a){restore(q,card,a.g);applyResult(q,card,a.g,a.ok);}
+  return card;
+}
+function orderItem(q,i){
+  const li=el(`li`);li.dataset.k=i;
+  li.appendChild(el(`span`,``,q.o[i]));
+  const up=el(`button`,`mv`,`↑`);up.type=`button`;up.setAttribute(`aria-label`,`Monter`);
+  const dn=el(`button`,`mv`,`↓`);dn.type=`button`;dn.setAttribute(`aria-label`,`Descendre`);
+  up.onclick=()=>{const p=li.previousElementSibling;if(p){li.parentNode.insertBefore(li,p);refreshMoves(li.parentNode);up.focus();}};
+  dn.onclick=()=>{const n=li.nextElementSibling;if(n){li.parentNode.insertBefore(n,li);refreshMoves(li.parentNode);dn.focus();}};
+  li.appendChild(up);li.appendChild(dn);return li;
+}
+function refreshMoves(ol){const items=[...ol.children];items.forEach((li,i)=>{const [up,dn]=li.querySelectorAll(`.mv`);if(up&&!li.dataset.locked){up.disabled=i===0;dn.disabled=i===items.length-1;}});}
+
+/* ---------- lecture, correction ---------- */
+function given(q,card){
+  if([`qcu`,`code`,`vf`].includes(q.t)){const c=card.querySelector(`input:checked`);return c?Number(c.value):null;}
+  if(q.t===`qcm`){const c=[...card.querySelectorAll(`input:checked`)].map(x=>Number(x.value));return c.length?c.sort((a,b)=>a-b):null;}
+  if(q.t===`num`){const v=card.querySelector(`input`).value.trim();return v===``?null:v;}
+  if(q.t===`order`)return [...card.querySelectorAll(`ol.order li`)].map(li=>Number(li.dataset.k));
+  if(q.t===`match`){const v=[...card.querySelectorAll(`select`)].map(s=>s.value);return v.some(x=>x===``)?null:v.map(Number);}
+  return null;
+}
+function parseNum(s){const v=Number(String(s).replace(/\s/g,``).replace(`,`,`.`));return isNaN(v)?null:v;}
+function isRight(q,g){
+  if([`qcu`,`code`,`vf`].includes(q.t))return g===q.a;
+  if(q.t===`qcm`){const a=q.a.slice().sort((x,y)=>x-y);return g.length===a.length&&g.every((v,i)=>v===a[i]);}
+  if(q.t===`num`){const v=parseNum(g);if(v===null)return false;const tol=q.tol!=null?q.tol:Math.max(1e-3,Math.abs(q.a)*1e-3);return Math.abs(v-q.a)<=tol+1e-9;}
+  if(q.t===`order`)return g.every((v,i)=>v===i);
+  if(q.t===`match`)return g.every((v,i)=>v===i);
+  return false;
+}
+function check(q,card){
+  if(S.answers[q.id])return;
+  const g=given(q,card);const msg=card.querySelector(`.msg`);
+  if(g===null){msg.textContent=q.t===`match`?`Associe chaque ligne avant de valider.`:q.t===`num`?`Entre une valeur.`:`Choisis une réponse.`;return;}
+  if(q.t===`num`&&parseNum(g)===null){msg.textContent=`Entre un nombre (ex. 0,54).`;return;}
+  msg.textContent=``;
+  const ok=isRight(q,g);
+  S.answers[q.id]={g,ok};save();
+  applyResult(q,card,g,ok);updateStats();checkExamEnd();
+}
+function restore(q,card,g){
+  if([`qcu`,`code`,`vf`].includes(q.t)){const i=card.querySelector(`input[value="${g}"]`);if(i)i.checked=true;}
+  else if(q.t===`qcm`){g.forEach(v=>{const i=card.querySelector(`input[value="${v}"]`);if(i)i.checked=true;});}
+  else if(q.t===`num`)card.querySelector(`input`).value=g;
+  else if(q.t===`order`){const ol=card.querySelector(`ol.order`);ol.innerHTML=``;g.forEach(i=>ol.appendChild(orderItem(q,i)));}
+  else if(q.t===`match`){card.querySelectorAll(`select`).forEach((s,i)=>s.value=String(g[i]));}
+}
+function applyResult(q,card,g,ok){
+  card.classList.remove(`ok`,`ko`);card.classList.add(ok?`ok`:`ko`);
+  card.querySelectorAll(`input,select,.mv`).forEach(x=>x.disabled=true);
+  const vbtn=card.querySelector(`.qfoot .btn`);if(vbtn)vbtn.hidden=true;
+  let expected=``;
+  if([`qcu`,`code`,`vf`,`qcm`].includes(q.t)){
+    const good=q.t===`qcm`?q.a:[q.a];
+    card.querySelectorAll(`.opts li`).forEach(li=>{const k=Number(li.dataset.k);const chosen=li.querySelector(`input`).checked;
+      if(good.includes(k))li.classList.add(`is-correct`);else if(chosen)li.classList.add(`is-wrong`);});
+  }else if(q.t===`num`){
+    const inp=card.querySelector(`input`);inp.classList.add(ok?`ok`:`ko`);
+    if(!ok)expected=`<p class="expected">Réponse attendue : ${fmt(q.a)}</p>`;
+  }else if(q.t===`order`){
+    card.querySelectorAll(`ol.order li`).forEach((li,i)=>{li.dataset.locked=`1`;li.classList.add(Number(li.dataset.k)===i?`is-correct`:`is-wrong`);});
+    if(!ok)expected=`<p class="expected" style="font-family:var(--body)"><b>Bon ordre :</b></p><ol style="margin:4px 0 0;padding-left:20px">`+q.o.map(x=>`<li>${x}</li>`).join(``)+`</ol>`;
+  }else if(q.t===`match`){
+    card.querySelectorAll(`.mrow`).forEach((row,i)=>{const r=g[i]===i;row.classList.add(r?`is-correct`:`is-wrong`);
+      if(!r&&!row.querySelector(`.fix`))row.appendChild(el(`div`,`fix`,`Bonne réponse : `+q.o[i][1]));});
+  }
+  let fb=card.querySelector(`.fb`);if(fb)fb.remove();
+  fb=el(`div`,`fb`);
+  fb.innerHTML=`<div class="verdict ${ok?`ok`:`ko`}">${ok?`Juste.`:`Faux.`}</div>`+expected+`<p class="expl">${q.e}</p>`;
+  const again=el(`button`,`btn`,`Réessayer cette question`);again.type=`button`;again.style.marginTop=`10px`;
+  again.onclick=()=>{delete S.answers[q.id];save();delete optOrder[q.id];const fresh=renderCard(q);card.replaceWith(fresh);updateStats();};
+  fb.appendChild(again);card.appendChild(fb);
+}
+
+/* ---------- stats, carte ---------- */
+function updateStats(){
+  const ids=S.exam?S.exam.ids:visibleIdsNoView();
+  let ans=0,ok=0;ids.forEach(id=>{const a=S.answers[id];if(a){ans++;if(a.ok)ok++;}});
+  $(`sAns`).textContent=`${ans}/${ids.length}`;
+  $(`sOk`).textContent=ok;
+  $(`sPct`).textContent=ans?Math.round(100*ok/ans)+` %`:`–`;
+  const G=ok-(ans-ok);$(`sG`).textContent=(G>0?`+`:``)+G;
+  $(`sMeter`).style.width=(ids.length?100*ok/ids.length:0)+`%`;
+  const cells=$(`cells`);cells.innerHTML=``;
+  ids.forEach(id=>{const a=S.answers[id];const b=el(`button`,`cell`+(a?(a.ok?` ok`:` ko`):``),String(id));b.type=`button`;b.title=`Q${id}`+(a?(a.ok?` · juste`:` · fausse`):``);
+    b.onclick=()=>{let c=$(`q-`+id);if(!c){S.view=`all`;buildFilters();render();c=$(`q-`+id);}if(c)c.scrollIntoView({behavior:`smooth`,block:`start`});};cells.appendChild(b);});
+  renderExamBox();
+}
+function visibleIdsNoView(){const v=S.view;S.view=`all`;const r=visibleIds();S.view=v;return r;}
+
+/* ---------- examen blanc ---------- */
+function startExam(){
+  const pool=(S.cm===`all`?QUESTIONS:QUESTIONS.filter(q=>String(q.c)===S.cm)).map(q=>q.id);
+  const ids=shuffle(pool).slice(0,Math.min(30,pool.length));
+  ids.forEach(id=>{delete S.answers[id];delete optOrder[id];});
+  S.exam={ids,finished:false};S.view=`all`;save();buildFilters();render();window.scrollTo({top:0});
+}
+function checkExamEnd(){if(S.exam&&!S.exam.finished&&S.exam.ids.every(id=>S.answers[id])){S.exam.finished=true;save();renderExamBox();}}
+function renderExamBox(){
+  const box=$(`examBox`);box.innerHTML=``;if(!S.exam)return;
+  const ids=S.exam.ids;const ans=ids.filter(id=>S.answers[id]).length;const ok=ids.filter(id=>S.answers[id]&&S.answers[id].ok).length;
+  const d=el(`div`,`exam`);
+  if(S.exam.finished){
+    const note=Math.round(20*ok/ids.length*10)/10;
+    d.innerHTML=`<div><p><b>Examen blanc terminé</b> · ${ok} bonnes réponses sur ${ids.length}</p><p class="note">${fmt(note)} / 20</p></div>`;
+  }else{
+    d.innerHTML=`<p><b>Examen blanc en cours</b> · ${ans}/${ids.length} questions répondues. Les filtres sont désactivés pendant l'examen.</p>`;
+    const fin=el(`button`,`btn`,`Terminer maintenant`);fin.type=`button`;fin.onclick=()=>{S.exam.finished=true;save();renderExamBox();};d.appendChild(fin);
+  }
+  const q=el(`button`,`btn`,`Quitter l'examen`);q.type=`button`;q.onclick=()=>{S.exam=null;save();buildFilters();render();};d.appendChild(q);
+  box.appendChild(d);
+}
+
+/* ---------- liste ---------- */
+function render(){
+  const list=$(`list`);list.innerHTML=``;
+  const ids=visibleIds();
+  if(!ids.length){list.appendChild(el(`div`,`empty`,S.view===`wrong`?`Aucune erreur pour l'instant dans cette sélection.`:S.view===`todo`?`Tout est fait dans cette sélection.`:`Aucune question ne correspond à ces filtres.`));}
+  ids.forEach(id=>list.appendChild(renderCard(BY_ID[id])));
+  updateStats();
+}
+
+/* ---------- boutons ---------- */
+$(`examBtn`).onclick=startExam;
+$(`orderBtn`).onclick=()=>{S.order=S.order?null:shuffle(QUESTIONS.map(q=>q.id));buildFilters();render();};
+let resetArmed=null;
+$(`resetBtn`).onclick=()=>{
+  const b=$(`resetBtn`);
+  if(!resetArmed){b.textContent=`Confirmer l'effacement`;resetArmed=setTimeout(()=>{b.textContent=`Effacer mes réponses`;resetArmed=null;},4000);return;}
+  clearTimeout(resetArmed);resetArmed=null;b.textContent=`Effacer mes réponses`;
+  S.answers={};S.exam=null;for(const k in optOrder)delete optOrder[k];save();buildFilters();render();
+};
+
+load();
+$(`lede`).innerHTML=`${QUESTIONS.length} questions sur les 6 CM et les labs, de 7 types différents. Chaque réponse est corrigée tout de suite, avec une explication. Tes réponses restent enregistrées dans ce navigateur.`;
+buildFilters();render();
+})();
+</script>
+
+<script>/* sync thème avec le site Révisions */(function(){function a(t){if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme")}var m=location.search.match(/[?&]theme=(light|dark)/);if(m)a(m[1]);addEventListener("message",function(e){if(e.data&&e.data.revisionTheme)a(e.data.revisionTheme)})})();</script>
+</body></html>
