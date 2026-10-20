@@ -1,0 +1,1104 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Grand QCM App. Machine</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout : une colonne de lecture (cartes-questions) sous une barre de score collante. */
+:root{
+  --bg:#F4F1EE; --surface:#FFFFFF; --surface-2:#F9F6F3; --ink:#1F1712; --muted:#6A5D54; --line:#DFD6CE;
+  --accent:#B23A0B; --accent-soft:#FBE8DD; --accent-ink:#FFFFFF;
+  --good:#1D7448; --good-soft:#DFF1E6; --bad:#B03238; --bad-soft:#F7E1E2; --goal:#A86A12; --goal-soft:#F7EBD6;
+  --code-bg:#F6F1EC;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15110F; --surface:#1F1916; --surface-2:#261F1B; --ink:#EEE7E2; --muted:#ABA097; --line:#3A302A;
+  --accent:#F3A06E; --accent-soft:#3D2416; --accent-ink:#15110F;
+  --good:#5FC48D; --good-soft:#163024; --bad:#F07C80; --bad-soft:#3A1B1D; --goal:#E3AE52; --goal-soft:#33281A;
+  --code-bg:#110D0B; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#15110F; --surface:#1F1916; --surface-2:#261F1B; --ink:#EEE7E2; --muted:#ABA097; --line:#3A302A;
+  --accent:#F3A06E; --accent-soft:#3D2416; --accent-ink:#15110F;
+  --good:#5FC48D; --good-soft:#163024; --bad:#F07C80; --bad-soft:#3A1B1D; --goal:#E3AE52; --goal-soft:#33281A;
+  --code-bg:#110D0B; color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:780px;margin:0 auto}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* En-tête */
+.top{padding-block:36px 18px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,6vw,44px);line-height:1.05;letter-spacing:-.01em;margin:6px 0 10px;text-wrap:balance}
+.lede{color:var(--muted);max-width:62ch;margin:0}
+.track{display:flex;gap:4px;margin-top:18px;flex-wrap:wrap;align-items:center}
+.track span{font-family:var(--mono);font-size:11.5px;padding:3px 8px;border:1px solid var(--line);border-radius:3px;color:var(--muted);background:var(--surface)}
+.track .trap{color:var(--bad);border-color:var(--bad)}
+.track .goal{color:var(--goal);border-color:var(--goal)}
+.track .start{color:var(--accent);border-color:var(--accent)}
+
+/* Filtres */
+.filters{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px}
+.frow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.flabel{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);min-width:64px}
+.chip{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:4px 11px;font-size:13.5px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip .n{font-family:var(--mono);font-size:11.5px;opacity:.75;margin-left:4px}
+select.sel{border:1px solid var(--line);background:var(--surface-2);border-radius:6px;padding:5px 8px;font-size:13.5px;max-width:100%}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:7px 12px;font-size:14px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.warn{border-color:var(--bad);color:var(--bad)}
+.actions-row{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Barre de score */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;margin-top:14px;border-bottom:1px solid var(--line)}
+.bar-inner{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline}
+.stat{display:flex;gap:6px;align-items:baseline}
+.stat b{font-family:var(--display);font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
+.stat small{color:var(--muted);font-size:12.5px}
+.stat.g b{color:var(--goal)}
+.meter{flex:1 1 160px;height:6px;background:var(--line);border-radius:3px;overflow:hidden;min-width:120px;align-self:center}
+.meter i{display:block;height:100%;background:var(--good);width:0;transition:width .3s}
+
+details.map{margin-top:10px}
+details.map summary{cursor:pointer;font-size:13.5px;color:var(--muted)}
+.cells{display:flex;flex-wrap:wrap;gap:3px;margin-top:8px}
+.cell{width:18px;height:18px;border:1px solid var(--line);background:var(--surface);border-radius:2px;padding:0;cursor:pointer;font-size:0}
+.cell.ok{background:var(--good);border-color:var(--good)}
+.cell.ko{background:var(--bad);border-color:var(--bad)}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px;border:1px solid var(--line)}
+
+/* Bandeau examen */
+.exam{margin-top:14px;border:1px solid var(--goal);background:var(--goal-soft);border-radius:8px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.exam p{margin:0}
+.exam .note{font-family:var(--display);font-weight:800;font-size:26px;color:var(--goal)}
+
+/* Questions */
+.list{display:grid;gap:14px;margin-top:16px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;min-width:0;scroll-margin-top:90px}
+.q.ok{border-left:4px solid var(--good)}
+.q.ko{border-left:4px solid var(--bad)}
+.qhead{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}
+.qnum{font-family:var(--display);font-weight:700;font-size:15px;margin-right:4px}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.03em;padding:2px 7px;border-radius:3px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+.tag.cm{color:var(--accent);border-color:var(--accent-soft);background:var(--accent-soft)}
+.prompt{margin:0 0 10px;max-width:68ch}
+.hint{font-size:12.5px;color:var(--muted);margin:-4px 0 10px}
+pre.code{background:var(--code-bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.5;margin:0 0 12px}
+.opts{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.opts label{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:8px 10px;cursor:pointer;background:var(--surface-2)}
+.opts label:hover{border-color:var(--accent)}
+.opts input{margin-top:4px;accent-color:var(--accent);flex:none}
+.opts li.is-correct label{border-color:var(--good);background:var(--good-soft)}
+.opts li.is-wrong label{border-color:var(--bad);background:var(--bad-soft)}
+.num-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.num-row input{border:1px solid var(--line);background:var(--surface-2);border-radius:6px;padding:7px 10px;width:12ch;font-family:var(--mono)}
+.num-row input.ok{border-color:var(--good);background:var(--good-soft)}
+.num-row input.ko{border-color:var(--bad);background:var(--bad-soft)}
+ol.order{margin:0;padding:0;list-style:none;display:grid;gap:6px;counter-reset:o}
+ol.order li{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--surface-2);counter-increment:o}
+ol.order li::before{content:counter(o);font-family:var(--mono);font-size:12px;color:var(--muted);width:18px;flex:none;text-align:center}
+ol.order li span{flex:1;min-width:0}
+ol.order li.is-correct{border-color:var(--good);background:var(--good-soft)}
+ol.order li.is-wrong{border-color:var(--bad);background:var(--bad-soft)}
+.mv{border:1px solid var(--line);background:var(--surface);border-radius:4px;width:30px;height:28px;cursor:pointer;flex:none;font-size:13px;line-height:1}
+.mv:disabled{opacity:.35;cursor:default}
+.match{display:grid;gap:8px}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:8px;align-items:center;border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--surface-2)}
+.mrow select{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:5px;padding:5px 6px;font-size:13.5px}
+.mrow.is-correct{border-color:var(--good);background:var(--good-soft)}
+.mrow.is-wrong{border-color:var(--bad);background:var(--bad-soft)}
+.mrow .fix{grid-column:1/-1;font-size:13px;color:var(--bad)}
+@media (max-width:520px){.mrow{grid-template-columns:1fr}}
+.qfoot{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.msg{font-size:13px;color:var(--bad)}
+.fb{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.verdict{font-weight:600}
+.verdict.ok{color:var(--good)}
+.verdict.ko{color:var(--bad)}
+.expl{margin:4px 0 0;color:var(--ink);max-width:68ch}
+.expected{font-family:var(--mono);font-size:13.5px}
+.empty{text-align:center;color:var(--muted);padding:30px 10px;border:1px dashed var(--line);border-radius:8px}
+sub,sup{line-height:0}
+</style>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Apprentissage machine · Polytech SI5</div>
+    <h1>Grand QCM d'apprentissage machine</h1>
+    <p class="lede" id="lede">Questions sur les 5 CM et les labs. Chaque réponse est corrigée tout de suite, avec une explication.</p>
+    <div class="track" aria-hidden="true">
+      <span class="start">fit()</span><span>CM1 linéaire</span><span>CM2 logistique</span><span>CM3 arbres</span><span>CM4 KNN</span><span>CM5 texte</span><span>méthode</span><span class="goal">score()</span>
+    </div>
+  </header>
+
+  <section class="filters" aria-label="Filtres">
+    <div class="frow"><span class="flabel">Cours</span><div class="frow" id="cmChips"></div></div>
+    <div class="frow">
+      <span class="flabel">Type</span>
+      <select class="sel" id="typeSel" aria-label="Type de question"></select>
+      <span class="flabel" style="min-width:auto;margin-left:6px">Afficher</span>
+      <div class="frow" id="viewChips"></div>
+    </div>
+    <div class="actions-row">
+      <button class="btn primary" id="examBtn" type="button">Examen blanc · 30 questions</button>
+      <button class="btn" id="orderBtn" type="button">Ordre aléatoire</button>
+      <button class="btn warn" id="resetBtn" type="button">Effacer mes réponses</button>
+    </div>
+  </section>
+
+  <div id="examBox"></div>
+
+  <div class="bar" id="bar">
+    <div class="bar-inner">
+      <div class="stat"><b id="sAns">0/0</b><small>répondues</small></div>
+      <div class="stat"><b id="sOk">0</b><small>justes</small></div>
+      <div class="stat"><b id="sPct">–</b><small>de réussite</small></div>
+      <div class="stat g" title="+1 par bonne réponse, −1 par erreur"><b id="sG">0</b><small>score net</small></div>
+      <div class="meter" aria-hidden="true"><i id="sMeter"></i></div>
+    </div>
+    <details class="map">
+      <summary>Carte des questions (clique une case pour y aller)</summary>
+      <div class="cells" id="cells"></div>
+      <div class="legend"><span><i></i>à faire</span><span><i style="background:var(--good);border-color:var(--good)"></i>juste</span><span><i style="background:var(--bad);border-color:var(--bad)"></i>fausse</span></div>
+    </details>
+  </div>
+
+  <main class="list" id="list" aria-live="polite"></main>
+</div>
+<script>
+const QUESTIONS = [
+/* ======================= CM1 — Régression linéaire ======================= */
+{c:1,t:`qcu`,q:`En machine learning supervisé, à partir d'un couple (X, y), que cherche-t-on ?`,
+o:[`Une fonction f telle que f(X) = y' minimise (ou maximise) une métrique d'évaluation M(y, y')`,`La matrice X la plus grande possible`,`Une fonction qui reproduit exactement chaque y du train`,`Un regroupement des X sans utiliser y`],a:0,
+e:`Le cours le pose ainsi : trouver f(X) = y' et minimiser M(y, y'). Conséquence importante : il faut connaître la métrique d'évaluation <b>avant</b> de choisir le modèle.`},
+
+{c:1,t:`vf`,q:`On peut choisir le modèle avant de savoir avec quelle métrique il sera évalué.`,a:1,
+e:`Faux. Le cours insiste : « il faut connaître la métrique d'évaluation avant de choisir le modèle ». Exemple : sur des classes déséquilibrées, viser l'accuracy ou le recall ne mène pas au même modèle.`},
+
+{c:1,t:`match`,q:`Associe chaque problème à sa nature.`,
+o:[[`Prédire le prix d'un appartement`,`Régression (sortie continue)`],[`Dire si un mail est un spam`,`Classification binaire`],[`Prédire l'espèce d'un iris parmi 3`,`Classification multi-classe`]],
+e:`Régression = y continu (prix, glycémie, tension). Classification = y discret (classe). La régression logistique, malgré son nom, est un modèle de <b>classification</b>.`},
+
+{c:1,t:`qcm`,q:`Pour une régression linéaire par moindres carrés <b>avec intercept</b>, quelles propriétés sont vraies sur le train ?`,
+o:[`La somme des erreurs (résidus) vaut 0`,`On minimise la somme des erreurs au carré`,`On minimise la somme des valeurs absolues des erreurs`,`Toutes les erreurs sont nulles`],a:[0,1],
+e:`Les deux propriétés du cours : somme des erreurs = 0 (grâce à l'intercept) et minimisation de la somme des carrés (MSE). Minimiser les valeurs absolues, c'est une autre régression (médiane, MAE), moins sensible aux outliers.`},
+
+{c:1,t:`qcu`,q:`Exemple du cours : on mesure I et U pour trouver R tel que U = RI. Où se trouve l'erreur dans le modèle des moindres carrés classique ?`,
+o:[`Sur U (la variable prédite) : on mesure l'écart vertical entre U mesuré et RI`,`Sur I uniquement`,`Sur R`,`Il n'y a pas d'erreur, la loi d'Ohm est exacte`],a:0,
+e:`Les moindres carrés supposent X connu exactement et toute l'erreur sur y : on minimise les écarts <b>verticaux</b> (yᵢ − ŷᵢ)². En pratique les deux mesures sont bruitées, mais le modèle ne le prend pas en compte.`},
+
+{c:1,t:`qcu`,q:`Quelle est la solution analytique (équation normale) de la régression linéaire ?`,
+o:[`β̂ = (XᵀX)⁻¹ Xᵀ y`,`β̂ = X⁻¹ y`,`β̂ = (XXᵀ)⁻¹ y`,`β̂ = Xᵀ y`],a:0,
+e:`On annule le gradient de ‖y − Xβ‖² : −2Xᵀ(y − Xβ) = 0 ⇒ XᵀXβ = Xᵀy. Il faut que XᵀX soit inversible (pas de colinéarité parfaite). X n'est en général pas carrée, d'où XᵀX.`},
+
+{c:1,t:`qcm`,q:`Pourquoi préférer la descente de gradient à l'équation normale dans certains cas ?`,
+o:[`Inverser XᵀX coûte cher quand il y a beaucoup de features`,`XᵀX peut être mal conditionnée ou non inversible (colinéarité)`,`La descente de gradient donne toujours exactement la même solution en une itération`,`Elle s'applique aussi à des fonctions de coût sans solution fermée (Lasso, log-loss…)`],a:[0,1,3],
+e:`L'inversion coûte ~O(p³). La descente de gradient marche aussi pour Lasso (pas de solution fermée) ou la régression logistique. Elle demande en revanche un learning rate et plusieurs itérations.`},
+
+{c:1,t:`qcu`,q:`Fonction de coût du cours : J(β) = 1/(2m) Σ (f(xᵢ) − yᵢ)². Que cherche-t-on avec la descente de gradient ?`,
+o:[`L'endroit où le gradient de J est nul (le minimum)`,`L'endroit où J est maximal`,`La valeur de m`,`Le point où f(x) = 0`],a:0,
+e:`On fait β ← β − α ∇J(β) jusqu'à convergence. J est convexe pour la régression linéaire, donc le point de gradient nul est le minimum global. Le 1/2 sert juste à simplifier la dérivée.`},
+
+{c:1,t:`match`,q:`Associe chaque régularisation à sa pénalité.`,
+o:[[`Ridge`,`L2 : ‖β‖₂²`],[`Lasso`,`L1 : ‖β‖₁`],[`Elastic-Net`,`ρ·L1 + (1 − ρ)·L2`]],
+e:`J(β) = α·pénalité + MSE. α règle la force de la régularisation. Elastic-Net mélange les deux avec le ratio ρ (<code>l1_ratio</code> en sklearn).`},
+
+{c:1,t:`qcu`,q:`Quelle régularisation peut mettre des coefficients <b>exactement à zéro</b> et fait donc de la sélection de variables ?`,
+o:[`Lasso (L1)`,`Ridge (L2)`,`Aucune des deux`,`Les deux également`],a:0,
+e:`La pénalité L1 a des « coins » sur les axes : l'optimum tombe souvent sur un axe, donc des βⱼ = 0. Ridge rétrécit les coefficients vers 0 sans les annuler. Utile pour l'interprétation : Lasso garde peu de features.`},
+
+{c:1,t:`qcu`,q:`Dans <code>Ridge(alpha=...)</code>, que se passe-t-il quand alpha devient très grand ?`,
+o:[`Les coefficients tendent vers 0 : le modèle sous-apprend (biais fort)`,`Le modèle surapprend davantage`,`Rien, alpha n'a pas d'effet sur le train`,`Le modèle devient polynomial`],a:0,
+e:`Plus α est grand, plus on pénalise ‖β‖ : modèle plus simple, variance plus faible, biais plus fort. α = 0 redonne la régression linéaire ordinaire. α se choisit par validation croisée.`},
+
+{c:1,t:`vf`,q:`La régularisation (Ridge, Lasso) sert à réduire l'over-fitting.`,a:0,
+e:`Vrai. On ajoute à la fonction de coût un terme basé sur la norme des coefficients, ce qui empêche le modèle de prendre des coefficients énormes pour coller au bruit (notamment en régression polynomiale de degré élevé).`},
+
+{c:1,t:`order`,q:`Remets dans l'ordre le pipeline ML en validation croisée du cours.`,
+o:[`Fixer les hyper-paramètres à évaluer`,`Séparer train / test`,`Pour chaque jeu d'hyper-paramètres et chaque fold : nettoyage, représentation, apprentissage, évaluation sur le fold`,`Calculer moyenne et écart-type des évaluations sur les folds`,`Choisir les meilleurs hyper-paramètres, puis évaluer une seule fois sur le test`],
+e:`Le point clé : le prétraitement (outliers, imputation, normalisation, encodage) est fait <b>sur chaque fold</b>, pas sur tout le dataset, pour éviter la fuite d'information (data leakage).`},
+
+{c:1,t:`qcu`,q:`Pourquoi le prétraitement (normalisation, imputation…) doit-il être appris sur chaque fold et non sur tout le dataset ?`,
+o:[`Sinon les statistiques du jeu de validation fuient dans l'apprentissage (data leakage) et l'évaluation est trop optimiste`,`Pour aller plus vite`,`Parce que sklearn l'impose`,`Parce que la normalisation change la cible y`],a:0,
+e:`Si on calcule la moyenne/écart-type ou la médiane d'imputation sur tout le dataset, le modèle a « vu » une partie de la validation. Solution sklearn : mettre le prétraitement dans un <code>Pipeline</code> passé à <code>GridSearchCV</code>.`},
+
+{c:1,t:`match`,q:`Associe chaque type de donnée à la représentation conseillée dans le cours.`,
+o:[[`Valeur numérique`,`Normalisation`],[`Catégorie (couleur, ville…)`,`OneHotEncoding`],[`Mois, jour, direction du vent`,`Représentation polaire (cos, sin)`],[`Mots`,`TF-IDF ou embedding vectoriel`]],
+e:`La représentation polaire évite que décembre (12) et janvier (1) soient « loin » : on code (cos 2πm/12, sin 2πm/12). Le OneHot évite d'introduire un ordre artificiel entre catégories.`},
+
+{c:1,t:`qcu`,q:`Pourquoi coder le mois avec (cos(2πm/12), sin(2πm/12)) plutôt que par l'entier m ?`,
+o:[`Pour que décembre et janvier soient proches : la variable est cyclique`,`Pour réduire le nombre de features`,`Pour que le modèle soit non linéaire`,`Parce que les entiers sont interdits en sklearn`],a:0,
+e:`Avec l'entier, |12 − 1| = 11 alors que les deux mois se suivent. Le passage au cercle respecte la périodicité. Même idée pour l'heure, le jour de la semaine, la direction du vent.`},
+
+{c:1,t:`qcm`,q:`Que propose le cours pour traiter les valeurs aberrantes et les valeurs manquantes ?`,
+o:[`Outliers : suppression ou cap (écrêtage)`,`Valeurs manquantes : suppression ou imputation`,`Outliers : les dupliquer`,`Valeurs manquantes : les remplacer par la cible y`],a:[0,1],
+e:`Cap = ramener la valeur à une borne (ex. un percentile). Imputation : moyenne, médiane, ou KNNImputer (CM4). Remplacer par y serait une fuite de la cible.`},
+
+{c:1,t:`match`,q:`Associe chaque terme du cours à sa définition.`,
+o:[[`Outlier`,`Point au milieu des autres en x, mais avec une grande erreur de prédiction`],[`Point isolé`,`Point loin des autres en x, qui peut tirer la pente à lui`],[`Range prediction`,`N'utiliser le modèle que sur la plage de valeurs qui a servi à l'apprendre`]],
+e:`Les deux types de points modifient la pente. Le point isolé (fort levier, h proche de 1) est le plus dangereux : Anscombe D en est l'exemple extrême.`},
+
+{c:1,t:`qcu`,q:`Un modèle de consommation est appris sur des températures entre 5 °C et 25 °C. On veut prédire à 40 °C. Quel principe du cours est en jeu ?`,
+o:[`Range prediction : on ne doit pas extrapoler hors de la plage d'apprentissage`,`Colinéarité`,`Régularisation L1`,`Studentized residuals`],a:0,
+e:`Rien ne garantit que la relation reste linéaire hors de la plage observée. Le modèle doit être utilisé sur la plage de valeurs qui a servi à le construire.`},
+
+{c:1,t:`qcm`,q:`Dans quels cas faut-il traiter la colinéarité entre features ?`,
+o:[`Quand on veut expliquer le poids de chaque feature`,`Pour faciliter la convergence en Ridge / Lasso`,`Toujours, sinon la prédiction est fausse`,`Jamais, elle n'a aucun effet`],a:[0,1],
+e:`Le cours : inutile si on cherche seulement à prédire ; utile pour interpréter les coefficients (deux features corrélées se « partagent » le poids de façon instable) ou pour la convergence. On la détecte par la corrélation entre features.`},
+
+{c:1,t:`vf`,q:`Pour une régression linéaire simple (sans régularisation) utilisée seulement pour prédire, la normalisation des features ne change pas les prédictions.`,a:0,
+e:`Vrai : les coefficients s'adaptent à l'échelle, la prédiction est identique. Le cours précise que la normalisation devient utile pour Ridge/Lasso (la pénalité dépend de l'échelle des coefficients) et pour comparer les poids des features.`},
+
+{c:1,t:`qcu`,q:`Que vaut <code>lr.score(X, y)</code> pour un <code>LinearRegression</code> de sklearn ?`,
+o:[`Le R² du modèle sur (X, y)`,`La MSE`,`L'accuracy`,`La RMSE`],a:0,
+e:`C'est le « problème » posé dans le cours : score() renvoie le R² pour un régresseur, et l'accuracy pour un classifieur. Sur le train, ce score est optimiste : il faut l'évaluer en validation / test.`},
+
+{c:1,t:`qcu`,q:`Que signifie R² = 0,67 ?`,
+o:[`Le modèle explique 67 % de la variance de y`,`67 % des prédictions sont exactes`,`L'erreur moyenne est de 0,67`,`La pente vaut 0,67`],a:0,
+e:`R² = 1 − Σ(yᵢ − ŷᵢ)² / Σ(yᵢ − ȳ)². Proche de 1 : prédictions proches des vraies valeurs ; proche de 0 : pas mieux que prédire la moyenne. Il peut même être négatif sur un test si le modèle est pire que la moyenne.`},
+
+{c:1,t:`num`,q:`Somme des carrés des résidus = 20, somme des carrés totale Σ(yᵢ − ȳ)² = 80. Calcule R².`,a:0.75,tol:0.001,
+e:`R² = 1 − 20/80 = 0,75. Le modèle explique 75 % de la variance.`},
+
+{c:1,t:`qcu`,q:`Quartet d'Anscombe (les 4 jeux de l'exercice 1 du CM2) : les 4 régressions ont β₀ = 3, β₁ = 0,5, MSE ≈ 1,25, R² ≈ 0,67. Que faut-il en conclure ?`,
+o:[`Des statistiques identiques ne garantissent pas qu'un modèle linéaire soit adapté : il faut tracer les données et analyser les résidus`,`Les 4 jeux sont identiques`,`La régression linéaire est adaptée aux 4 jeux`,`Le R² suffit pour valider un modèle`],a:0,
+e:`A : linéaire bruité (OK). B : relation courbe (il faut un polynôme de degré 2). C : linéaire parfait avec un outlier. D : x constant sauf un point isolé qui fait toute la pente.`},
+
+{c:1,t:`match`,q:`Associe chaque jeu d'Anscombe à son diagnostic.`,
+o:[[`Jeu A`,`Relation linéaire bruitée : la régression convient`],[`Jeu B`,`Relation non linéaire (parabole) : régression polynomiale`],[`Jeu C`,`Droite presque parfaite avec un outlier qui fausse la pente`],[`Jeu D`,`Tous les x égaux sauf un point isolé qui fixe à lui seul la pente`]],
+e:`Pour C : supprimer ou capper l'outlier (13 ; 12,74) donne une droite quasi parfaite. Pour D : aucun modèle fiable, il faudrait des données avec des x variés.`},
+
+{c:1,t:`qcu`,q:`Jeu C d'Anscombe : le résidu studentisé du point (13 ; 12,74) est énorme (≫ 3). Pourquoi ?`,
+o:[`Sans ce point, les 10 autres sont presque parfaitement alignés : le RMSE du modèle sans lui est quasi nul, donc le rapport explose`,`Parce que x = 13 est la plus grande valeur`,`Parce que son levier vaut 1`,`Parce que y est négatif`],a:0,
+e:`Le résidu studentisé divise l'erreur du point par le RMSE du modèle appris <b>sans</b> ce point. Ici ce RMSE est presque nul : l'outlier est détecté sans ambiguïté. Pour le jeu A, tous les résidus studentisés restent sous 3 (max ≈ 2,1).`},
+
+{c:1,t:`qcm`,q:`À propos du résidu studentisé εᵢ = eᵢ / (RMSE₍₋ᵢ₎ · √(1 − hᵢ)) :`,
+o:[`RMSE₍₋ᵢ₎ est le RMSE du modèle appris sans la donnée i`,`hᵢ = 1/n + (xᵢ − x̄)² / Σ(xⱼ − x̄)² est le levier du point i`,`On considère qu'il y a une relation linéaire si les |εᵢ| restent inférieurs à 3`,`εᵢ est toujours positif`],a:[0,1,2],
+e:`Le levier hᵢ est grand pour un point loin de x̄ (point isolé). Un |εᵢ| > 3 signale un point mal expliqué par le modèle. εᵢ a le signe du résidu.`},
+
+{c:1,t:`qcu`,q:`Jeu D d'Anscombe : pour le point (19 ; 12,5), le levier vaut h = 1. Que se passe-t-il pour son résidu studentisé ?`,
+o:[`Il n'est pas calculable : √(1 − h) = 0 et, sans ce point, tous les x valent 8 donc aucune droite n'est définie`,`Il vaut 0, donc le point est parfait`,`Il vaut 3 exactement`,`Il est négatif`],a:0,
+e:`La droite passe forcément par ce point (résidu nul) : il contrôle seul la pente. C'est le cas extrême du point isolé. Le diagnostic doit aussi regarder le levier, pas seulement l'erreur.`},
+
+{c:1,t:`vf`,q:`Jeu B d'Anscombe : comme tous ses résidus studentisés sont inférieurs à 3, le modèle linéaire est adapté.`,a:1,
+e:`Faux. Les résidus restent petits (max ≈ 2,2) mais ils ont une <b>structure</b> : positifs au milieu, négatifs aux extrémités. C'est la signature d'une relation courbe. Il faut aussi regarder le graphe des résidus en fonction de x.`},
+
+{c:1,t:`num`,q:`Régression polynomiale de <b>degré 2</b> sur 2 features (x₁, x₂). Combien de coefficients β (intercept compris) ?`,a:6,tol:0,
+e:`β₀ + β₁x₁ + β₂x₂ + β₃x₁² + β₄x₁x₂ + β₅x₂² : 6 coefficients. En degré 3 on en a 10 (comme dans le cours). Formule générale : C(d + n, n) pour d features et un degré n.`},
+
+{c:1,t:`num`,q:`Même question avec 10 features et un polynôme de degré 2 : combien de termes (intercept compris) ?`,a:66,tol:0,
+e:`C(12, 2) = 66 : 1 intercept + 10 termes linéaires + 10 carrés + 45 produits croisés. Le nombre de features explose avec le degré, d'où le risque d'over-fitting et l'intérêt de Ridge/Lasso.`},
+
+{c:1,t:`vf`,q:`Une régression polynomiale reste un modèle linéaire… en ses coefficients β.`,a:0,
+e:`Vrai. On crée de nouvelles features (x², x₁x₂…) avec <code>PolynomialFeatures</code>, puis on fait une régression linéaire classique sur ces features. Le modèle est non linéaire en x mais linéaire en β.`},
+
+{c:1,t:`qcu`,q:`Sur le dataset Diabetes, quand on augmente le degré du polynôme, le score R² en train monte mais le R² en validation baisse. Que se passe-t-il ?`,
+o:[`Over-fitting : le modèle apprend le bruit du train`,`Under-fitting`,`Le dataset est trop grand`,`La normalisation est mal faite`],a:0,
+e:`Écart train/validation qui se creuse = surapprentissage. Remèdes : baisser le degré, régulariser (Ridge/Lasso avec un alpha choisi en CV), plus de données.`},
+
+{c:1,t:`match`,q:`Associe chaque métrique de régression à sa propriété.`,
+o:[[`MAE`,`Moyenne des |erreurs|, robuste aux outliers, même unité que y`],[`RMSE`,`Racine de la MSE, même unité que y, pénalise fortement les grosses erreurs`],[`R²`,`Part de variance expliquée, sans unité`]],
+e:`Lab Diabetes : on choisit entre R², MAE et RMSE. Le RMSE est sensible aux grosses erreurs (carré), la MAE non. Le R² permet de comparer des modèles sans se soucier de l'unité.`},
+
+{c:1,t:`code`,q:`Que manque-t-il pour que ce pipeline soit correct en validation croisée ?`,
+k:`scaler = StandardScaler().fit(X)          # sur tout X
+X_s = scaler.transform(X)
+X_tr, X_te, y_tr, y_te = train_test_split(X_s, y)
+gs = GridSearchCV(Ridge(), {"alpha":[0.1,1,10]}, cv=5).fit(X_tr, y_tr)`,
+o:[`Le scaler est appris sur tout X (test compris) : il faut le mettre dans un Pipeline avec Ridge, appris après le split`,`Il manque fit_transform sur y`,`Ridge n'accepte pas alpha`,`Il faut cv=1`],a:0,
+e:`Correct : <code>pipe = Pipeline([("sc", StandardScaler()), ("m", Ridge())])</code> puis <code>GridSearchCV(pipe, {"m__alpha": [...]})</code> sur le train seulement. Le scaler est alors réappris sur chaque fold.`},
+/* ======================= CM2 — Régression logistique, métriques, déséquilibre ======================= */
+{c:2,t:`qcm`,q:`Pourquoi une droite ajustée avec la MSE ne convient-elle pas pour une classification binaire (y ∈ {0, 1}) ?`,
+o:[`La droite prédit des valeurs hors de [0, 1], qu'on ne peut pas lire comme des probabilités`,`Un point très éloigné (mais bien classé) tire la droite et déplace la frontière`,`La MSE est impossible à calculer sur des 0 et des 1`,`Une droite ne peut pas séparer deux classes`],a:[0,1],
+e:`C'est le schéma à faire au tableau : deux paquets de points à 0 et à 1, on ajoute un point à 1 très à droite, la droite s'aplatit et le seuil 0,5 se décale, ce qui crée des erreurs. On cherche plutôt une courbe en S bornée entre 0 et 1.`},
+
+{c:2,t:`qcu`,q:`Quelle fonction utilise la régression logistique pour passer d'un score linéaire à une probabilité ?`,
+o:[`La sigmoïde σ(z) = 1 / (1 + e⁻ᶻ)`,`La fonction ReLU`,`La fonction identité`,`La fonction valeur absolue`],a:0,
+e:`σ est en S, bornée dans ]0, 1[, σ(0) = 0,5. Le cours cite aussi la tangente hyperbolique (bornée dans ]−1, 1[), mais c'est la sigmoïde qu'on interprète comme une probabilité.`},
+
+{c:2,t:`qcu`,q:`Comment interprète-t-on f(x) = σ(β₀ + β₁x) en régression logistique ?`,
+o:[`f(x) = P(y = 1 | x)`,`f(x) = P(x | y = 1)`,`f(x) = la classe prédite`,`f(x) = l'erreur du modèle`],a:0,
+e:`La sortie est la probabilité d'appartenir à la classe 1 sachant x. C'est ce que renvoie <code>predict_proba(X)[:, 1]</code>.`},
+
+{c:2,t:`qcu`,q:`Avec un seuil à 0,5, quand la régression logistique prédit-elle la classe 1 ?`,
+o:[`Quand β₀ + β₁x ≥ 0`,`Quand β₀ + β₁x ≥ 0,5`,`Quand β₁ > 0`,`Quand x ≥ 0`],a:0,
+e:`σ(z) ≥ 0,5 ⇔ z ≥ 0. La frontière de décision est donc β₀ + β₁x = 0 : une droite (un hyperplan en dimension > 1). La régression logistique est un classifieur <b>linéaire</b>.`},
+
+{c:2,t:`num`,q:`Modèle β₀ = −4, β₁ = 0,8. Quelle valeur de x est sur la frontière de décision ?`,a:5,tol:0.001,
+e:`β₀ + β₁x = 0 ⇔ x = 4/0,8 = 5. En x = 5, P(y = 1 | x) = σ(0) = 0,5.`},
+
+{c:2,t:`num`,q:`Même modèle (β₀ = −4, β₁ = 0,8). Calcule P(y = 1 | x = 7), arrondie à 2 décimales. On donne e⁻¹·⁶ ≈ 0,202.`,a:0.83,tol:0.006,
+e:`z = −4 + 5,6 = 1,6. σ(1,6) = 1/(1 + 0,202) ≈ 0,83. La classe prédite est 1.`},
+
+{c:2,t:`vf`,q:`Si on n'a pas besoin de la probabilité, on peut prédire la classe en regardant seulement le signe de β₀ + β₁x.`,a:0,
+e:`Vrai, c'est dans le cours : la sigmoïde est croissante, donc calculer le signe du score linéaire suffit. Pas besoin d'évaluer l'exponentielle.`},
+
+{c:2,t:`qcu`,q:`Quelle fonction de perte minimise la régression logistique ?`,
+o:[`La log-loss (entropie croisée binaire) : J(β) = −Σ [yᵢ log ŷᵢ + (1 − yᵢ) log(1 − ŷᵢ)]`,`La MSE`,`La MAE`,`Le nombre d'erreurs de classification`],a:0,
+e:`On garde le modèle, on change la perte. La log-loss pénalise très fort une prédiction confiante et fausse (−log ŷ → ∞ quand ŷ → 0 alors que y = 1). Elle est convexe, contrairement à la MSE composée avec la sigmoïde.`},
+
+{c:2,t:`num`,q:`Un exemple a y = 1 et le modèle prédit ŷ = 0,1. Quelle est sa contribution à la log-loss (logarithme népérien, 2 décimales) ?`,a:2.30,tol:0.01,
+e:`−ln(0,1) ≈ 2,30. Si le modèle avait prédit 0,9, la perte aurait été −ln(0,9) ≈ 0,11. Une erreur confiante coûte très cher.`},
+
+{c:2,t:`vf`,q:`Pour un exemple avec y = 0, la log-loss vaut −log(1 − ŷ).`,a:0,
+e:`Vrai : le terme y·log ŷ s'annule et il reste (1 − y)·log(1 − ŷ) = log(1 − ŷ). La perte est faible si ŷ est proche de 0.`},
+
+{c:2,t:`qcu`,q:`Dans <code>LogisticRegression</code> de sklearn, que représente l'hyper-paramètre C ?`,
+o:[`L'inverse de la force de régularisation : C = 1/λ`,`Le nombre de classes`,`La force de régularisation : plus C est grand, plus on régularise`,`Le seuil de décision`],a:0,
+e:`Piège classique : C petit = forte régularisation (modèle plus simple), C grand = faible régularisation (risque d'over-fitting). C'est l'inverse de l'alpha de Ridge/Lasso.`},
+
+{c:2,t:`qcm`,q:`Quels hyper-paramètres de <code>LogisticRegression</code> sont à explorer dans le lab ?`,
+o:[`penalty : l1, l2, elasticnet (ou aucune)`,`C`,`class_weight`,`n_neighbors`],a:[0,1,2],
+e:`Pour l1 et elasticnet il faut un solver compatible (<code>saga</code>, ou <code>liblinear</code> pour l1), et <code>l1_ratio</code> pour elasticnet. n_neighbors est un hyper-paramètre de KNN. À savoir : depuis sklearn 1.8, <code>penalty</code> est déprécié ; on règle directement <code>l1_ratio</code> (0 = L2, 1 = L1, entre les deux = Elastic-Net) et <code>C</code>.`},
+
+{c:2,t:`qcu`,q:`Que renvoie <code>lr.score(X, y)</code> pour une <code>LogisticRegression</code> ?`,
+o:[`L'accuracy (taux de bonnes classifications)`,`La log-loss`,`Le R²`,`Le F1-score`],a:0,
+e:`Pour tout classifieur sklearn, score() = accuracy. Problème soulevé par le cours : sur des classes déséquilibrées, l'accuracy est trompeuse. Dans GridSearchCV, on choisit donc <code>scoring="f1"</code>, <code>"recall"</code>, <code>"balanced_accuracy"</code>…`},
+
+{c:2,t:`qcu`,q:`Différence entre <code>predict</code> et <code>predict_proba</code> ?`,
+o:[`predict renvoie la classe, predict_proba renvoie un tableau (n, K) de probabilités par classe`,`predict_proba renvoie la classe, predict la probabilité`,`Ils renvoient la même chose`,`predict_proba ne marche que pour la régression`],a:0,
+e:`predict = argmax des probabilités (seuil 0,5 en binaire). predict_proba permet de changer le seuil, par exemple le baisser pour augmenter le recall.`},
+
+{c:2,t:`match`,q:`Associe chaque case de la matrice de confusion (classe positive = malade) à sa définition.`,
+o:[[`TP (vrai positif)`,`Malade, prédit malade`],[`FN (faux négatif)`,`Malade, prédit sain`],[`FP (faux positif)`,`Sain, prédit malade`],[`TN (vrai négatif)`,`Sain, prédit sain`]],
+e:`Le premier mot (vrai/faux) dit si la prédiction est juste, le second (positif/négatif) dit ce qui a été prédit.`},
+
+{c:2,t:`match`,q:`Associe chaque métrique à sa formule.`,
+o:[[`Accuracy`,`(TP + TN) / total`],[`Recall (rappel)`,`TP / (TP + FN)`],[`Precision`,`TP / (TP + FP)`],[`F1-score`,`2·P·R / (P + R)`]],
+e:`Recall : parmi les vrais positifs, combien j'en trouve. Precision : parmi ce que je déclare positif, combien le sont vraiment. F1 : moyenne harmonique des deux.`},
+
+{c:2,t:`num`,q:`TP = 40, FP = 10, FN = 20, TN = 930. Calcule la precision.`,a:0.8,tol:0.001,
+e:`P = 40 / (40 + 10) = 0,8.`},
+
+{c:2,t:`num`,q:`TP = 40, FP = 10, FN = 20, TN = 930. Calcule le F1-score (2 décimales).`,a:0.73,tol:0.006,
+e:`P = 0,8 ; R = 40/60 ≈ 0,667 ; F1 = 2·0,8·0,667 / (0,8 + 0,667) ≈ 0,727. L'accuracy vaut 0,97 : très flatteuse à cause des 930 TN.`},
+
+{c:2,t:`qcu`,q:`Exercice du cours : 0,5 % des patients ont le cancer. Un modèle prédit « personne n'a le cancer ». Quelle est son accuracy ?`,
+o:[`99,5 %`,`0,5 %`,`50 %`,`0 %`],a:0,
+e:`Il a raison sur tous les sains (99,5 %). Son recall vaut 0 : il ne détecte aucun cancer. Sa precision n'est même pas définie (0/0). D'où l'inutilité de l'accuracy sur des classes déséquilibrées.`},
+
+{c:2,t:`qcm`,q:`Même population (10 000 patients, 50 cancers). Le second modèle déclare 1 % des patients malades (100 personnes), et ces 100 incluent les 50 vrais cancers. Qu'est-ce qui est vrai ?`,
+o:[`Son accuracy est aussi 99,5 %`,`Son recall vaut 1`,`Sa precision vaut 0,5`,`Il est équivalent au premier modèle`],a:[0,1,2],
+e:`TP = 50, FP = 50, FN = 0, TN = 9 900. Accuracy = 9 950/10 000 = 99,5 %, comme le modèle naïf ! Pourtant il trouve tous les cancers (R = 1) avec P = 0,5 (F1 ≈ 0,67). En médecine on préfère ce modèle : le recall compte plus.`},
+
+{c:2,t:`qcu`,q:`Détection de cancer : quelle métrique privilégier ?`,
+o:[`Le recall : rater un malade (FN) coûte beaucoup plus cher qu'une fausse alerte`,`L'accuracy`,`La precision seule`,`Le R²`],a:0,
+e:`Un FN = un cancer non soigné. Un FP = un examen complémentaire. On vise le recall, en surveillant la precision (ou le F1 / F2) pour ne pas tout déclarer malade.`},
+
+{c:2,t:`qcu`,q:`Filtre anti-spam : quelle métrique privilégier si on ne veut surtout pas perdre un vrai mail ?`,
+o:[`La precision de la classe spam : ce qu'on met en spam doit vraiment en être`,`Le recall de la classe spam`,`L'accuracy`,`La MAE`],a:0,
+e:`Un FP (vrai mail classé spam) est grave pour l'utilisateur. On veut donc une precision élevée sur la classe « spam », quitte à laisser passer quelques spams.`},
+
+{c:2,t:`vf`,q:`Baisser le seuil de décision de 0,5 à 0,2 augmente en général le recall et diminue la precision.`,a:0,
+e:`Vrai : on déclare positifs plus d'exemples, donc on rate moins de positifs (FN ↓, recall ↑) mais on fait plus de fausses alertes (FP ↑, precision ↓). C'est le compromis precision / recall.`},
+
+{c:2,t:`match`,q:`Associe chaque stratégie de rééquilibrage à son principe.`,
+o:[[`Oversampling`,`Dupliquer des exemples de la classe minoritaire`],[`Undersampling`,`Retirer des exemples de la classe majoritaire`],[`SMOTE`,`Créer des exemples synthétiques entre deux minoritaires voisins`],[`class_weight`,`Pénaliser davantage les erreurs sur la classe minoritaire dans la perte`]],
+e:`Les trois premières modifient les données, la dernière modifie la fonction de coût. L'undersampling perd de l'information, l'oversampling par duplication favorise l'over-fitting, SMOTE limite ce problème.`},
+
+{c:2,t:`qcu`,q:`Comment SMOTE crée-t-il un nouvel exemple à partir de s₁ (minoritaire) et s₂ (un de ses voisins minoritaires) ?`,
+o:[`nouveau = s₁ + λ·(s₂ − s₁), avec λ tiré dans [0, 1]`,`nouveau = s₁ + s₂`,`nouveau = copie exacte de s₁`,`nouveau = moyenne de toute la classe majoritaire`],a:0,
+e:`Le point est sur le segment [s₁, s₂]. Attention, le CM écrit « s1 + random(0,1)*s2 » : c'est une coquille, il faut bien la différence (s₂ − s₁), sinon le point sort du segment.`},
+
+{c:2,t:`num`,q:`SMOTE : s₁ = (2, 4), s₂ = (6, 2), λ = 0,25. Quelle est la <b>première</b> coordonnée du nouvel exemple ?`,a:3,tol:0.001,
+e:`nouveau = (2, 4) + 0,25·((6, 2) − (2, 4)) = (2, 4) + 0,25·(4, −2) = (3 ; 3,5).`},
+
+{c:2,t:`match`,q:`Associe chaque variante de SMOTE à son idée.`,
+o:[[`SMOTE (Chawla, 2002)`,`Nouveaux points entre minoritaires voisins, partout`],[`Borderline-SMOTE (Han, 2005)`,`Nouveaux points près de la frontière entre classes`],[`ADASYN (He, 2008)`,`Plus de points là où la classe majoritaire domine (exemples difficiles)`]],
+e:`Toutes sont dans la bibliothèque <code>imblearn</code> (imbalanced-learn). Elles ne s'appliquent qu'au train, jamais au test.`},
+
+{c:2,t:`vf`,q:`On peut appliquer SMOTE sur tout le dataset avant le train_test_split.`,a:1,
+e:`Faux. Des points synthétiques fabriqués à partir d'exemples de test se retrouveraient en train : fuite d'information et évaluation trop optimiste. On met SMOTE dans un <code>imblearn.pipeline.Pipeline</code>, appliqué uniquement aux folds d'entraînement. Le test garde la distribution réelle.`},
+
+{c:2,t:`qcu`,q:`Avec <code>class_weight="balanced"</code>, quel poids reçoit la classe c ?`,
+o:[`n_samples / (n_classes × n_c)`,`n_c / n_samples`,`1 pour toutes les classes`,`n_classes / n_c`],a:0,
+e:`Formule de la doc sklearn : <code>n_samples / (n_classes * np.bincount(y))</code>. Le poids est inversement proportionnel à la fréquence. Par défaut, class_weight = None (tous les poids à 1).`},
+
+{c:2,t:`num`,q:`Iris déséquilibré : 50 setosa, 10 versicolor, 10 virginica. Avec class_weight="balanced", quel poids reçoit versicolor (2 décimales) ?`,a:2.33,tol:0.006,
+e:`70 / (3 × 10) ≈ 2,33. Setosa reçoit 70 / (3 × 50) ≈ 0,47. Une erreur sur versicolor « coûte » 5 fois plus qu'une erreur sur setosa.`},
+
+{c:2,t:`qcu`,q:`Classification à K = 4 classes en One-vs-Rest (OvR). Combien de classifieurs et comment décide-t-on ?`,
+o:[`4 classifieurs (« classe k contre le reste ») ; on prend la classe de probabilité maximale`,`6 classifieurs ; vote majoritaire`,`1 seul classifieur`,`16 classifieurs ; moyenne`],a:0,
+e:`OvR : K classifieurs, chacun donne la probabilité d'appartenir à sa classe. On choisit le max.`},
+
+{c:2,t:`num`,q:`One-vs-One (OvO) avec K = 5 classes : combien de classifieurs ?`,a:10,tol:0,
+e:`K(K − 1)/2 = 5 × 4 / 2 = 10. Chaque classifieur oppose deux classes et vote ; on garde la classe qui a le plus de votes.`},
+
+{c:2,t:`qcm`,q:`Lab régression logistique sur Iris déséquilibré. Quelles démarches sont correctes ?`,
+o:[`Décrire le dataset : nombre d'exemples, dimension, intervalles des features, corrélation features / label`,`Choisir une métrique adaptée au déséquilibre (F1 macro, recall, balanced accuracy)`,`Comparer oversampling, undersampling, class_weight et SMOTE en validation croisée`,`Choisir les hyper-paramètres sur le jeu de test`],a:[0,1,2],
+e:`Les hyper-paramètres se choisissent en validation croisée sur le train. Le test sert une seule fois, à la fin, pour l'estimation finale.`},
+
+{c:2,t:`vf`,q:`La régression logistique peut séparer deux classes disposées en cercles concentriques sans transformation des features.`,a:1,
+e:`Faux : sa frontière est linéaire. Il faudrait ajouter des features (x₁², x₂², comme en régression polynomiale) ou prendre un modèle non linéaire (arbre, KNN).`},
+
+{c:2,t:`code`,q:`Quelle ligne choisit correctement C et la pénalité en optimisant le F1 sur un problème déséquilibré ?`,
+k:`pipe = Pipeline([("sc", StandardScaler()),
+                 ("lr", LogisticRegression(solver="saga", max_iter=5000))])
+grid = {"lr__C": [0.01, 0.1, 1, 10],
+        "lr__penalty": ["l1", "l2"],
+        "lr__class_weight": [None, "balanced"]}`,
+o:[`GridSearchCV(pipe, grid, cv=StratifiedKFold(5), scoring="f1_macro").fit(X_train, y_train)`,`GridSearchCV(pipe, grid, cv=5).fit(X_test, y_test)`,`GridSearchCV(pipe, grid, scoring="r2").fit(X_train, y_train)`,`pipe.fit(X, y).score(X, y)`],a:0,
+e:`StratifiedKFold garde la proportion des classes dans chaque fold (indispensable avec une classe rare). Sans scoring, GridSearchCV optimiserait l'accuracy. Le R² est une métrique de régression. (Avec sklearn ≥ 1.8, on écrirait plutôt <code>"lr__l1_ratio": [0, 1]</code> au lieu de <code>lr__penalty</code>.)`},
+/* ======================= CM3 — Arbres, ensembles ======================= */
+{c:3,t:`qcu`,q:`Comment un arbre de décision prédit-il la classe d'un nouvel exemple ?`,
+o:[`On descend l'arbre en suivant les tests jusqu'à une feuille, et on renvoie la classe majoritaire de cette feuille`,`On calcule la distance aux exemples d'entraînement`,`On fait la moyenne de toutes les feuilles`,`On applique une sigmoïde à la racine`],a:0,
+e:`predict = classe majoritaire de la feuille. predict_proba = proportion de chaque classe dans la feuille.`},
+
+{c:3,t:`num`,q:`Une feuille contient 8 exemples « oui » et 2 « non ». Que renvoie predict_proba pour la classe « oui » ?`,a:0.8,tol:0.001,
+e:`8/10 = 0,8. predict renvoie « oui » (classe majoritaire).`},
+
+{c:3,t:`vf`,q:`Pour un même jeu de données, l'arbre de décision obtenu est unique.`,a:1,
+e:`Faux, le cours le souligne : la solution n'est pas unique. Plusieurs features peuvent donner le même gain, l'ordre des tests change l'arbre, et sklearn tire les features au hasard en cas d'égalité (<code>random_state</code>).`},
+
+{c:3,t:`qcu`,q:`À quoi ressemble la frontière de décision d'un arbre de décision en 2D ?`,
+o:[`Des segments parallèles aux axes : un découpage en rectangles`,`Une seule droite oblique`,`Un cercle`,`Une courbe lisse`],a:0,
+e:`Chaque nœud teste une seule feature contre un seuil (x₁ < s) : on coupe l'espace parallèlement aux axes. Pour approcher une frontière oblique, il faut beaucoup de petites marches, donc un arbre profond.`},
+
+{c:3,t:`qcu`,q:`Formule de l'indice de Gini d'un nœud t ?`,
+o:[`Gini(t) = 1 − Σⱼ P(j | t)²`,`Gini(t) = Σⱼ P(j | t)`,`Gini(t) = −Σⱼ P(j | t)`,`Gini(t) = max P(j | t)`],a:0,
+e:`P(j | t) = fréquence de la classe j dans le nœud. Gini mesure l'impureté : la probabilité de mal classer un exemple tiré au hasard si on l'étiquette au hasard selon la distribution du nœud.`},
+
+{c:3,t:`qcm`,q:`Quelles affirmations sur Gini sont vraies ?`,
+o:[`Gini = 0 pour un nœud pur (une seule classe)`,`Gini est maximal quand toutes les classes ont la même proportion`,`Avec c classes, le maximum vaut 1 − 1/c`,`Gini vaut 1 pour un nœud pur`],a:[0,1,2],
+e:`Avec c classes équiprobables : 1 − c·(1/c)² = 1 − 1/c. En binaire, le maximum est 0,5.`},
+
+{c:3,t:`num`,q:`Un nœud contient 3 « fraude = oui » et 7 « non ». Calcule son Gini.`,a:0.42,tol:0.001,
+e:`1 − 0,3² − 0,7² = 1 − 0,09 − 0,49 = 0,42. C'est la racine de l'exemple du cours (10 dossiers, 3 fraudes).`},
+
+{c:3,t:`num`,q:`Avec 3 classes en proportions égales, que vaut le Gini (2 décimales) ?`,a:0.67,tol:0.006,
+e:`1 − 3 × (1/3)² = 1 − 1/3 ≈ 0,67 : c'est le maximum pour 3 classes (1 − 1/c).`},
+
+{c:3,t:`qcu`,q:`Comment choisit-on le meilleur split dans un arbre ?`,
+o:[`Celui qui fait le plus baisser le Gini pondéré des enfants : Σ (nᵢ/n)·Gini(tᵢ)`,`Celui qui crée le plus d'enfants`,`Celui sur la feuille la plus grande`,`Au hasard`],a:0,
+e:`On compare l'impureté du parent à la moyenne des impuretés des enfants, pondérée par leur taille (nᵢ = nombre d'exemples dans l'enfant i, n = dans le parent). Les autres métriques (entropie) donnent en général le même choix.`},
+
+{c:3,t:`num`,q:`Exemple du cours (10 dossiers, 3 fraudes). Split sur « Statut marital » : Marié (4 dossiers, 0 fraude) contre Célibataire/Divorcé (6 dossiers, 3 fraudes). Gini pondéré (2 décimales) ?`,a:0.30,tol:0.006,
+e:`Gini(Marié) = 0 ; Gini(C/D) = 1 − 0,5² − 0,5² = 0,5. Pondéré : 4/10 × 0 + 6/10 × 0,5 = 0,30. On passe de 0,42 à 0,30 : bon split.`},
+
+{c:3,t:`num`,q:`Même exemple. Split sur « Remboursement » : Oui (3 dossiers, 0 fraude) contre Non (7 dossiers, 3 fraudes). Gini pondéré (2 décimales) ?`,a:0.34,tol:0.006,
+e:`Gini(Non) = 1 − (3/7)² − (4/7)² ≈ 0,490. Pondéré : 7/10 × 0,490 ≈ 0,343. Moins bon que Statut marital (0,30) : on choisit Statut marital à la racine.`},
+
+{c:3,t:`qcu`,q:`Les arbres de décision ont tendance à…`,
+o:[`over-fitter : laissés libres, ils poussent jusqu'à des feuilles pures`,`under-fitter systématiquement`,`ignorer les données d'entraînement`,`n'utiliser qu'une seule feature`],a:0,
+e:`Sans contrainte, chaque feuille finit par contenir un seul exemple : 100 % en train, mauvais en test. On limite la croissance avec max_depth, min_samples_split, min_samples_leaf (pré-élagage), ou ccp_alpha (élagage).`},
+
+{c:3,t:`match`,q:`Associe chaque hyper-paramètre de DecisionTreeClassifier à son effet.`,
+o:[[`max_depth`,`Profondeur maximale de l'arbre`],[`min_samples_split`,`Nombre minimal d'exemples dans un nœud pour pouvoir le couper`],[`min_samples_leaf`,`Nombre minimal d'exemples dans chaque feuille`],[`class_weight`,`Poids différent pour chaque classe (corrige le déséquilibre)`]],
+e:`Le cours : une valeur très petite de min_samples_* → over-fitting ; une valeur très grande → l'arbre n'apprend plus rien. Le réglage n'est pas facile, d'où la recherche en validation croisée.`},
+
+{c:3,t:`vf`,q:`Les arbres de décision nécessitent de normaliser les features.`,a:1,
+e:`Faux. Chaque test compare une feature à un seuil : une transformation monotone (comme la standardisation) ne change pas l'ordre des valeurs, donc pas les splits. C'est l'inverse de KNN, où la normalisation est essentielle.`},
+
+{c:3,t:`vf`,q:`D'après le cours, un arbre de décision est sensible au déséquilibre des classes, et class_weight permet de le corriger.`,a:0,
+e:`Vrai : la classe majoritaire domine les feuilles et le critère d'impureté. class_weight donne un poids différent à chaque classe dans le calcul de l'impureté.`},
+
+{c:3,t:`qcu`,q:`Que fait <code>tree.plot_tree(clf)</code> ?`,
+o:[`Affiche l'arbre appris : test de chaque nœud, Gini, nombre d'exemples, répartition par classe`,`Trace la frontière de décision`,`Élague l'arbre`,`Affiche la matrice de confusion`],a:0,
+e:`C'est un des gros atouts des arbres : ils sont interprétables, on peut lire les règles de décision.`},
+
+{c:3,t:`qcu`,q:`Principe de l'ensemble learning ?`,
+o:[`Faire voter plusieurs classifieurs pour réduire l'erreur`,`Entraîner un seul très gros modèle`,`Normaliser les données plusieurs fois`,`Supprimer les outliers`],a:0,
+e:`Si les classifieurs font des erreurs indépendantes, le vote majoritaire se trompe beaucoup moins souvent que chacun d'eux. Toute la difficulté : construire vite des classifieurs qui ne font pas les mêmes erreurs.`},
+
+{c:3,t:`num`,q:`5 classifieurs indépendants, chacun se trompe avec ε = 0,1. Vote majoritaire. Probabilité d'erreur du vote en % (2 décimales) ?`,a:0.86,tol:0.02,
+e:`Il faut au moins 3 erreurs sur 5 : C(5,3)ε³(1−ε)² + C(5,4)ε⁴(1−ε) + C(5,5)ε⁵ = 0,0081 + 0,00045 + 0,00001 = 0,00856 ≈ 0,86 % (le cours arrondit à 0,9 %). Contre 10 % pour un seul classifieur.`},
+
+{c:3,t:`num`,q:`3 classifieurs indépendants, ε = 0,1, vote majoritaire. Probabilité d'erreur du vote en % ?`,a:2.8,tol:0.05,
+e:`Au moins 2 erreurs sur 3 : 3 × 0,01 × 0,9 + 0,001 = 0,028 = 2,8 %.`},
+
+{c:3,t:`vf`,q:`Si ε > 0,5 pour chaque classifieur, le vote majoritaire améliore quand même le résultat.`,a:1,
+e:`Faux : avec des classifieurs pires que le hasard, le vote amplifie l'erreur (elle tend vers 1 quand on en ajoute). L'ensemble n'aide que si chaque membre fait mieux que le hasard et que les erreurs sont peu corrélées.`},
+
+{c:3,t:`match`,q:`VotingClassifier : associe chaque mode de vote à sa règle.`,
+o:[[`voting="hard"`,`Classe majoritaire parmi les prédictions`],[`voting="soft"`,`Classe qui maximise la somme (ou moyenne) des probabilités`],[`VotingRegressor`,`Moyenne des prédictions`]],
+e:`Le soft voting demande des estimateurs qui ont predict_proba. Le paramètre <code>weights</code> permet de donner plus de poids aux meilleurs modèles.`},
+
+{c:3,t:`qcu`,q:`Soft voting. Modèle A : P(classe 1) = 0,9. Modèle B : 0,4. Modèle C : 0,4. Quelle classe est prédite en hard et en soft ?`,
+o:[`Hard : classe 0 (2 votes sur 3) ; soft : classe 1 (moyenne 0,567)`,`Hard : 1 ; soft : 0`,`Les deux donnent 1`,`Les deux donnent 0`],a:0,
+e:`Hard : A vote 1, B et C votent 0 → 0. Soft : (0,9 + 0,4 + 0,4)/3 ≈ 0,567 > 0,5 → 1. Le soft vote tient compte de la confiance de chaque modèle.`},
+
+{c:3,t:`match`,q:`Bagging ou boosting ? Associe.`,
+o:[[`Bagging`,`Modèles entraînés en parallèle sur des jeux de données tirés avec remise`],[`Boosting`,`Modèles entraînés en séquence, chacun corrige les erreurs du précédent`],[`Random Forest`,`Bagging d'arbres + sous-ensemble aléatoire de features`],[`AdaBoost / Gradient Boosting`,`Boosting d'arbres peu profonds`]],
+e:`Bagging : réduit surtout la variance (arbres profonds, qui over-fittent, moyennés). Boosting : réduit surtout le biais (arbres faibles, souvent des souches de profondeur 1 ou 2).`},
+
+{c:3,t:`qcm`,q:`Comment Random Forest rend-il les arbres différents les uns des autres ?`,
+o:[`Chaque arbre est appris sur un échantillon bootstrap : même taille, tiré avec remise (certaines observations dupliquées, d'autres absentes)`,`Chaque split ne considère qu'un sous-ensemble aléatoire de m ≈ √M features`,`Chaque arbre utilise une profondeur différente imposée`,`Chaque arbre est appris sur les erreurs du précédent`],a:[0,1],
+e:`Les deux sources d'aléa décorrèlent les arbres, ce qui rend le vote efficace. La dernière option décrit le boosting.`},
+
+{c:3,t:`num`,q:`Random Forest de classification sur des données à 64 features. Combien de features (m = √M) chaque split considère-t-il par défaut ?`,a:8,tol:0,
+e:`√64 = 8 (<code>max_features="sqrt"</code>, valeur par défaut en classification).`},
+
+{c:3,t:`qcu`,q:`Que contrôle <code>n_estimators</code> dans RandomForestClassifier ?`,
+o:[`Le nombre d'arbres de la forêt`,`La profondeur des arbres`,`Le nombre de features par split`,`Le nombre de classes`],a:0,
+e:`Le CM indique un défaut à 10 : c'était le cas dans les anciennes versions de sklearn, c'est 100 depuis la version 0.22. Plus d'arbres ne fait pas over-fitter, ça coûte juste plus de temps de calcul.`},
+
+{c:3,t:`vf`,q:`Augmenter le nombre d'arbres d'une Random Forest provoque de l'over-fitting.`,a:1,
+e:`Faux : l'erreur se stabilise quand on ajoute des arbres (moyenne de modèles décorrélés). C'est la profondeur des arbres, ou trop peu de diversité, qui joue sur l'over-fitting. En boosting, au contraire, trop d'itérations peut over-fitter.`},
+
+{c:3,t:`order`,q:`Remets dans l'ordre l'algorithme AdaBoost du cours.`,
+o:[`Donner le même poids à toutes les observations`,`Apprendre un arbre peu profond (profondeur ~2) sur les données pondérées`,`Augmenter le poids des observations mal classées, diminuer celui des bien classées`,`Donner à l'arbre un poids qui dépend de sa qualité`,`Recommencer ; pour prédire, faire la somme pondérée des prédictions des arbres`],
+e:`AdaBoost se concentre de plus en plus sur les observations difficiles. Les meilleurs arbres pèsent plus dans le vote final.`},
+
+{c:3,t:`order`,q:`Remets dans l'ordre l'algorithme de Gradient Boosting (version du lab, à la main).`,
+o:[`Initialiser la prédiction (par ex. la moyenne de y)`,`Calculer le résidu : y − prédiction actuelle`,`Apprendre un arbre de profondeur 1 qui prédit ce résidu`,`Mettre à jour : prédiction ← prédiction + η × prédiction de l'arbre`,`Recommencer à partir du nouveau résidu`],
+e:`η (learning rate) est petit pour avancer prudemment. La prédiction finale est F₀ + η·Σ hₘ(x).`},
+
+{c:3,t:`qcu`,q:`Différence d'esprit entre AdaBoost et Gradient Boosting selon le cours ?`,
+o:[`AdaBoost repondère les observations difficiles ; Gradient Boosting corrige progressivement les résidus (le gradient de la perte)`,`AdaBoost est un bagging`,`Gradient Boosting utilise des arbres très profonds en parallèle`,`Il n'y a aucune différence`],a:0,
+e:`Les deux sont séquentiels. AdaBoost change les poids des exemples ; Gradient Boosting change la cible (il apprend le résidu).`},
+
+{c:3,t:`num`,q:`Gradient boosting. y = 3, prédiction initiale F₀ = 2,2, le premier arbre prédit un résidu de 1,0, learning rate η = 0,5. Nouvelle prédiction ?`,a:2.7,tol:0.001,
+e:`F₁ = 2,2 + 0,5 × 1,0 = 2,7. Le nouveau résidu vaut 3 − 2,7 = 0,3 : le prochain arbre apprendra ce résidu.`},
+
+{c:3,t:`qcu`,q:`Pourquoi prendre un learning rate η petit en gradient boosting ?`,
+o:[`Pour corriger le résidu par petits pas et mieux généraliser (au prix de plus d'arbres)`,`Pour aller plus vite`,`Pour avoir des arbres plus profonds`,`Pour que les résidus deviennent négatifs`],a:0,
+e:`η petit = régularisation (shrinkage). On compense par plus d'itérations (n_estimators). η et n_estimators se règlent ensemble.`},
+
+{c:3,t:`qcm`,q:`Quelles affirmations sur bagging et boosting sont correctes ?`,
+o:[`Le bagging réduit surtout la variance`,`Le boosting réduit surtout le biais`,`Le bagging se parallélise facilement`,`Le boosting se parallélise facilement entre arbres`],a:[0,1,2],
+e:`En boosting, l'arbre m dépend des résidus de l'arbre m − 1 : on ne peut pas les apprendre en parallèle.`},
+
+{c:3,t:`qcu`,q:`Lab Iris : en traçant les frontières de décision, quelle différence attend-on entre régression logistique et arbre de décision ?`,
+o:[`Logistique : frontières droites (obliques) ; arbre : frontières en escalier, parallèles aux axes`,`Les deux donnent des cercles`,`L'arbre donne des droites obliques, la logistique des escaliers`,`Aucune différence`],a:0,
+e:`Random Forest donne aussi des frontières en escalier, mais plus lisses (moyenne de nombreux arbres) et moins sensibles aux points isolés qu'un arbre seul.`},
+/* ======================= CM4 — KNN ======================= */
+{c:4,t:`order`,q:`Remets dans l'ordre la prédiction KNN pour un nouvel individu (classification).`,
+o:[`Calculer sa distance à toutes les observations d'entraînement`,`Sélectionner les K plus proches voisins`,`Attribuer la classe majoritaire (ou pondérée) parmi ces K voisins`],
+e:`Pour une régression, on remplace le vote par la moyenne des y des K voisins.`},
+
+{c:4,t:`qcu`,q:`KNN en régression : comment prédit-on ?`,
+o:[`Moyenne (éventuellement pondérée) des y des K plus proches voisins`,`Classe majoritaire des voisins`,`Médiane de tout le dataset`,`Une droite ajustée sur tous les points`],a:0,
+e:`<code>KNeighborsRegressor</code>. Avec weights="distance", les voisins proches comptent davantage.`},
+
+{c:4,t:`qcu`,q:`Distance-weighted voting : quel poids donne-t-on à un voisin à distance dᵢ ?`,
+o:[`wᵢ = 1/dᵢ`,`wᵢ = dᵢ`,`wᵢ = dᵢ²`,`wᵢ = 1 pour tous`],a:0,
+e:`Un voisin à distance 0,1 pèse 10, un voisin à distance 2 pèse 0,5. En sklearn : <code>weights="distance"</code> (défaut : "uniform").`},
+
+{c:4,t:`qcu`,q:`K = 3. Voisins : A à distance 1 (classe rouge), B à distance 4 (bleu), C à distance 4 (bleu). Prédiction en vote majoritaire puis en vote pondéré par 1/d ?`,
+o:[`Majoritaire : bleu ; pondéré : rouge (1 contre 0,25 + 0,25 = 0,5)`,`Majoritaire : rouge ; pondéré : bleu`,`Bleu dans les deux cas`,`Rouge dans les deux cas`],a:0,
+e:`Le vote pondéré donne raison au voisin très proche. C'est l'intérêt de weights="distance" quand les K voisins sont à des distances très différentes.`},
+
+{c:4,t:`match`,q:`Choix de K : associe.`,
+o:[[`K petit (K = 1)`,`Modèle flexible, sensible au bruit : variance élevée, over-fitting`],[`K grand`,`Modèle lisse : biais élevé, under-fitting`],[`K = nombre total d'exemples`,`Prédit toujours la classe majoritaire du train`]],
+e:`Le cours : le choix de K est « probablement le point le plus important ». On le choisit par validation croisée (le lab demande 3 folds). En binaire, un K impair évite les égalités.`},
+
+{c:4,t:`vf`,q:`Avec K = 1, l'accuracy sur le train vaut 100 % (s'il n'y a pas deux points identiques de classes différentes).`,a:0,
+e:`Vrai : chaque point d'entraînement est son propre plus proche voisin. C'est un signe d'over-fitting, pas de qualité : il faut évaluer en validation.`},
+
+{c:4,t:`qcu`,q:`Pourquoi la mise à l'échelle est-elle essentielle avec KNN ?`,
+o:[`KNN repose sur des distances : une feature à grande échelle (salaire en dizaines de milliers) écrase les autres (âge)`,`Pour accélérer l'apprentissage`,`Parce que KNN ne marche qu'avec des valeurs entre 0 et 1`,`Ce n'est pas nécessaire`],a:0,
+e:`Exemple du cours : âge 20–80 et salaire 20 000–100 000. Sans normalisation, la distance est quasiment la différence de salaire. On met un StandardScaler ou un MinMaxScaler dans le Pipeline.`},
+
+{c:4,t:`num`,q:`Distance euclidienne entre (1, 2) et (4, 6) ?`,a:5,tol:0.001,
+e:`√(3² + 4²) = √25 = 5. La distance de Manhattan serait 3 + 4 = 7.`},
+
+{c:4,t:`match`,q:`Associe chaque distance à sa formule.`,
+o:[[`Euclidienne`,`√Σ (xⱼ − yⱼ)²`],[`Manhattan`,`Σ |xⱼ − yⱼ|`],[`Minkowski`,`(Σ |xⱼ − yⱼ|ᵖ)^(1/p)`]],
+e:`Minkowski généralise : p = 1 donne Manhattan, p = 2 donne l'euclidienne (défaut sklearn : metric="minkowski", p=2). Le choix de la métrique peut changer fortement les voisins.`},
+
+{c:4,t:`qcm`,q:`Curse of dimensionality : que se passe-t-il en grande dimension ?`,
+o:[`Les observations deviennent toutes relativement éloignées les unes des autres`,`La notion de « plus proche voisin » devient moins discriminante`,`Les distances deviennent moins informatives`,`KNN devient plus précis`],a:[0,1,2],
+e:`En grande dimension, la distance au plus proche et au plus lointain voisin se ressemblent. Remède du cours : réduction de dimension (PCA, LDA) avant KNN.`},
+
+{c:4,t:`qcu`,q:`Pourquoi dit-on que KNN est un modèle « lazy » ?`,
+o:[`L'entraînement se contente de mémoriser les données ; tout le calcul est fait à la prédiction`,`Il converge lentement`,`Il n'utilise qu'une feature`,`Il ne fait pas de prédiction`],a:0,
+e:`Entraînement très rapide, prédiction potentiellement coûteuse (n distances par requête). C'est l'inverse des arbres ou de la régression logistique.`},
+
+{c:4,t:`qcm`,q:`Quels leviers accélèrent la prédiction de KNN ?`,
+o:[`Réduire le nombre d'observations (échantillonnage)`,`Utiliser une structure de recherche : KD-tree, Ball tree`,`Réduire le nombre de dimensions (PCA → KNN)`,`Accepter une recherche approximative (Annoy)`],a:[0,1,2,3],
+e:`Les quatre leviers du cours (A, B, C, D). En sklearn : <code>algorithm="kd_tree"</code> ou <code>"ball_tree"</code> (défaut "auto").`},
+
+{c:4,t:`qcu`,q:`Construction d'un KD-tree en 2D : comment choisit-on les coupes ?`,
+o:[`On coupe à la médiane selon x₁, puis selon x₂ dans chaque moitié, et on alterne les axes niveau par niveau`,`On coupe toujours selon x₁`,`On coupe au hasard selon un hyperplan oblique`,`On coupe selon la classe des points`],a:0,
+e:`Niveau 1 : x₁, niveau 2 : x₂, niveau 3 : x₁… Prendre la médiane donne un arbre équilibré. Les coupes aléatoires obliques, c'est Annoy.`},
+
+{c:4,t:`num`,q:`Points (2,7), (1,3), (4,5), (7,2), (8,6), (6,9), (9,4). Quelle est la valeur de la première coupe (médiane selon x₁) ?`,a:6,tol:0,
+e:`x₁ triés : 1, 2, 4, <b>6</b>, 7, 8, 9. La médiane est 6 (le point (6,9)). À gauche : (1,3), (2,7), (4,5).`},
+
+{c:4,t:`num`,q:`Recherche du plus proche voisin de q = (6,5 ; 5) parmi (2,7), (1,3), (4,5), (7,2), (8,6), (6,9), (9,4). Quelle est la distance au plus proche voisin (2 décimales) ?`,a:1.80,tol:0.01,
+e:`Le plus proche est (8,6) : √(1,5² + 1²) = √3,25 ≈ 1,80. Attention, le CM écrit 1,08 : c'est une coquille. (7,2) est à 3,04, (4,5) à 2,5.`},
+
+{c:4,t:`qcu`,q:`Recherche dans un KD-tree : on a trouvé un candidat à distance 3,04. Le plan de coupe x₁ = 7 est à distance |6,5 − 7| = 0,5 de q. Que fait-on ?`,
+o:[`On explore aussi l'autre côté du plan, car 0,5 < 3,04 : un point plus proche peut s'y trouver`,`On s'arrête, le candidat est forcément le bon`,`On supprime le plan`,`On recommence depuis la racine avec K = 2`],a:0,
+e:`Règle d'élagage : si la distance au plan est supérieure à la meilleure distance trouvée, toute la région de l'autre côté est éliminée sans calcul. C'est ce qui rend le KD-tree rapide en petite dimension.`},
+
+{c:4,t:`vf`,q:`Le KD-tree reste très efficace en grande dimension (plusieurs centaines de features).`,a:1,
+e:`Faux. En grande dimension, presque tous les plans sont « proches » de la requête et on visite presque tout l'arbre. On passe alors à la réduction de dimension ou à la recherche approximative (Annoy).`},
+
+{c:4,t:`qcu`,q:`Comment fonctionne Annoy ?`,
+o:[`Il construit plusieurs arbres avec des coupes aléatoires (hyperplans) ; les candidats de tous les arbres sont ensuite comparés exactement`,`Il calcule toutes les distances exactement`,`Il trie les points par classe`,`Il apprend un réseau de neurones`],a:0,
+e:`Approximate Nearest Neighbors : un peu moins précis, beaucoup plus rapide. Intéressant avec de très nombreux points (~100 000) et beaucoup de features (128, 768…), par exemple des embeddings.`},
+
+{c:4,t:`qcu`,q:`KNNImputer : comment impute-t-il une valeur manquante ?`,
+o:[`Avec la moyenne de cette feature chez les K plus proches voisins (calculés sur les features présentes)`,`Avec la moyenne de la colonne sur tout le dataset`,`Avec 0`,`Avec la cible y`],a:0,
+e:`Avantage par rapport à l'imputation moyenne/médiane : il exploite la similarité entre observations. Comme toute imputation, il s'apprend sur le train (dans le Pipeline).`},
+
+{c:4,t:`qcu`,q:`Pourquoi faire une PCA avant KNN sur des données à 100 features ?`,
+o:[`Réduire le coût des distances et limiter la curse of dimensionality`,`Pour rendre KNN supervisé`,`Pour supprimer les classes rares`,`Parce que KNN ne marche qu'en 2D`],a:0,
+e:`Ex : 100 variables → 10 composantes. Moins de calcul, voisinage plus pertinent dans certains cas. Le nombre de composantes devient un hyper-paramètre à régler en CV.`},
+
+{c:4,t:`qcu`,q:`À quoi ressemble la frontière de décision de KNN avec K = 1 ?`,
+o:[`Très découpée, elle suit chaque point (cellules de Voronoï)`,`Une droite`,`Des rectangles parallèles aux axes`,`Un cercle unique`],a:0,
+e:`Avec K plus grand, elle se lisse. Lab : tracer les frontières pour plusieurs K pour voir le passage over-fitting → under-fitting.`},
+
+{c:4,t:`code`,q:`Que manque-t-il dans ce code ?`,
+k:`knn = KNeighborsClassifier()
+grid = {"n_neighbors": [1, 3, 5, 7, 9, 15],
+        "weights": ["uniform", "distance"]}
+gs = GridSearchCV(knn, grid, cv=3).fit(X_train, y_train)`,
+o:[`La normalisation : il faut un Pipeline(StandardScaler(), KNeighborsClassifier()) et préfixer les paramètres`,`Un random_state`,`L'appel à predict_proba`,`Rien`],a:0,
+e:`<code>pipe = Pipeline([("sc", StandardScaler()), ("knn", KNeighborsClassifier())])</code> puis <code>{"knn__n_neighbors": [...], "knn__weights": [...]}</code>. Sans normalisation, la feature à plus grande échelle décide seule des voisins.`},
+/* ======================= CM5 — Le texte avant les transformers ======================= */
+{c:5,t:`match`,q:`Associe chaque tâche NLP à sa forme entrée → sortie.`,
+o:[[`Analyse de sentiment`,`N → 1 : classification de texte`],[`Reconnaissance d'entités nommées (NER)`,`N → N : une étiquette par mot`],[`Traduction automatique`,`N → M : génération de texte`]],
+e:`N → 1 : ML classique (bon résultat, faible coût). N → N : LSTM, Temporal CNN + CRF, ou CRF seul. N → M : IA générative.`},
+
+{c:5,t:`qcm`,q:`Quelles tâches sont des classifications de texte (N → 1) ?`,
+o:[`Analyse de sentiment (positif / négatif / neutre)`,`Détection de spam`,`Classer un article en sport / politique / économie`,`Étiquetage grammatical (POS tagging)`],a:[0,1,2],
+e:`Le POS tagging donne une étiquette à chaque mot : c'est du N → N, comme le NER.`},
+
+{c:5,t:`qcu`,q:`Qu'est-ce que la tokenisation ?`,
+o:[`Découper une chaîne de caractères en unités (tokens)`,`Transformer un mot en vecteur`,`Supprimer les mots fréquents`,`Traduire le texte`],a:0,
+e:`C'est la première étape du pipeline. La plus simple découpe sur les espaces et la ponctuation (pas d'entraînement). BPE et WordPiece apprennent des sous-mots.`},
+
+{c:5,t:`match`,q:`Associe chaque tokenizer à son fonctionnement.`,
+o:[[`Séparateurs (espace, ponctuation)`,`Pas d'entraînement ; on coupe sur les séparateurs choisis`],[`BPE (GPT)`,`Fusionne progressivement les paires d'unités les plus fréquentes, puis applique les fusions dans l'ordre`],[`WordPiece (BERT)`,`Fusionne la paire qui maximise P(ab) / (P(a)·P(b)), puis cherche la plus longue sous-chaîne connue`]],
+e:`BPE regarde la fréquence brute de la paire ; WordPiece regarde si la paire est plus fréquente que ce qu'on attendrait de ses parties (même idée que la PMI). Les deux s'entraînent sur un corpus externe ou sur le train.`},
+
+{c:5,t:`vf`,q:`BPE et WordPiece permettent de représenter un mot jamais vu à l'entraînement en le découpant en sous-mots connus.`,a:0,
+e:`Vrai : « déconstruction » peut devenir « dé + construc + tion ». C'est le grand avantage des tokenizers à sous-mots sur un vocabulaire de mots entiers.`},
+
+{c:5,t:`qcu`,q:`Qu'est-ce qu'une représentation Bag of Words (BoW) ?`,
+o:[`Un vecteur de la taille du vocabulaire qui compte les occurrences de chaque mot dans le document`,`Un vecteur dense appris par réseau de neurones`,`La liste ordonnée des mots`,`La traduction du texte`],a:0,
+e:`<code>CountVectorizer</code>. Simple et efficace pour la classification, mais on perd l'ordre des mots et le vecteur est très grand et creux.`},
+
+{c:5,t:`qcm`,q:`Comment réduire la taille du vecteur BoW ?`,
+o:[`Tout passer en minuscules`,`min_df / max_df : retirer les mots trop rares / trop fréquents`,`Fixer la taille du vocabulaire (max_features)`,`Retirer les stop words, faire du stemming ou de la lemmatisation`],a:[0,1,2,3],
+e:`Les six leviers du cours : minuscules, min_df, max_df, taille fixe du vocabulaire, stop words, stemming/lemmatisation.`},
+
+{c:5,t:`match`,q:`Stemming ou lemmatisation ?`,
+o:[[`Stemming`,`Approche statistique / par règles, coupe les suffixes, peut inventer des mots`],[`Lemmatisation`,`Approche linguistique, ramène à une forme qui existe (lemme)`]],
+e:`Le cours conseille plutôt le stemming aujourd'hui : performance acceptable et bien plus efficace. Ex : « mangeaient » → stem « mang », lemme « manger ».`},
+
+{c:5,t:`qcu`,q:`BoW : comment distinguer « Le chat mange la souris » de « La souris mange le chat » ?`,
+o:[`Ajouter des n-grammes (ex. bigrammes « chat mange », « souris mange »)`,`Passer en minuscules`,`Augmenter min_df`,`Supprimer les stop words`],a:0,
+e:`Les deux phrases ont exactement le même BoW en unigrammes. Avec <code>ngram_range=(1, 2)</code>, les bigrammes encodent un peu d'ordre local.`},
+
+{c:5,t:`qcu`,q:`Formule du TF-IDF ?`,
+o:[`tfidf(t, d) = tf(t, d) × log(N / nombre de documents contenant t)`,`tfidf(t, d) = tf(t, d) + idf(t)`,`tfidf(t, d) = nombre de documents / tf`,`tfidf(t, d) = tf(t, d)²`],a:0,
+e:`tf = occurrences de t dans d / nombre de mots de d. idf = log(N / df(t)). Un mot présent partout a un idf nul : il n'est pas discriminant.`},
+
+{c:5,t:`num`,q:`Corpus de 3 documents. Le mot « le » apparaît dans les 3. Quelle est son IDF ?`,a:0,tol:0.0001,
+e:`log(3/3) = log(1) = 0 : un mot toujours présent ne discrimine rien, son TF-IDF est nul partout. C'est le rôle de l'IDF.`},
+
+{c:5,t:`num`,q:`Document « le chat dort » dans un corpus de 3 documents ; « chat » apparaît dans 2 documents. TF-IDF de « chat » dans ce document (log népérien, 3 décimales) ?`,a:0.135,tol:0.002,
+e:`tf = 1/3 ; idf = ln(3/2) ≈ 0,405 ; tf-idf ≈ 0,135. (sklearn utilise une idf lissée, ln((1 + N)/(1 + df)) + 1, puis normalise le vecteur : les valeurs diffèrent mais l'idée est la même.)`},
+
+{c:5,t:`vf`,q:`Plus un mot est rare dans le corpus, plus son IDF est élevée.`,a:0,
+e:`Vrai : idf = log(N/df), donc df petit ⇒ idf grand. Un mot rare présent dans un document est très caractéristique de ce document.`},
+
+{c:5,t:`qcu`,q:`Matrice de co-occurrence (fenêtre de 1 mot avant et après) sur le corpus du cours. La ligne de « chat » vaut [le:2, mange:1, aime:1, autres:0]. Qu'est-ce que cette ligne ?`,
+o:[`L'embedding (non réduit) du mot « chat » : ses contextes`,`L'embedding de la phrase`,`Le TF-IDF de « chat »`,`La probabilité de « chat »`],a:0,
+e:`Hypothèse distributionnelle : un mot est défini par ses contextes. Deux mots qui apparaissent dans des contextes semblables (chat, chien) ont des lignes proches.`},
+
+{c:5,t:`qcu`,q:`Pourquoi faire une SVD de la matrice de co-occurrence ?`,
+o:[`Pour réduire la dimension (taille du vocabulaire → k) en gardant les directions les plus importantes`,`Pour la rendre symétrique`,`Pour compter les mots`,`Pour tokeniser`],a:0,
+e:`X = UΣVᵀ. Les valeurs singulières de Σ sont rangées par ordre décroissant ; on garde les k premières. Embedding des mots : U_k Σ_k (<code>U[:, :k] @ np.diag(S[:k])</code>).`},
+
+{c:5,t:`match`,q:`SVD X = UΣVᵀ : associe chaque matrice à son rôle.`,
+o:[[`U`,`Vecteurs singuliers gauches : directions principales côté mots`],[`Σ`,`Valeurs singulières : importance de chaque direction`],[`Vᵀ`,`Vecteurs singuliers droits : directions côté contextes`]],
+e:`Réduction au rang k : on garde les k plus grandes valeurs singulières. k est un hyper-paramètre (question 3 du lab : trouver le meilleur rang).`},
+
+{c:5,t:`qcu`,q:`Pourquoi passer de la co-occurrence brute à la PPMI ?`,
+o:[`Un mot très fréquent comme « le » co-occurre avec presque tout ; la PMI compare la co-occurrence à ce qu'on attendrait par hasard`,`Pour avoir des nombres entiers`,`Pour obtenir des valeurs négatives`,`Pour réduire la taille du vocabulaire`],a:0,
+e:`PMI(w, c) = log P(w, c) / (P(w)·P(c)). Si w et c sont indépendants, PMI = 0. PPMI = max(PMI, 0) : on garde seulement les associations plus fréquentes que le hasard.`},
+
+{c:5,t:`num`,q:`Total de la matrice = 26. Count(le, chat) = 2, somme de la ligne « le » = 4, somme de la colonne « chat » = 4. Calcule la PMI(le, chat) en log₂ (2 décimales).`,a:1.70,tol:0.01,
+e:`P(le, chat) = 2/26, P(le) = P(chat) = 4/26. PMI = log₂((2/26) / (4/26 × 4/26)) = log₂(2 × 26 / 16) = log₂(3,25) ≈ 1,70.`},
+
+{c:5,t:`vf`,q:`La PPMI d'une paire qui n'apparaît jamais ensemble vaut 0.`,a:0,
+e:`Vrai : la PMI vaut log(0) = −∞, et max(−∞, 0) = 0. Dans le code du cours, le masque évite de calculer log(0).`},
+
+{c:5,t:`code`,q:`Ce code PPMI est tiré du cours. Quelle ligne est fausse ?`,
+k:`total = X.sum()
+P_wc = X / total
+P_w = X.sum(axis=1, keepdims=True) / total
+P_c = X.sum(axis=1, keepdims=True) / total
+PMI = np.zeros_like(X)
+mask = Pij > 0
+PMI[mask] = np.log2(P_wc[mask] / (P_w @ P_c)[mask])`,
+o:[`P_c doit sommer sur les lignes (axis=0, keepdims=True) pour obtenir un vecteur ligne, et mask doit utiliser P_wc (Pij n'existe pas)`,`total doit valoir X.mean()`,`np.log2 doit être np.exp`,`Tout est correct`],a:0,
+e:`P_w est une colonne (n, 1), P_c doit être une ligne (1, n) pour que P_w @ P_c donne la matrice (n, n) des P(w)P(c). Avec axis=1, P_w @ P_c lève une erreur de dimensions. Ici la matrice est symétrique, donc les valeurs seraient les mêmes une fois transposées.`},
+
+{c:5,t:`qcm`,q:`Comment passer d'embeddings de mots à un embedding de texte (sans réseau de neurones) ?`,
+o:[`Moyenne des embeddings des mots du texte`,`Moyenne pondérée par le TF-IDF de chaque mot`,`Prendre l'embedding du premier mot`,`Concaténer tous les embeddings du vocabulaire`],a:[0,1],
+e:`La pondération TF-IDF donne moins de poids aux mots peu informatifs (« le », « de »).`},
+
+{c:5,t:`qcu`,q:`NER : quel schéma d'étiquetage est utilisé dans le cours ?`,
+o:[`BIO : B- début d'entité, I- intérieur, O hors entité`,`One-hot`,`TF-IDF`,`OvR`],a:0,
+e:`« Emmanuel Macron a rencontré Joe Biden à Paris » → B-PER I-PER O O B-PER I-PER O B-LOC.`},
+
+{c:5,t:`match`,q:`Étiquettes BIO de la phrase « Joe Biden visite Paris ».`,
+o:[[`Joe`,`B-PER`],[`Biden`,`I-PER`],[`visite`,`O`],[`Paris`,`B-LOC`]],
+e:`Chaque entité commence par B-, ses mots suivants sont I-, le reste est O.`},
+
+{c:5,t:`qcm`,q:`NER avec un modèle ML : quelles features peut-on construire pour le token « Paris » ?`,
+o:[`Le token, le token précédent et le suivant`,`Première lettre majuscule, tout en majuscules, contient un chiffre`,`Préfixe et suffixe (« Par », « ris »), catégorie grammaticale (PROPN)`,`La classe du document entier`],a:[0,1,2],
+e:`Pipeline : phrase → tokens → features du token et de son contexte → classifieur → étiquette par token. Les performances sont bonnes si le contexte est bien défini ; un CRF améliore beaucoup en tenant compte des étiquettes voisines (I-PER suit B-PER).`},
+
+{c:5,t:`qcu`,q:`Pourquoi un CRF fait-il mieux qu'un classifieur indépendant par token en NER ?`,
+o:[`Il modélise la cohérence entre étiquettes voisines (par ex. I-PER ne peut pas suivre O)`,`Il est plus rapide`,`Il n'a pas besoin de features`,`Il fait de la traduction`],a:0,
+e:`Un classifieur token par token peut produire « O I-PER », ce qui est incohérent. Le CRF choisit la meilleure <b>séquence</b> d'étiquettes.`},
+
+{c:5,t:`qcu`,q:`Lab 20 Newsgroups : classifier les messages en 20 catégories. Quelle approche le cours recommande-t-il ?`,
+o:[`TF-IDF (CountVectorizer + TfidfTransformer ou TfidfVectorizer) + un modèle de ML classique, avec recherche d'hyper-paramètres`,`Une IA générative`,`Un CRF`,`KNN sur le texte brut`],a:0,
+e:`Classification de textes (N → 1) : ML classique, bon résultat pour un faible coût. Hyper-paramètres à régler : min_df, max_df, max_features, ngram_range, stop words, et ceux du classifieur (C de la régression logistique…).`},
+
+{c:5,t:`order`,q:`Remets dans l'ordre le pipeline de la question 3 du lab texte.`,
+o:[`Tokenisation (ponctuation)`,`Lemmatisation`,`Matrice de co-occurrence`,`PPMI`,`Réduction au rang k (SVD)`],
+e:`Puis embedding de document (moyenne des mots) et classifieur. On cherche le meilleur rang k en validation croisée.`},
+/* ======================= Transversal — méthode et choix de modèle ======================= */
+{c:6,t:`match`,q:`Diagnostic : associe les scores observés à la situation.`,
+o:[[`Train 0,99 ; validation 0,70`,`Over-fitting (variance trop forte)`],[`Train 0,62 ; validation 0,60`,`Under-fitting (biais trop fort)`],[`Train 0,88 ; validation 0,86`,`Bon compromis`]],
+e:`Over-fitting : simplifier (régulariser, max_depth, K plus grand, degré plus bas), plus de données. Under-fitting : modèle plus riche (polynôme, arbre plus profond, boosting, K plus petit).`},
+
+{c:6,t:`match`,q:`Associe chaque hyper-paramètre au sens qui <b>réduit</b> l'over-fitting.`,
+o:[[`alpha (Ridge / Lasso)`,`L'augmenter`],[`C (LogisticRegression)`,`Le diminuer`],[`max_depth (arbre)`,`Le diminuer`],[`n_neighbors (KNN)`,`L'augmenter`]],
+e:`À connaître par cœur, c'est un piège fréquent : C est l'<b>inverse</b> de la force de régularisation.`},
+
+{c:6,t:`qcu`,q:`À quoi sert le jeu de test ?`,
+o:[`À estimer une seule fois, à la fin, la performance du modèle choisi`,`À choisir les hyper-paramètres`,`À entraîner le modèle final`,`À normaliser les données`],a:0,
+e:`Si on choisit les hyper-paramètres sur le test, l'estimation devient optimiste. Les hyper-paramètres se choisissent en validation croisée sur le train.`},
+
+{c:6,t:`qcu`,q:`Pourquoi utiliser StratifiedKFold plutôt que KFold sur des classes déséquilibrées ?`,
+o:[`Chaque fold garde la même proportion de chaque classe ; sinon certains folds peuvent n'avoir presque aucun exemple de la classe rare`,`C'est plus rapide`,`Pour mélanger les features`,`Pour faire du bagging`],a:0,
+e:`Avec 0,5 % de positifs et 5 folds, un fold non stratifié peut ne contenir aucun positif : recall et precision n'y ont plus de sens. GridSearchCV utilise déjà StratifiedKFold par défaut pour un classifieur.`},
+
+{c:6,t:`qcu`,q:`On rapporte « 0,85 ± 0,02 » en validation croisée 5 folds. Que représente ± 0,02 ?`,
+o:[`L'écart-type du score sur les 5 folds : la stabilité du modèle`,`L'erreur du test`,`La précision de la machine`,`Le learning rate`],a:0,
+e:`Le cours demande moyenne et écart-type. Entre deux modèles de scores proches, on peut préférer le plus stable (ou le plus simple) si l'écart est inférieur à la variabilité.`},
+
+{c:6,t:`match`,q:`Associe chaque modèle à son type de frontière de décision.`,
+o:[[`Régression logistique`,`Linéaire (droite / hyperplan)`],[`Arbre de décision`,`Rectangles parallèles aux axes`],[`KNN`,`Irrégulière, suit les données (Voronoï si K = 1)`],[`Random Forest`,`Escaliers lissés par la moyenne des arbres`]],
+e:`C'est exactement ce que fait tracer le lab Arbres (étapes 0 à 2) et le lab KNN.`},
+
+{c:6,t:`match`,q:`Associe chaque modèle à son besoin de normalisation.`,
+o:[[`KNN`,`Indispensable (distances)`],[`Ridge / Lasso / logistique régularisée`,`Recommandée (la pénalité dépend de l'échelle)`],[`Arbre / Random Forest / Boosting`,`Inutile (tests à seuil par feature)`]],
+e:`La régression linéaire sans régularisation n'en a pas besoin pour prédire, mais en a besoin pour comparer les poids des features.`},
+
+{c:6,t:`match`,q:`Coût d'apprentissage et de prédiction : associe.`,
+o:[[`KNN`,`Apprentissage quasi nul, prédiction coûteuse`],[`Régression logistique`,`Apprentissage itératif, prédiction très rapide (un produit scalaire)`],[`Random Forest`,`Apprentissage parallélisable, prédiction = parcourir tous les arbres`],[`Gradient Boosting`,`Apprentissage séquentiel (non parallélisable entre arbres)`]],
+e:`Argument à utiliser pour justifier un choix en contexte : beaucoup de requêtes en temps réel → éviter KNN sur un gros dataset.`},
+
+{c:6,t:`qcu`,q:`Une banque doit pouvoir expliquer à un client pourquoi son crédit est refusé. Quel modèle privilégier ?`,
+o:[`Un modèle interprétable : régression logistique (coefficients) ou arbre peu profond (règles)`,`Un gradient boosting de 1 000 arbres`,`KNN avec K = 1`,`Une Random Forest de 500 arbres`],a:0,
+e:`L'interprétabilité est un critère de choix au même titre que la performance. Pour des coefficients comparables en logistique, il faut normaliser les features et traiter la colinéarité.`},
+
+{c:6,t:`qcu`,q:`Données tabulaires, relations non linéaires, interactions entre features, on veut la meilleure performance. Quel premier choix est le plus raisonnable ?`,
+o:[`Un ensemble d'arbres (Random Forest ou Gradient Boosting)`,`Une régression linéaire simple`,`KNN sans normalisation`,`Une régression logistique sans features polynomiales`],a:0,
+e:`Les ensembles d'arbres captent non-linéarités et interactions sans normalisation et avec peu de prétraitement. On compare ensuite en validation croisée avec une baseline simple (logistique).`},
+
+{c:6,t:`qcu`,q:`Pourquoi commencer par une baseline simple (régression linéaire / logistique, ou classe majoritaire) ?`,
+o:[`Pour avoir un point de comparaison : un modèle complexe doit faire nettement mieux pour justifier sa complexité`,`Parce que c'est toujours le meilleur modèle`,`Parce que sklearn l'exige`,`Pour éviter de normaliser`],a:0,
+e:`Exemple du cancer : la baseline « personne n'est malade » a 99,5 % d'accuracy. Si ton modèle fait 99,5 %, il n'apporte rien sur cette métrique.`},
+
+{c:6,t:`qcm`,q:`Quelles sont des fuites d'information (data leakage) ?`,
+o:[`Normaliser avec la moyenne calculée sur tout le dataset avant le split`,`Appliquer SMOTE avant le split`,`Choisir le meilleur modèle d'après le score sur le test`,`Mettre le StandardScaler dans un Pipeline passé à GridSearchCV`],a:[0,1,2],
+e:`La dernière option est justement la bonne pratique : le scaler est réappris sur chaque fold d'entraînement.`},
+
+{c:6,t:`qcu`,q:`Dans un <code>Pipeline([("sc", StandardScaler()), ("clf", LogisticRegression())])</code>, comment écrit-on la grille pour C ?`,
+o:[`{"clf__C": [0.1, 1, 10]}`,`{"C": [0.1, 1, 10]}`,`{"clf.C": [0.1, 1, 10]}`,`{"sc__C": [0.1, 1, 10]}`],a:0,
+e:`Nom de l'étape + deux underscores + nom du paramètre. Après le fit : <code>gs.best_params_</code>, <code>gs.best_score_</code>, <code>gs.best_estimator_</code>.`},
+
+{c:6,t:`qcu`,q:`Après GridSearchCV(…, refit=True).fit(X_train, y_train), que contient best_estimator_ ?`,
+o:[`Le pipeline avec les meilleurs hyper-paramètres, réentraîné sur tout X_train`,`Le modèle du dernier fold`,`Un modèle entraîné sur le test`,`La moyenne des modèles des folds`],a:0,
+e:`On l'évalue ensuite une fois sur X_test. <code>gs.score(X_test, y_test)</code> utilise la même métrique que <code>scoring</code>.`},
+
+{c:6,t:`match`,q:`Quelle métrique de classification choisir ?`,
+o:[[`Classes équilibrées, erreurs de même coût`,`Accuracy`],[`Rater un positif est très grave (maladie, fraude)`,`Recall`],[`Une fausse alerte est très coûteuse (spam, alerte police)`,`Precision`],[`Classes déséquilibrées, compromis global`,`F1 (macro en multi-classe) ou balanced accuracy`]],
+e:`Toujours justifier la métrique par le coût des erreurs dans le contexte. C'est ce qu'attend l'examen.`},
+
+{c:6,t:`vf`,q:`Le F1 « macro » donne le même poids à chaque classe, quelle que soit sa taille.`,a:0,
+e:`Vrai : on calcule le F1 de chaque classe puis on fait la moyenne simple. Le F1 « weighted » pondère par l'effectif et peut masquer une classe rare mal prédite.`},
+
+{c:6,t:`match`,q:`Associe chaque situation à la méthode la plus adaptée du cours.`,
+o:[[`Données à 300 features, 1 million de points, recherche de voisins rapide`,`PCA puis KNN, ou recherche approximative (Annoy)`],[`10 % de valeurs manquantes sur des features corrélées`,`KNNImputer`],[`Classe rare à 2 %, on ne veut pas dupliquer les points`,`SMOTE (ou class_weight)`],[`Relation y = f(x) courbe sur une seule feature`,`Régression polynomiale (+ Ridge)`]],
+e:`Toutes ces réponses se justifient par une phrase du cours. À l'examen, nomme la méthode ET la raison.`},
+
+{c:6,t:`qcu`,q:`Biais / variance : quelle phrase est juste ?`,
+o:[`Un modèle trop simple a un biais élevé ; un modèle trop complexe a une variance élevée`,`Un modèle complexe a toujours un biais élevé`,`La variance ne dépend pas du modèle`,`Régulariser augmente la variance`],a:0,
+e:`Régulariser, augmenter K (KNN), limiter max_depth : moins de variance, plus de biais. Bagging : moins de variance. Boosting : moins de biais.`}
+];
+(function(){
+const TYPE_LABEL={qcu:`Choix unique`,qcm:`Choix multiples`,vf:`Vrai / Faux`,num:`Calcul`,order:`Remise en ordre`,match:`Association`,code:`Lecture de code`};
+const CM_LABEL={1:`CM1`,2:`CM2`,3:`CM3`,4:`CM4`,5:`CM5`,6:`Méthode`};
+const CM_TITLE={1:`Régression linéaire`,2:`Régression logistique, métriques, déséquilibre`,3:`Arbres et ensembles`,4:`KNN`,5:`Le texte avant les transformers`,6:`Méthode, pipeline, choix de modèle`};
+QUESTIONS.forEach((q,i)=>{q.id=i+1;});
+const BY_ID={};QUESTIONS.forEach(q=>BY_ID[q.id]=q);
+const KEY=`ml-grand-qcm-v1`;
+const S={answers:{},cm:`all`,type:`all`,view:`all`,order:null,exam:null};
+const optOrder={};
+const $=id=>document.getElementById(id);
+
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||`null`);if(d){S.answers=d.answers||{};S.exam=d.exam||null;}}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({answers:S.answers,exam:S.exam}));}catch(e){}}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function range(n){return Array.from({length:n},(_,i)=>i);}
+function fmt(x){return String(x).replace(`.`,`,`);}
+function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+
+function orderFor(q){
+  if(optOrder[q.id])return optOrder[q.id];
+  let o;
+  if(q.t===`vf`)o=[0,1];
+  else if(q.t===`order`){o=shuffle(range(q.o.length));let guard=0;while(o.every((v,i)=>v===i)&&guard++<10)o=shuffle(o);}
+  else if(q.t===`match`)o=shuffle(range(q.o.length));
+  else if(q.o)o=shuffle(range(q.o.length));
+  else o=[];
+  optOrder[q.id]=o;return o;
+}
+
+/* ---------- filtres ---------- */
+function baseIds(){
+  if(S.exam)return S.exam.ids.slice();
+  return S.order?S.order.slice():QUESTIONS.map(q=>q.id);
+}
+function visibleIds(){
+  return baseIds().filter(id=>{
+    const q=BY_ID[id],a=S.answers[id];
+    if(!S.exam&&S.cm!==`all`&&String(q.c)!==S.cm)return false;
+    if(!S.exam&&S.type!==`all`&&q.t!==S.type)return false;
+    if(S.view===`todo`&&a)return false;
+    if(S.view===`wrong`&&!(a&&!a.ok))return false;
+    return true;
+  });
+}
+
+function buildFilters(){
+  const cmBox=$(`cmChips`);cmBox.innerHTML=``;
+  const counts={};QUESTIONS.forEach(q=>counts[q.c]=(counts[q.c]||0)+1);
+  const mk=(val,label,n,title)=>{const b=el(`button`,`chip`);b.type=`button`;b.innerHTML=label+(n!=null?`<span class="n">${n}</span>`:``);if(title)b.title=title;b.setAttribute(`aria-pressed`,String(S.cm===val));b.onclick=()=>{S.cm=val;buildFilters();render();};return b;};
+  cmBox.appendChild(mk(`all`,`Tous`,QUESTIONS.length));
+  Object.keys(CM_LABEL).forEach(k=>cmBox.appendChild(mk(k,CM_LABEL[k],counts[k]||0,CM_TITLE[k])));
+  const sel=$(`typeSel`);
+  if(!sel.options.length){
+    sel.appendChild(new Option(`Tous les types`,`all`));
+    Object.keys(TYPE_LABEL).forEach(t=>sel.appendChild(new Option(TYPE_LABEL[t],t)));
+    sel.onchange=()=>{S.type=sel.value;render();};
+  }
+  sel.value=S.type;
+  const vb=$(`viewChips`);vb.innerHTML=``;
+  [[`all`,`Toutes`],[`todo`,`À faire`],[`wrong`,`Mes erreurs`]].forEach(([v,l])=>{
+    const b=el(`button`,`chip`,l);b.type=`button`;b.setAttribute(`aria-pressed`,String(S.view===v));
+    b.onclick=()=>{S.view=v;buildFilters();render();};vb.appendChild(b);
+  });
+  const locked=!!S.exam;
+  cmBox.querySelectorAll(`button`).forEach(b=>b.disabled=locked);sel.disabled=locked;
+  $(`orderBtn`).textContent=S.order?`Ordre du cours`:`Ordre aléatoire`;
+  $(`orderBtn`).disabled=locked;
+}
+
+/* ---------- rendu d'une question ---------- */
+function renderCard(q){
+  const card=el(`article`,`q`);card.id=`q-`+q.id;card.dataset.id=q.id;
+  const head=el(`div`,`qhead`);
+  head.appendChild(el(`span`,`qnum`,`Q${q.id}`));
+  const cm=el(`span`,`tag cm`,CM_LABEL[q.c]);cm.title=CM_TITLE[q.c];head.appendChild(cm);
+  head.appendChild(el(`span`,`tag`,TYPE_LABEL[q.t]));
+  card.appendChild(head);
+  card.appendChild(el(`p`,`prompt`,q.q));
+  if(q.k){const pre=el(`pre`,`code`);pre.textContent=q.k;card.appendChild(pre);}
+  const body=el(`div`,`body`);
+  const ord=orderFor(q);
+  if(q.t===`qcm`)card.insertBefore(el(`p`,`hint`,`Plusieurs réponses possibles : coche toutes les bonnes.`),null);
+  if([`qcu`,`code`,`vf`,`qcm`].includes(q.t)){
+    const opts=q.t===`vf`?[`Vrai`,`Faux`]:q.o;
+    const ul=el(`ul`,`opts`);
+    ord.forEach(i=>{
+      const li=el(`li`);li.dataset.k=i;
+      const lab=el(`label`);
+      const inp=document.createElement(`input`);
+      inp.type=q.t===`qcm`?`checkbox`:`radio`;inp.name=`q${q.id}`;inp.value=i;inp.id=`q${q.id}-o${i}`;
+      lab.appendChild(inp);lab.appendChild(el(`span`,``,opts[i]));li.appendChild(lab);ul.appendChild(li);
+    });
+    body.appendChild(ul);
+  }else if(q.t===`num`){
+    const row=el(`div`,`num-row`);
+    const inp=document.createElement(`input`);inp.type=`text`;inp.inputMode=`decimal`;inp.id=`q${q.id}-num`;inp.placeholder=`Ta réponse`;inp.setAttribute(`aria-label`,`Réponse numérique`);
+    inp.addEventListener(`keydown`,e=>{if(e.key===`Enter`)check(q,card);});
+    row.appendChild(inp);row.appendChild(el(`span`,`hint`,`Virgule ou point acceptés.`));body.appendChild(row);
+  }else if(q.t===`order`){
+    const ol=el(`ol`,`order`);
+    ord.forEach(i=>ol.appendChild(orderItem(q,i)));
+    body.appendChild(ol);refreshMoves(ol);
+  }else if(q.t===`match`){
+    const box=el(`div`,`match`);
+    q.o.forEach((pair,i)=>{
+      const row=el(`div`,`mrow`);row.dataset.k=i;
+      row.appendChild(el(`div`,``,pair[0]));
+      const s=document.createElement(`select`);s.id=`q${q.id}-m${i}`;s.setAttribute(`aria-label`,`Associer : `+pair[0].replace(/<[^>]+>/g,``));
+      s.appendChild(new Option(`Choisir…`,``));
+      ord.forEach(j=>{const op=new Option(q.o[j][1].replace(/<[^>]+>/g,``),j);s.appendChild(op);});
+      row.appendChild(s);box.appendChild(row);
+    });
+    body.appendChild(box);
+  }
+  card.appendChild(body);
+  const foot=el(`div`,`qfoot`);
+  const btn=el(`button`,`btn primary`,`Valider`);btn.type=`button`;btn.onclick=()=>check(q,card);
+  foot.appendChild(btn);foot.appendChild(el(`span`,`msg`));card.appendChild(foot);
+  const a=S.answers[q.id];
+  if(a){restore(q,card,a.g);applyResult(q,card,a.g,a.ok);}
+  return card;
+}
+function orderItem(q,i){
+  const li=el(`li`);li.dataset.k=i;
+  li.appendChild(el(`span`,``,q.o[i]));
+  const up=el(`button`,`mv`,`↑`);up.type=`button`;up.setAttribute(`aria-label`,`Monter`);
+  const dn=el(`button`,`mv`,`↓`);dn.type=`button`;dn.setAttribute(`aria-label`,`Descendre`);
+  up.onclick=()=>{const p=li.previousElementSibling;if(p){li.parentNode.insertBefore(li,p);refreshMoves(li.parentNode);up.focus();}};
+  dn.onclick=()=>{const n=li.nextElementSibling;if(n){li.parentNode.insertBefore(n,li);refreshMoves(li.parentNode);dn.focus();}};
+  li.appendChild(up);li.appendChild(dn);return li;
+}
+function refreshMoves(ol){const items=[...ol.children];items.forEach((li,i)=>{const [up,dn]=li.querySelectorAll(`.mv`);if(up&&!li.dataset.locked){up.disabled=i===0;dn.disabled=i===items.length-1;}});}
+
+/* ---------- lecture, correction ---------- */
+function given(q,card){
+  if([`qcu`,`code`,`vf`].includes(q.t)){const c=card.querySelector(`input:checked`);return c?Number(c.value):null;}
+  if(q.t===`qcm`){const c=[...card.querySelectorAll(`input:checked`)].map(x=>Number(x.value));return c.length?c.sort((a,b)=>a-b):null;}
+  if(q.t===`num`){const v=card.querySelector(`input`).value.trim();return v===``?null:v;}
+  if(q.t===`order`)return [...card.querySelectorAll(`ol.order li`)].map(li=>Number(li.dataset.k));
+  if(q.t===`match`){const v=[...card.querySelectorAll(`select`)].map(s=>s.value);return v.some(x=>x===``)?null:v.map(Number);}
+  return null;
+}
+function parseNum(s){const v=Number(String(s).replace(/\s/g,``).replace(`,`,`.`));return isNaN(v)?null:v;}
+function isRight(q,g){
+  if([`qcu`,`code`,`vf`].includes(q.t))return g===q.a;
+  if(q.t===`qcm`){const a=q.a.slice().sort((x,y)=>x-y);return g.length===a.length&&g.every((v,i)=>v===a[i]);}
+  if(q.t===`num`){const v=parseNum(g);if(v===null)return false;const tol=q.tol!=null?q.tol:Math.max(1e-3,Math.abs(q.a)*1e-3);return Math.abs(v-q.a)<=tol+1e-9;}
+  if(q.t===`order`)return g.every((v,i)=>v===i);
+  if(q.t===`match`)return g.every((v,i)=>v===i);
+  return false;
+}
+function check(q,card){
+  if(S.answers[q.id])return;
+  const g=given(q,card);const msg=card.querySelector(`.msg`);
+  if(g===null){msg.textContent=q.t===`match`?`Associe chaque ligne avant de valider.`:q.t===`num`?`Entre une valeur.`:`Choisis une réponse.`;return;}
+  if(q.t===`num`&&parseNum(g)===null){msg.textContent=`Entre un nombre (ex. 0,54).`;return;}
+  msg.textContent=``;
+  const ok=isRight(q,g);
+  S.answers[q.id]={g,ok};save();
+  applyResult(q,card,g,ok);updateStats();checkExamEnd();
+}
+function restore(q,card,g){
+  if([`qcu`,`code`,`vf`].includes(q.t)){const i=card.querySelector(`input[value="${g}"]`);if(i)i.checked=true;}
+  else if(q.t===`qcm`){g.forEach(v=>{const i=card.querySelector(`input[value="${v}"]`);if(i)i.checked=true;});}
+  else if(q.t===`num`)card.querySelector(`input`).value=g;
+  else if(q.t===`order`){const ol=card.querySelector(`ol.order`);ol.innerHTML=``;g.forEach(i=>ol.appendChild(orderItem(q,i)));}
+  else if(q.t===`match`){card.querySelectorAll(`select`).forEach((s,i)=>s.value=String(g[i]));}
+}
+function applyResult(q,card,g,ok){
+  card.classList.remove(`ok`,`ko`);card.classList.add(ok?`ok`:`ko`);
+  card.querySelectorAll(`input,select,.mv`).forEach(x=>x.disabled=true);
+  const vbtn=card.querySelector(`.qfoot .btn`);if(vbtn)vbtn.hidden=true;
+  let expected=``;
+  if([`qcu`,`code`,`vf`,`qcm`].includes(q.t)){
+    const good=q.t===`qcm`?q.a:[q.a];
+    card.querySelectorAll(`.opts li`).forEach(li=>{const k=Number(li.dataset.k);const chosen=li.querySelector(`input`).checked;
+      if(good.includes(k))li.classList.add(`is-correct`);else if(chosen)li.classList.add(`is-wrong`);});
+  }else if(q.t===`num`){
+    const inp=card.querySelector(`input`);inp.classList.add(ok?`ok`:`ko`);
+    if(!ok)expected=`<p class="expected">Réponse attendue : ${fmt(q.a)}</p>`;
+  }else if(q.t===`order`){
+    card.querySelectorAll(`ol.order li`).forEach((li,i)=>{li.dataset.locked=`1`;li.classList.add(Number(li.dataset.k)===i?`is-correct`:`is-wrong`);});
+    if(!ok)expected=`<p class="expected" style="font-family:var(--body)"><b>Bon ordre :</b></p><ol style="margin:4px 0 0;padding-left:20px">`+q.o.map(x=>`<li>${x}</li>`).join(``)+`</ol>`;
+  }else if(q.t===`match`){
+    card.querySelectorAll(`.mrow`).forEach((row,i)=>{const r=g[i]===i;row.classList.add(r?`is-correct`:`is-wrong`);
+      if(!r&&!row.querySelector(`.fix`))row.appendChild(el(`div`,`fix`,`Bonne réponse : `+q.o[i][1]));});
+  }
+  let fb=card.querySelector(`.fb`);if(fb)fb.remove();
+  fb=el(`div`,`fb`);
+  fb.innerHTML=`<div class="verdict ${ok?`ok`:`ko`}">${ok?`Juste.`:`Faux.`}</div>`+expected+`<p class="expl">${q.e}</p>`;
+  const again=el(`button`,`btn`,`Réessayer cette question`);again.type=`button`;again.style.marginTop=`10px`;
+  again.onclick=()=>{delete S.answers[q.id];save();delete optOrder[q.id];const fresh=renderCard(q);card.replaceWith(fresh);updateStats();};
+  fb.appendChild(again);card.appendChild(fb);
+}
+
+/* ---------- stats, carte ---------- */
+function updateStats(){
+  const ids=S.exam?S.exam.ids:visibleIdsNoView();
+  let ans=0,ok=0;ids.forEach(id=>{const a=S.answers[id];if(a){ans++;if(a.ok)ok++;}});
+  $(`sAns`).textContent=`${ans}/${ids.length}`;
+  $(`sOk`).textContent=ok;
+  $(`sPct`).textContent=ans?Math.round(100*ok/ans)+` %`:`–`;
+  const G=ok-(ans-ok);$(`sG`).textContent=(G>0?`+`:``)+G;
+  $(`sMeter`).style.width=(ids.length?100*ok/ids.length:0)+`%`;
+  const cells=$(`cells`);cells.innerHTML=``;
+  ids.forEach(id=>{const a=S.answers[id];const b=el(`button`,`cell`+(a?(a.ok?` ok`:` ko`):``),String(id));b.type=`button`;b.title=`Q${id}`+(a?(a.ok?` · juste`:` · fausse`):``);
+    b.onclick=()=>{let c=$(`q-`+id);if(!c){S.view=`all`;buildFilters();render();c=$(`q-`+id);}if(c)c.scrollIntoView({behavior:`smooth`,block:`start`});};cells.appendChild(b);});
+  renderExamBox();
+}
+function visibleIdsNoView(){const v=S.view;S.view=`all`;const r=visibleIds();S.view=v;return r;}
+
+/* ---------- examen blanc ---------- */
+function startExam(){
+  const pool=(S.cm===`all`?QUESTIONS:QUESTIONS.filter(q=>String(q.c)===S.cm)).map(q=>q.id);
+  const ids=shuffle(pool).slice(0,Math.min(30,pool.length));
+  ids.forEach(id=>{delete S.answers[id];delete optOrder[id];});
+  S.exam={ids,finished:false};S.view=`all`;save();buildFilters();render();window.scrollTo({top:0});
+}
+function checkExamEnd(){if(S.exam&&!S.exam.finished&&S.exam.ids.every(id=>S.answers[id])){S.exam.finished=true;save();renderExamBox();}}
+function renderExamBox(){
+  const box=$(`examBox`);box.innerHTML=``;if(!S.exam)return;
+  const ids=S.exam.ids;const ans=ids.filter(id=>S.answers[id]).length;const ok=ids.filter(id=>S.answers[id]&&S.answers[id].ok).length;
+  const d=el(`div`,`exam`);
+  if(S.exam.finished){
+    const note=Math.round(20*ok/ids.length*10)/10;
+    d.innerHTML=`<div><p><b>Examen blanc terminé</b> · ${ok} bonnes réponses sur ${ids.length}</p><p class="note">${fmt(note)} / 20</p></div>`;
+  }else{
+    d.innerHTML=`<p><b>Examen blanc en cours</b> · ${ans}/${ids.length} questions répondues. Les filtres sont désactivés pendant l'examen.</p>`;
+    const fin=el(`button`,`btn`,`Terminer maintenant`);fin.type=`button`;fin.onclick=()=>{S.exam.finished=true;save();renderExamBox();};d.appendChild(fin);
+  }
+  const q=el(`button`,`btn`,`Quitter l'examen`);q.type=`button`;q.onclick=()=>{S.exam=null;save();buildFilters();render();};d.appendChild(q);
+  box.appendChild(d);
+}
+
+/* ---------- liste ---------- */
+function render(){
+  const list=$(`list`);list.innerHTML=``;
+  const ids=visibleIds();
+  if(!ids.length){list.appendChild(el(`div`,`empty`,S.view===`wrong`?`Aucune erreur pour l'instant dans cette sélection.`:S.view===`todo`?`Tout est fait dans cette sélection.`:`Aucune question ne correspond à ces filtres.`));}
+  ids.forEach(id=>list.appendChild(renderCard(BY_ID[id])));
+  updateStats();
+}
+
+/* ---------- boutons ---------- */
+$(`examBtn`).onclick=startExam;
+$(`orderBtn`).onclick=()=>{S.order=S.order?null:shuffle(QUESTIONS.map(q=>q.id));buildFilters();render();};
+let resetArmed=null;
+$(`resetBtn`).onclick=()=>{
+  const b=$(`resetBtn`);
+  if(!resetArmed){b.textContent=`Confirmer l'effacement`;resetArmed=setTimeout(()=>{b.textContent=`Effacer mes réponses`;resetArmed=null;},4000);return;}
+  clearTimeout(resetArmed);resetArmed=null;b.textContent=`Effacer mes réponses`;
+  S.answers={};S.exam=null;for(const k in optOrder)delete optOrder[k];save();buildFilters();render();
+};
+
+load();
+$(`lede`).innerHTML=`${QUESTIONS.length} questions sur les 5 CM, les labs et la méthode (choix de modèle, pipeline, métriques), de 7 types différents. Chaque réponse est corrigée tout de suite, avec une explication. Tes réponses restent enregistrées dans ce navigateur.`;
+buildFilters();render();
+})();
+</script>
+
+<script>/* sync thème avec le site Révisions */(function(){function a(t){if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme")}var m=location.search.match(/[?&]theme=(light|dark)/);if(m)a(m[1]);addEventListener("message",function(e){if(e.data&&e.data.revisionTheme)a(e.data.revisionTheme)})})();</script>
+</body></html>
