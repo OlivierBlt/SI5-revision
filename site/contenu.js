@@ -34,9 +34,34 @@ window.REVISION = {
       nom: "Apprentissage machine",
       couleur: "#C2410C",
       motif: "dots",
-      description: "Les fondamentaux de l'apprentissage automatique, des modèles classiques à l'évaluation.",
-      chapitres: [],
-      ressources: []
+      description: "Régression linéaire et logistique, métriques et classes déséquilibrées, arbres et ensembles, KNN, texte avant les transformers.",
+      chapitres: ["CM1", "CM2", "CM3", "CM4", "CM5", "Labs"],
+      ressources: [
+        {
+          id: "fiche-synthese",
+          titre: "Fiche de synthèse",
+          type: "fiche",
+          fichier: "matieres/app-machine/fiche-synthese.html",
+          description: "Toutes les notions des 5 CM : formules à savoir utiliser, pièges, coquilles des CM corrigées, tableau pour choisir et justifier un modèle.",
+          tags: ["CM1–CM5", "Formules", "Choix de modèle"]
+        },
+        {
+          id: "qcm-ml",
+          titre: "Grand QCM d'apprentissage machine",
+          type: "qcm",
+          fichier: "matieres/app-machine/qcm-ml.html",
+          description: "172 questions sur les 5 CM, les labs et la méthode, corrigées immédiatement avec explication. Calculs, associations, code sklearn. Mode examen blanc de 30 questions.",
+          tags: ["CM1–CM5", "Labs", "Mode examen"]
+        },
+        {
+          id: "examen-blanc",
+          titre: "Examen blanc",
+          type: "examen",
+          fichier: "matieres/app-machine/examen-blanc.html",
+          description: "11 problèmes type examen (Anscombe, prix immobilier, cancer rare, fraude, boosting, KNN, KD-tree, texte, choix de modèle), questions de cours, code sklearn et calculs, corrigé à déplier.",
+          tags: ["CM1–CM5", "Problèmes", "Corrigé"]
+        }
+      ]
     },
     {
       id: "app-renforcement",
